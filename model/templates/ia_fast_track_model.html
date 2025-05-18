@@ -1,0 +1,1848 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IA FAST TRACK MODEL</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000417;
+            color: #FFFFFF;
+            background-image: url('https://ia-fast-track.edgeexpertise.es/static/img/ai-head.png');
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+
+            body::before {
+                content: "";
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 4, 23, 0.85);
+                z-index: -1;
+            }
+
+        .main-container {
+            position: relative;
+            z-index: 1;
+        }
+
+        .nav-menu {
+            border-bottom: 2px solid #4839CD;
+            padding-bottom: 0.5rem;
+        }
+
+        .nav-button {
+            background-color: transparent;
+            color: #9EA3A2;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem 0.5rem 0 0;
+            font-weight: 600;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            border: 2px solid transparent;
+            border-bottom: none;
+            margin-bottom: -2px;
+        }
+
+            .nav-button:hover {
+                color: #FFFFFF;
+                background-color: rgba(72, 57, 205, 0.2);
+            }
+
+            .nav-button.active {
+                background-color: #000417;
+                color: #F0CE09;
+                border-color: #4839CD;
+                border-bottom-color: #000417;
+            }
+
+        .card {
+            background-color: rgba(10, 10, 30, 0.7);
+            border: 1px solid #4839CD;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .highlight-yellow {
+            color: #F0CE09;
+        }
+
+        .highlight-teal {
+            color: #FFFFFF;
+        }
+
+        .highlight-purple {
+            color: #4839CD;
+        }
+
+        .highlight-accent {
+            color: #4C8EFA;
+        }
+
+        .highlight-gray {
+            color: #9EA3A2;
+        }
+
+
+        .btn-primary {
+            background-color: #4C8EFA;
+            color: white;
+            font-weight: bold;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            transition: background-color 0.3s ease;
+        }
+
+            .btn-primary:hover {
+                background-color: #3C72D8;
+            }
+
+        .btn-secondary {
+            background-color: #4839CD;
+            color: white;
+            font-weight: bold;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            transition: background-color 0.3s ease;
+        }
+
+            .btn-secondary:hover {
+                background-color: #3A2D9E;
+            }
+
+        .main-filter-button {
+            background-color: rgba(76, 142, 250, 0.3);
+            color: white;
+            padding: 0.6rem 1.2rem;
+            font-size: 0.95rem;
+            border-radius: 0.5rem;
+            margin: 0.25rem;
+            transition: all 0.3s ease;
+            border: 1px solid #4C8EFA;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+            .main-filter-button:hover {
+                background-color: rgba(76, 142, 250, 0.5);
+                border-color: #6CA0FC;
+                transform: translateY(-2px);
+            }
+
+            .main-filter-button.active {
+                background-color: #4C8EFA;
+                color: white;
+                border-color: #6CA0FC;
+                font-weight: 600;
+                box-shadow: 0 0 10px rgba(76, 142, 250, 0.4);
+            }
+
+            .main-filter-button svg {
+                width: 1.25em;
+                height: 1.25em;
+            }
+
+
+        .objetivo-filter-card-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .objetivo-filter-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(76, 142, 250, 0.1);
+            color: #E0E0E0;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            border: 1px solid #4C8EFA;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-height: 120px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+            .objetivo-filter-card:hover {
+                background-color: rgba(76, 142, 250, 0.25);
+                border-color: #6CA0FC;
+                transform: translateY(-3px);
+                box-shadow: 0 4px 8px rgba(76, 142, 250, 0.3);
+            }
+
+            .objetivo-filter-card.active {
+                background-color: #4C8EFA;
+                color: white;
+                border-color: #8EBBFA;
+                font-weight: 600;
+                box-shadow: 0 0 12px rgba(76, 142, 250, 0.5);
+            }
+
+            .objetivo-filter-card svg {
+                width: 2em;
+                height: 2em;
+                margin-bottom: 0.5rem;
+                fill: currentColor;
+            }
+
+            .objetivo-filter-card span {
+                font-size: 0.9rem;
+                line-height: 1.3;
+            }
+
+
+        .filter-steps-container .filter-section-wrapper {
+            background-color: rgba(17, 24, 39, 0.3);
+            border: 1px solid rgba(72, 57, 205, 0.5);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-steps-container h4 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            text-align: center;
+            color: #4839CD;
+        }
+
+        .subcategory-filter-card-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .subcategory-filter-card {
+            display: flex;
+            align-items: center;
+            background-color: rgba(76, 142, 250, 0.15);
+            color: white;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #4C8EFA;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            min-height: 50px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            text-align: left;
+            box-sizing: border-box;
+        }
+
+            .subcategory-filter-card:hover {
+                background-color: rgba(76, 142, 250, 0.3);
+                border-color: #6CA0FC;
+                transform: translateY(-2px);
+            }
+
+            .subcategory-filter-card.active {
+                background-color: #4C8EFA;
+                color: white;
+                border-color: #6CA0FC;
+                font-weight: 600;
+                box-shadow: 0 0 10px rgba(76, 142, 250, 0.4);
+            }
+
+            .subcategory-filter-card svg {
+                width: 1.35em;
+                height: 1.35em;
+                margin-right: 0.75rem;
+                fill: currentColor;
+                flex-shrink: 0;
+            }
+
+            .subcategory-filter-card span {
+                flex-grow: 1;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+
+        .solution-card {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid #4839CD;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+            .solution-card:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+            }
+
+            .solution-card.suggested-highlight {
+                border-left: 5px solid #F0CE09;
+                background-color: rgba(240, 206, 9, 0.1);
+            }
+
+            .solution-card.solution-card-selected {
+                background-color: rgba(76, 142, 250, 0.15);
+                border-color: #4C8EFA;
+                box-shadow: 0 0 15px rgba(76, 142, 250, 0.5);
+            }
+
+            .solution-card h5 { /* Color se aplica en JS */
+            }
+
+        .category-header {
+            color: #FFFFFF;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #4839CD;
+            grid-column: 1 / -1;
+        }
+
+        .subcategory-header {
+            color: #9EA3A2;
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-top: 1rem;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.25rem;
+            border-bottom: 1px dashed #4839CD;
+            grid-column: 1 / -1;
+        }
+
+        .catalog-scroll::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .catalog-scroll::-webkit-scrollbar-track {
+            background: rgba(72, 57, 205, 0.2);
+            border-radius: 10px;
+        }
+
+        .catalog-scroll::-webkit-scrollbar-thumb {
+            background: #4C8EFA;
+            border-radius: 10px;
+        }
+
+            .catalog-scroll::-webkit-scrollbar-thumb:hover {
+                background: #3C72D8;
+            }
+
+        input[type="text"], input[type="number"], input[type="password"], textarea {
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid #4839CD;
+            color: white;
+            padding: 0.5rem;
+            border-radius: 0.375rem;
+            width: 100%;
+        }
+
+        select {
+            background-color: rgba(30, 41, 59, 0.7);
+            border: 1px solid #4839CD;
+            color: white;
+            padding: 0.5rem;
+            border-radius: 0.375rem;
+            width: 100%;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%239EA3A2'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd' /%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.5rem center;
+            background-size: 1.5em 1.5em;
+        }
+
+            select:disabled {
+                background-color: rgba(30, 41, 59, 0.4);
+                color: #6b7280;
+                cursor: not-allowed;
+            }
+
+            select option {
+                background-color: #000417;
+                color: white;
+            }
+
+            input[type="text"]:focus, input[type="number"]:focus, input[type="password"]:focus, textarea:focus, select:focus {
+                outline: none;
+                border-color: #4C8EFA;
+                box-shadow: 0 0 0 2px rgba(76, 142, 250, 0.4);
+            }
+
+        label {
+            display: block;
+            margin-bottom: 0.25rem;
+            font-weight: 500;
+        }
+
+        .chart-container {
+            position: relative;
+            margin: auto;
+            height: 250px;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .custom-file-input-container {
+            margin-top: 0.5rem;
+        }
+
+        .custom-file-input {
+            color: transparent;
+        }
+
+            .custom-file-input::-webkit-file-upload-button {
+                visibility: hidden;
+            }
+
+            .custom-file-input::before {
+                content: 'Seleccionar archivos';
+                display: inline-block;
+                background: #4839CD;
+                color: white;
+                border: none;
+                border-radius: 0.375rem;
+                padding: 0.5rem 1rem;
+                outline: none;
+                white-space: nowrap;
+                -webkit-user-select: none;
+                cursor: pointer;
+                font-weight: 500;
+                transition: background-color 0.3s ease;
+            }
+
+            .custom-file-input:hover::before {
+                background-color: #3A2D9E;
+            }
+
+            .custom-file-input:active::before {
+                background-color: #2C227A;
+            }
+
+        #fileListDisplay {
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+            color: #9EA3A2;
+        }
+
+            #fileListDisplay li {
+                padding: 0.25rem 0;
+            }
+
+        #sectionResumen .card h4 {
+            color: #4C8EFA;
+            font-weight: 600;
+        }
+
+        .summary-pill-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .summary-pill {
+            background-color: rgba(76, 142, 250, 0.2);
+            color: #E0E0E0;
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            border: 1px solid #4C8EFA;
+            display: inline-flex;
+            align-items: center;
+        }
+
+            .summary-pill svg {
+                width: 1.1em;
+                height: 1.1em;
+                margin-right: 0.5em;
+                fill: #4C8EFA;
+            }
+
+        .kpi-summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .kpi-summary-card {
+            background-color: rgba(76, 142, 250, 0.1);
+            border: 1px solid #4C8EFA;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+        }
+
+            .kpi-summary-card .kpi-name {
+                font-weight: 600;
+                color: #FFFFFF;
+                margin-bottom: 0.5rem;
+                font-size: 1rem;
+                display: flex;
+                align-items: center;
+            }
+
+                .kpi-summary-card .kpi-name svg {
+                    width: 1.2em;
+                    height: 1.2em;
+                    margin-right: 0.5em;
+                    fill: #4C8EFA;
+                }
+
+            .kpi-summary-card .kpi-value-section {
+                background-color: rgba(0, 4, 23, 0.3);
+                padding: 0.75rem;
+                border-radius: 0.375rem;
+                margin-top: auto;
+            }
+
+            .kpi-summary-card .kpi-value-label {
+                font-size: 0.8rem;
+                color: #9EA3A2;
+                margin-bottom: 0.125rem;
+            }
+
+            .kpi-summary-card .kpi-value {
+                font-size: 1.1rem;
+                font-weight: 500;
+                color: #E0E0E0;
+            }
+
+            .kpi-summary-card .kpi-metric {
+                font-size: 0.8rem;
+                color: #4C8EFA;
+                margin-left: 0.25rem;
+            }
+
+        .roadmap-container {
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        .roadmap-line {
+            position: absolute;
+            left: calc(1rem - 1px);
+            top: 1rem;
+            bottom: 1rem;
+            width: 2px;
+            background-color: #4C8EFA;
+            opacity: 0.5;
+        }
+
+        .roadmap-step {
+            position: relative;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background-color: rgba(76, 142, 250, 0.08);
+            border-radius: 0.5rem;
+            border: 1px solid rgba(76, 142, 250, 0.3);
+        }
+
+            .roadmap-step:last-child {
+                margin-bottom: 0;
+            }
+
+        .roadmap-step-icon-wrapper {
+            position: absolute;
+            left: -2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: #000417;
+            padding: 0.25rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .roadmap-step-icon {
+            width: 2rem;
+            height: 2rem;
+            background-color: #4C8EFA;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+            border: 2px solid #000417;
+        }
+
+            .roadmap-step-icon svg {
+                width: 1.2em;
+                height: 1.2em;
+            }
+
+        .roadmap-step-content {
+            margin-left: 1rem;
+        }
+
+        .roadmap-step-title {
+            font-weight: 600;
+            color: #FFFFFF;
+            margin-bottom: 0.25rem;
+        }
+
+        .roadmap-step-description {
+            font-size: 0.9rem;
+            color: #bdc1c6;
+        }
+
+        #sectionLogin .card {
+            max-width: 450px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        #sectionLogin label {
+            color: #E0E0E0;
+        }
+
+        #loginErrorMessage {
+            color: #F87171;
+            background-color: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 0.75rem;
+            border-radius: 0.375rem;
+            margin-top: 1rem;
+            text-align: center;
+        }
+
+        .client-selection-card {
+            background-color: rgba(76, 142, 250, 0.1);
+            border: 1px solid #4C8EFA;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+            .client-selection-card:hover {
+                background-color: rgba(76, 142, 250, 0.25);
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(76, 142, 250, 0.2);
+            }
+
+            .client-selection-card h5 {
+                color: #E0E0E0;
+                font-weight: 600;
+                font-size: 1.125rem;
+            }
+    </style>
+</head>
+<body>
+    <div class="main-container min-h-screen flex flex-col items-center p-4 md:p-8">
+        <header class="w-full max-w-6xl mb-8">
+            <div class="flex flex-col sm:flex-row justify-between items-center py-4">
+                <img src="https://ia-fast-track.edgeexpertise.es/static/img/logo-fast-track.png" alt="[Logo IA FAST TRACK]" class="h-12 sm:h-16 mb-4 sm:mb-0">
+                <div class="flex space-x-4 items-center">
+                    <img src="https://ia-fast-track.edgeexpertise.es/static/img/logo.png" alt="[Logo Synergia Tech Experts]" class="h-8 sm:h-10">
+                    <img src="https://ia-fast-track.edgeexpertise.es/static/img/logo-edge.png" alt="[Logo Edge Expertise]" class="h-8 sm:h-10">
+                </div>
+            </div>
+            <h1 class="text-3xl md:text-4xl font-bold text-center highlight-accent">IA FAST TRACK MODEL</h1>
+            <p id="appSubtitle" class="text-center text-lg highlight-gray mt-2">Guía para la identificación y descripción de pilotos de automatización (RPA & IA)</p>
+        </header>
+
+        <nav id="mainNav" class="w-full max-w-4xl mb-8 nav-menu flex-wrap justify-center gap-0 hidden">
+            <button id="navCliente" class="nav-button">1. Info Cliente</button>
+            <button id="navOportunidades" class="nav-button">2. Oportunidades</button>
+            <button id="navDefinicion" class="nav-button">3. Definición Piloto</button>
+            <button id="navResumen" class="nav-button">4. Resumen</button>
+        </nav>
+
+        <main class="w-full max-w-4xl">
+            <section id="sectionLogin" class="page-section">
+                <h2 class="text-2xl md:text-3xl font-semibold mb-6 text-center highlight-accent">Acceso a la Plataforma</h2>
+                <div class="card">
+                    <form id="loginForm">
+                        <div class="mb-4">
+                            <label for="username">Usuario:</label>
+                            <input type="text" id="username" name="username" required>
+                        </div>
+                        <div class="mb-6">
+                            <label for="password">Contraseña:</label>
+                            <input type="password" id="password" name="password" required>
+                        </div>
+                        <button type="submit" class="btn-primary w-full py-2.5 text-lg">Acceder</button>
+                    </form>
+                    <div id="loginErrorMessage" class="hidden mt-4"></div>
+                </div>
+            </section>
+
+            <section id="sectionClientSelection" class="page-section hidden">
+                <h2 class="text-2xl font-semibold mb-6 highlight-teal">Seleccione una Empresa Cliente</h2>
+                <div id="clientListContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                </div>
+            </section>
+
+
+            <section id="sectionCliente" class="page-section hidden">
+                <h2 class="text-2xl font-semibold mb-4 highlight-teal">Información del Cliente y Contexto <span id="clienteSectionCompanyName" class="highlight-accent"></span></h2>
+                <div class="card">
+                    <h3 class="text-xl font-semibold mb-2 highlight-yellow">Contexto de la Empresa</h3>
+                    <p id="clienteContexto" class="text-gray-300"></p>
+                </div>
+                <div class="card">
+                    <h3 class="text-xl font-semibold mb-2 highlight-yellow">Resumen Ejecutivo (Diagnóstico IA)</h3>
+                    <p id="clienteResumen" class="text-gray-300"></p>
+                </div>
+
+                <div class="card">
+                    <h3 class="text-xl font-semibold mb-3 highlight-yellow">Scoring Global</h3>
+                    <div class="chart-container mb-3" style="height:150px;">
+                        <canvas id="scoringGlobalChart"></canvas>
+                    </div>
+                    <p class="text-gray-300 text-center">Actual: <span id="scoringActualText" class="font-bold"></span> / Objetivo 12m: <span id="scoringObjetivoText" class="font-bold"></span></p>
+                </div>
+
+                <div class="grid md:grid-cols-1 lg:grid-cols-2 gap-4">
+                    <div class="card">
+                        <h3 class="text-xl font-semibold mb-2 highlight-yellow">Transformación Digital (Scoring Total: <span id="transformacionScoringText"></span>)</h3>
+                        <div class="chart-container">
+                            <canvas id="transformacionChart"></canvas>
+                        </div>
+                        <ul id="transformacionCategoriasList" class="list-disc list-inside text-gray-300 mt-3 text-sm"></ul>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="text-xl font-semibold mb-2 highlight-yellow">Madurez de Procesos (Scoring Total: <span id="procesosScoringText"></span>)</h3>
+                        <div class="chart-container">
+                            <canvas id="procesosChart"></canvas>
+                        </div>
+                        <ul id="procesosCategoriasList" class="list-disc list-inside text-gray-300 mt-3 text-sm"></ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 class="text-xl font-semibold mb-2 highlight-yellow">Propuestas de Colaboración (Diagnóstico IA)</h3>
+                    <ul id="colaboracionPropuesta" class="list-disc list-inside text-gray-300"></ul>
+                </div>
+                <div class="text-center mt-6">
+                    <button onclick="navigateTo('sectionOportunidades', document.getElementById('navOportunidades'))" class="btn-primary px-8 py-3 text-lg">Iniciar Análisis de Piloto &raquo;</button>
+                </div>
+            </section>
+
+            <section id="sectionOportunidades" class="page-section hidden">
+                <h2 class="text-2xl font-semibold mb-4 highlight-teal">Identificación de Oportunidades <span id="oportunidadesSectionCompanyName" class="highlight-accent"></span></h2>
+                <div class="card">
+                    <h3 class="text-xl font-semibold mb-2 highlight-accent">Catálogo de Soluciones IA FAST TRACK</h3>
+                    <p class="text-gray-300 mb-6">Explore las soluciones potenciales. Las soluciones <span class="highlight-yellow font-bold">Sugeridas</span> por el diagnóstico IA están resaltadas. La solución <span class="highlight-purple font-bold">seleccionada para el piloto</span> se marcará con un borde distintivo.</p>
+
+                    <div class="filter-steps-container">
+                        <div class="filter-section-wrapper">
+                            <h4>Paso 1: Seleccione un Objetivo de Negocio</h4>
+                            <div id="quickMainFiltersContainer" class="flex flex-wrap justify-center items-center gap-2 mt-3 mb-4">
+                            </div>
+                            <div id="objetivoCardsContainer" class="objetivo-filter-card-container">
+                            </div>
+                        </div>
+
+                        <div id="subcategoryFilterSection" class="filter-section-wrapper hidden">
+                            <h4>Paso 2: Seleccione un Caso de Uso (Opcional)</h4>
+                            <div id="subcategoryFilterCardContainer" class="subcategory-filter-card-container">
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div id="catalogContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[60vh] overflow-y-auto catalog-scroll pr-2 mt-6">
+                    </div>
+                </div>
+                <div class="card mt-6">
+                    <h3 class="text-xl font-semibold mb-2 highlight-accent">Selección del Proceso a Pilotar</h3>
+                    <div class="mb-4">
+                        <label for="selectedProcessName" class="block mb-1">Nombre del Proceso Seleccionado para Piloto:</label>
+                        <input type="text" id="selectedProcessName" placeholder="Ej: Automatización de Facturación de Carga o introduzca uno nuevo">
+                    </div>
+                    <div class="mb-4">
+                        <label for="selectedProcessDescription" class="block mb-1">Descripción del Proyecto Piloto:</label>
+                        <textarea id="selectedProcessDescription" rows="3" placeholder="Descripción del proyecto seleccionado o a definir."></textarea>
+                    </div>
+                    <div class="mb-4">
+                        <label for="selectedProcessTechnology" class="block mb-1">Tecnología Principal del Proyecto:</label>
+                        <input type="text" id="selectedProcessTechnology" placeholder="Ej: RPA, IA Generativa, etc.">
+                    </div>
+
+                    <label for="currentProcessDescription" class="block mb-2">Descripción Detallada del Proceso Actual del Cliente:</label>
+                    <textarea id="currentProcessDescription" rows="4" placeholder="Describa los pasos manuales, sistemas involucrados, volumen, frecuencia, personas dedicadas, etc." class="mb-2"></textarea>
+
+                    <div class="custom-file-input-container">
+                        <label for="currentProcessFiles" class="block mb-1 text-sm font-medium">Adjuntar Archivos (opcional):</label>
+                        <input type="file" id="currentProcessFiles" multiple class="custom-file-input">
+                        <div id="fileListDisplay">
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-6">
+                        <button onclick="navigateToSectionWithPrefill('sectionDefinicion')" class="btn-primary px-8 py-3 text-lg">Definir Piloto &raquo;</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="sectionDefinicion" class="page-section hidden">
+                <h2 class="text-2xl font-semibold mb-4 highlight-teal">Definición del Piloto de IA/RPA <span id="definicionSectionCompanyName" class="highlight-accent"></span></h2>
+                <div class="card">
+                    <label for="pilotoNameInput" class="block mb-1 text-lg highlight-accent font-semibold">Nombre del Piloto:</label>
+                    <input type="text" id="pilotoNameInput" class="mb-3 text-xl" placeholder="Introduzca el nombre del piloto">
+
+
+                    <label for="pilotValueProposition" class="block mb-2">Propuesta de Valor del Piloto:</label>
+                    <textarea id="pilotValueProposition" rows="4" placeholder="¿Qué problema específico resuelve este piloto y qué beneficios clave aportará? (Ej: Reducir tiempo, costes, errores; mejorar CX, etc.)" class="mb-4"></textarea>
+
+                    <label for="pilotTechType" class="block mb-2">Tipo de Tecnología Principal:</label>
+                    <select id="pilotTechType" class="mb-4">
+                        <option value="RPA">RPA (Automatización Robótica de Procesos)</option>
+                        <option value="RPA Cognitiva">RPA Cognitiva (con IA)</option>
+                        <option value="IA Generativa">IA Generativa</option>
+                        <option value="IA Predictiva">IA Predictiva / Machine Learning</option>
+                        <option value="Combinada">Combinada / Otra</option>
+                    </select>
+
+                    <label for="pilotSolutionDescription" class="block mb-2">Descripción de la Solución Técnica Propuesta:</label>
+                    <textarea id="pilotSolutionDescription" rows="4" placeholder="¿Cómo se aplicará la tecnología? ¿Qué herramientas o plataformas se usarán? ¿Integraciones clave?" class="mb-4"></textarea>
+                </div>
+
+                <div class="card">
+                    <h3 class="text-xl font-semibold mb-3 highlight-accent">KPIs Objetivo del Piloto</h3>
+                    <p class="text-sm text-gray-400 mb-3">A continuación se muestran KPIs sugeridos para la solución seleccionada. Puede modificarlos o añadir nuevos.</p>
+                    <div id="kpiContainer" class="space-y-4">
+                    </div>
+                    <button onclick="addKpiInput()" class="btn-secondary mt-4">+ Añadir KPI</button>
+                </div>
+                <div class="text-center mt-6">
+                    <button onclick="generateSummary()" class="btn-primary px-8 py-3 text-lg">Generar Resumen &raquo;</button>
+                </div>
+            </section>
+
+            <section id="sectionResumen" class="page-section hidden">
+                <h2 class="text-2xl font-semibold mb-4 highlight-teal">Resumen del Piloto Propuesto</h2>
+                <div class="card">
+                    <h3 class="text-xl font-semibold mb-2 highlight-accent">Empresa: <span id="summaryCompanyName"></span></h3>
+                    <div id="summaryPillsContainer" class="summary-pill-container mt-3 mb-4">
+                    </div>
+                    <hr class="border-gray-600 my-4">
+
+                    <h4 class="text-lg font-semibold mt-3 highlight-accent">Proceso Seleccionado para Piloto:</h4>
+                    <p id="summaryProcessName" class="text-gray-300"></p>
+
+                    <h4 class="text-lg font-semibold mt-4 highlight-accent">Descripción del Proyecto Piloto:</h4>
+                    <p id="summarySelectedProcessDescription" class="text-gray-300 whitespace-pre-wrap"></p>
+
+                    <h4 class="text-lg font-semibold mt-4 highlight-accent">Tecnología Principal del Proyecto:</h4>
+                    <p id="summarySelectedProcessTechnology" class="text-gray-300"></p>
+
+                    <h4 class="text-lg font-semibold mt-4 highlight-accent">Descripción del Proceso Actual del Cliente:</h4>
+                    <p id="summaryCurrentProcessDescription" class="text-gray-300 whitespace-pre-wrap"></p>
+                    <div id="summaryAttachedFiles" class="mt-2">
+                    </div>
+
+
+                    <h4 class="text-lg font-semibold mt-4 highlight-accent">Propuesta de Valor del Piloto:</h4>
+                    <p id="summaryPilotValueProposition" class="text-gray-300 whitespace-pre-wrap"></p>
+
+                    <h4 class="text-lg font-semibold mt-4 highlight-accent">Tipo de Tecnología (Solución):</h4>
+                    <p id="summaryPilotTechType" class="text-gray-300"></p>
+
+                    <h4 class="text-lg font-semibold mt-4 highlight-accent">Descripción de la Solución Técnica:</h4>
+                    <p id="summaryPilotSolutionDescription" class="text-gray-300 whitespace-pre-wrap"></p>
+
+                    <h4 class="text-lg font-semibold mt-4 highlight-accent">KPIs Objetivo:</h4>
+                    <div id="summaryKpiList" class="kpi-summary-grid"></div>
+                </div>
+                <div class="card">
+                    <h3 class="text-xl font-semibold mb-4 highlight-accent">Próximos Pasos</h3>
+                    <div class="roadmap-container">
+                        <div class="roadmap-line"></div>
+                        <ul id="summaryNextStepsList" class="space-y-0">
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="w-full max-w-6xl mt-12 text-center text-sm text-gray-400">
+            <p>&copy; 2025 IA FAST TRACK MODEL - Una colaboración de Synergia Tech Experts y Edge Expertise.</p>
+        </footer>
+    </div>
+
+    <script>
+        // --- ESTADO DE LA APLICACIÓN ---
+        let clientData = {}; // Se poblará con datos del cliente seleccionado desde el backend
+        let catalogData = {}; // Se poblará con el catálogo de proyectos desde el backend
+        let currentSelectedClientId = null; // Para saber qué cliente está activo
+
+        let currentFilter = "All";
+        let currentSubcategoryFilter = "AllSubcategories";
+        let currentSelectedSolutionId = null;
+        let selectedPilot = {
+            name: "",
+            currentDescription: "", // Descripción del proceso actual del cliente
+            attachedFileNames: [],
+            valueProposition: "", // Propuesta de valor del piloto (Sección Definición)
+            techType: "", // Tipo de tecnología del piloto (Sección Definición)
+            solutionDescription: "", // Descripción de la solución técnica (Sección Definición)
+            kpis: [],
+            originalProjectData: null,
+            originalCategoryName: null,
+            originalSubcategoryName: null,
+            // Campos editables de la sección "Selección del Proceso a Pilotar"
+            selectedProcessDescriptionContent: "", // Descripción del proyecto (editable)
+            selectedProcessTechnologyContent: ""  // Tecnología del proyecto (editable)
+        };
+        let csrfToken = null; // Para el token CSRF de Django
+
+        let scoringGlobalChartInstance = null;
+        let transformacionChartInstance = null;
+        let procesosChartInstance = null;
+
+        // --- FUNCIONES DE AYUDA (como getIconForObjetivo, getIconForSubcategory, generateSafeId) ---
+        const icons = {
+            default: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.5 13.5h-1.5V12h1.5v1.5zm-6.75 6h1.5V18h-1.5v1.5z" /></svg>`,
+            automatizacion: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" /></svg>`,
+            generativa: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.5 13.5h-1.5V12h1.5v1.5zm-6.75 6h1.5V18h-1.5v1.5z" /></svg>`,
+            predictiva: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h12A2.25 2.25 0 0020.25 14.25V3M3.75 21h16.5M16.5 3.75h.008v.008H16.5V3.75z" /></svg>`,
+            optimizacion: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941" /></svg>`,
+            clientes: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>`,
+            datos: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125" /></svg>`,
+            innovacion: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.354a15.054 15.054 0 01-4.5 0m3.75-2.354v-1.012A12.037 12.037 0 0112 15c-2.17 0-4.207.56-5.998 1.584m11.996 0A12.037 12.037 0 0012 15c-2.17 0-4.207.56-5.998 1.584m11.996 0v1.012A15.054 15.054 0 0012 21.75c-2.676 0-5.216-.584-7.499-1.632M15 9.75a3 3 0 11-6 0 3 3 0 016 0z" /></svg>`
+        };
+
+        function getIconForObjetivo(objetivoName) {
+            const name = objetivoName.toLowerCase();
+            if (name.includes("eficiencia") || name.includes("productividad")) return icons.automatizacion;
+            if (name.includes("ingresos") || name.includes("ventas") || name.includes("crecimiento")) return icons.optimizacion;
+            if (name.includes("experiencia") || name.includes("fidelización") || name.includes("cliente")) return icons.clientes;
+            if (name.includes("decisiones") || name.includes("datos")) return icons.datos;
+            if (name.includes("innovación") || name.includes("desarrollo ágil")) return icons.innovacion;
+            return icons.default;
+        }
+
+        function getIconForSubcategory(subcategoryName) {
+            const name = subcategoryName.toLowerCase();
+            if (name.includes("todos los casos")) return `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" /></svg>`;
+            if (name.includes("automatización") || name.includes("rpa") || name.includes("financieras") || name.includes("administrativas")) return icons.automatizacion;
+            if (name.includes("generativa") || name.includes("contenido") || name.includes("documentación") || name.includes("asistida") || name.includes("comunicación")) return icons.generativa;
+            if (name.includes("predictiva") || name.includes("análisis") || name.includes("modelos") || name.includes("anticipación") || name.includes("cualificación")) return icons.predictiva;
+            if (name.includes("optimización") || name.includes("eficiencia") || name.includes("recursos") || name.includes("conversión") || name.includes("ofertas")) return icons.optimizacion;
+            if (name.includes("cliente") || name.includes("personalización") || name.includes("soporte") || name.includes("fidelización") || name.includes("retención")) return icons.clientes;
+            if (name.includes("datos") || name.includes("inteligencia de negocio") || name.includes("decisiones")) return icons.datos;
+            if (name.includes("innovación") || name.includes("ideación") || name.includes("prototipado") || name.includes("desarrollo ágil") || name.includes("conceptualización")) return icons.innovacion;
+            if (name.includes("ti") || name.includes("seguridad") || name.includes("infraestructura")) return icons.default;
+            if (name.includes("leads") || name.includes("ventas")) return icons.optimizacion;
+            return icons.default;
+        }
+
+        function generateSafeId(str) {
+            if (typeof str !== 'string') return `invalid_id_${Math.random().toString(36).substring(2, 9)}`;
+            return str.toLowerCase().replace(/[^a-z0-9_]/g, '_');
+        }
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+
+        // --- LÓGICA DE NAVEGACIÓN Y UI (mayormente como la tenías) ---
+        // (navigateTo, setActiveStep1Filter, updateSubcategoryFilters, setActiveSubcategoryCard, etc.)
+        // (createScoringGlobalChart, createTransformacionChart, createProcesosChart)
+        // (prefillPilotDefinition, addKpiInput, renderKpiInputs, removeKpiInput)
+        // (generateSummary)
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // NO CARGAR DATOS HARDCODEADOS AQUÍ
+            // catalogData y clientData se cargarán después del login y selección de cliente
+
+            document.getElementById('mainNav').classList.add('hidden');
+            navigateTo('sectionLogin'); // Mostrar login primero
+
+            // Los setup de filtros y renderizado del catálogo se llamarán después de cargar los datos
+            // setupMainFilters();
+            // updateSubcategoryFilters();
+            // renderProcessCatalog();
+
+            const loginForm = document.getElementById('loginForm');
+            loginForm.addEventListener('submit', handleLogin);
+
+            const fileInput = document.getElementById('currentProcessFiles');
+            const fileListDisplay = document.getElementById('fileListDisplay');
+            fileInput.addEventListener('change', (event) => {
+                selectedPilot.attachedFileNames = [];
+                fileListDisplay.innerHTML = '';
+                if (event.target.files.length > 0) {
+                    const ul = document.createElement('ul');
+                    ul.classList.add('list-disc', 'list-inside', 'pl-2');
+                    for (const file of event.target.files) {
+                        selectedPilot.attachedFileNames.push(file.name);
+                        const li = document.createElement('li');
+                        li.textContent = file.name;
+                        ul.appendChild(li);
+                    }
+                    fileListDisplay.appendChild(ul);
+                } else {
+                    fileListDisplay.textContent = 'Ningún archivo seleccionado.';
+                }
+            });
+        });
+
+        const navButtons = document.querySelectorAll('.nav-button');
+        const pageSections = document.querySelectorAll('.page-section');
+
+        navButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const targetSectionId = button.id.replace('nav', 'section');
+                navigateTo(targetSectionId, button);
+            });
+        });
+
+        async function handleLogin(event) {
+            event.preventDefault();
+            const usernameInput = document.getElementById('username');
+            const passwordInput = document.getElementById('password');
+            const errorMessageDiv = document.getElementById('loginErrorMessage');
+            errorMessageDiv.classList.add('hidden');
+
+            const username = usernameInput.value;
+            const password = passwordInput.value;
+
+            // Obtener CSRF token si aún no lo tenemos
+            if (!csrfToken) {
+                csrfToken = getCookie('csrftoken');
+            }
+            if (!csrfToken) { // Si Django no ha enviado un CSRF token (ej. primera carga sin backend que lo sirva)
+                console.warn("CSRF token cookie no encontrado. Asumiendo entorno de desarrollo sin CSRF para simulación.");
+                // En un entorno real con Django, este token es esencial.
+            }
+
+
+            // --- INICIO: LLAMADA REAL A API DE LOGIN DJANGO ---
+            try {
+                // Reemplazar '/api/login/' con la URL correcta de tu endpoint Django
+                const response = await fetch('/api/login/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        // Incluir CSRF token si está disponible y es requerido por Django
+                        ...(csrfToken && { 'X-CSRFToken': csrfToken })
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    console.log("Login exitoso desde backend");
+                    document.getElementById('appSubtitle').textContent = "Panel de Administración de Pilotos IA";
+                    await fetchClientsAndDisplay(); // Carga lista de clientes y navega
+                } else {
+                    errorMessageDiv.textContent = data.message || "Error de login desconocido.";
+                    errorMessageDiv.classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error("Error en la petición de login:", error);
+                errorMessageDiv.textContent = "Error de conexión al intentar iniciar sesión. (¿Está el backend Django funcionando?)";
+                errorMessageDiv.classList.remove('hidden');
+            }
+            // --- FIN: LLAMADA REAL A API DE LOGIN DJANGO ---
+        }
+
+        async function fetchClientsAndDisplay() {
+            try {
+                const response = await fetch('/api/clients/'); // Ajusta esta URL a tu endpoint
+                if (!response.ok) throw new Error(`Error fetching clients: ${response.statusText} (${response.status})`);
+                const clients = await response.json();
+                displayClientList(clients);
+                navigateTo('sectionClientSelection');
+            } catch (error) {
+                console.error("Error fetching client list:", error);
+                alert("No se pudo cargar la lista de clientes desde el servidor.");
+            }
+        }
+
+        function displayClientList(clients) {
+            const clientListContainer = document.getElementById('clientListContainer');
+            clientListContainer.innerHTML = '';
+
+            if (clients && clients.length > 0) {
+                clients.forEach(client => {
+                    const clientCard = document.createElement('div');
+                    clientCard.classList.add('client-selection-card');
+                    clientCard.innerHTML = `<h5>${client.name}</h5>`;
+                    clientCard.onclick = () => handleClientSelection(client.id, client.name);
+                    clientListContainer.appendChild(clientCard);
+                });
+            } else {
+                clientListContainer.innerHTML = '<p class="text-gray-400 text-center">No hay clientes disponibles.</p>';
+            }
+        }
+
+        async function handleClientSelection(clientId, clientName) {
+            console.log("Cliente seleccionado:", clientId, clientName);
+            document.getElementById('appSubtitle').textContent = `Cargando datos para ${clientName}...`;
+            currentSelectedClientId = clientId; // Guardar ID del cliente seleccionado
+
+            try {
+                const [diagnosticoResponse, catalogResponse] = await Promise.all([
+                    fetch(`/api/client/${clientId}/diagnostico/`), // Ajusta la URL
+                    fetch('/api/proyectos/catalog/')              // Ajusta la URL
+                ]);
+
+                if (!diagnosticoResponse.ok) throw new Error(`Error fetching diagnostico: ${diagnosticoResponse.statusText} (${diagnosticoResponse.status})`);
+                if (!catalogResponse.ok) throw new Error(`Error fetching catalog: ${catalogResponse.statusText} (${catalogResponse.status})`);
+
+                const diagnosticoData = await diagnosticoResponse.json();
+                const projectCatalogData = await catalogResponse.json();
+
+                clientData = diagnosticoData; // Datos del diagnóstico del cliente
+                catalogData = projectCatalogData; // Catálogo de proyectos
+
+                document.getElementById('summaryCompanyName').textContent = clientName;
+                document.getElementById('appSubtitle').textContent = `Panel de Pilotos IA para: ${clientName}`;
+
+                loadSelectedClientDataAndProceed(clientName);
+            } catch (error) {
+                console.error("Error fetching client/catalog data:", error);
+                alert("Error al cargar los datos del cliente o el catálogo de proyectos desde el servidor.");
+                alert(error);
+                document.getElementById('appSubtitle').textContent = "Guía para la identificación y descripción de pilotos de automatización (RPA & IA)";
+            }
+        }
+
+
+        function loadSelectedClientDataAndProceed(selectedCompanyName) {
+            document.getElementById('mainNav').classList.remove('hidden');
+            loadClientData(); // Carga datos en la UI de Info Cliente (charts, etc.)
+            updateSectionTitles(selectedCompanyName); // Actualiza títulos de sección
+
+            // Resetear filtros y catálogo para el nuevo cliente
+            currentFilter = "All";
+            currentSubcategoryFilter = "AllSubcategories";
+            currentSelectedSolutionId = null;
+            selectedPilot = { // Resetear el objeto selectedPilot
+                name: "", currentDescription: "", attachedFileNames: [],
+                valueProposition: "", techType: "", solutionDescription: "", kpis: [],
+                originalProjectData: null, originalCategoryName: null, originalSubcategoryName: null,
+                selectedProcessDescriptionContent: "", selectedProcessTechnologyContent: ""
+            };
+            document.getElementById('selectedProcessName').value = "";
+            document.getElementById('selectedProcessDescription').value = "";
+            document.getElementById('selectedProcessTechnology').value = "";
+            document.getElementById('currentProcessDescription').value = "";
+            document.getElementById('currentProcessFiles').value = ""; // Limpiar input de archivos
+            document.getElementById('fileListDisplay').innerHTML = "";
+
+
+            setupMainFilters(); // Re-inicializa los filtros principales (por si cambian según el cliente, aunque no es el caso actual)
+            updateSubcategoryFilters(); // Actualiza los filtros de subcategoría (se ocultarán inicialmente)
+            renderProcessCatalog(); // Renderiza el catálogo de proyectos
+            navigateTo('sectionCliente', document.getElementById('navCliente'));
+        }
+
+        function updateSectionTitles(companyName = "") {
+            const formattedCompanyName = companyName ? `- ${companyName}` : "";
+            const clienteTitleSpan = document.getElementById('clienteSectionCompanyName');
+            const oportunidadesTitleSpan = document.getElementById('oportunidadesSectionCompanyName');
+            const definicionTitleSpan = document.getElementById('definicionSectionCompanyName');
+
+            if (clienteTitleSpan) clienteTitleSpan.textContent = formattedCompanyName;
+            if (oportunidadesTitleSpan) oportunidadesTitleSpan.textContent = formattedCompanyName;
+            if (definicionTitleSpan) definicionTitleSpan.textContent = formattedCompanyName;
+        }
+
+
+        function navigateTo(sectionId, clickedButton = null) {
+            pageSections.forEach(section => {
+                section.classList.add('hidden');
+            });
+            const targetEl = document.getElementById(sectionId);
+            if (targetEl) {
+                targetEl.classList.remove('hidden');
+            } else {
+                console.error("Sección de destino no encontrada:", sectionId);
+                return;
+            }
+
+            if (sectionId !== 'sectionLogin' && sectionId !== 'sectionClientSelection') {
+                document.getElementById('mainNav').classList.remove('hidden');
+                navButtons.forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                let activeBtnToSet = clickedButton;
+                if (!activeBtnToSet && sectionId !== 'sectionLogin' && sectionId !== 'sectionClientSelection') {
+                    const correspondingNavButton = document.getElementById(sectionId.replace('section', 'nav'));
+                    if (correspondingNavButton) activeBtnToSet = correspondingNavButton;
+                }
+                if (activeBtnToSet) activeBtnToSet.classList.add('active');
+            } else {
+                document.getElementById('mainNav').classList.add('hidden');
+            }
+
+
+            if (sectionId === 'sectionDefinicion') {
+                document.getElementById('pilotoNameInput').value = selectedPilot.name || document.getElementById('selectedProcessName').value || "";
+
+                if (currentSelectedSolutionId && selectedPilot.originalProjectData) {
+                    prefillPilotDefinition(selectedPilot.originalProjectData);
+                } else {
+                    document.getElementById('pilotoNameInput').value = selectedPilot.name || document.getElementById('selectedProcessName').value || "";
+                    document.getElementById('pilotValueProposition').value = "";
+                    document.getElementById('pilotTechType').value = "RPA";
+                    document.getElementById('pilotSolutionDescription').value = selectedPilot.selectedProcessDescriptionContent || "";
+                    selectedPilot.kpis = [];
+                    renderKpiInputs();
+                }
+            }
+            window.scrollTo(0, 0);
+        }
+
+        function navigateToSectionWithPrefill(sectionId) {
+            selectedPilot.name = document.getElementById('selectedProcessName').value;
+            selectedPilot.selectedProcessDescriptionContent = document.getElementById('selectedProcessDescription').value;
+            selectedPilot.selectedProcessTechnologyContent = document.getElementById('selectedProcessTechnology').value;
+            selectedPilot.currentDescription = document.getElementById('currentProcessDescription').value;
+
+            navigateTo(sectionId, document.getElementById(sectionId.replace('section', 'nav')));
+        }
+
+
+        const defaultChartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: 'y',
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: { color: '#9EA3A2' },
+                    grid: { color: 'rgba(158, 163, 162, 0.2)' }
+                },
+                y: {
+                    ticks: { color: '#9EA3A2', autoSkip: false },
+                    grid: { display: false }
+                }
+            },
+            plugins: {
+                legend: {
+                    labels: { color: '#FFFFFF' }
+                },
+                tooltip: {
+                    titleColor: '#F0CE09',
+                    bodyColor: '#FFFFFF',
+                    backgroundColor: 'rgba(0, 4, 23, 0.9)',
+                    borderColor: '#4C8EFA',
+                    borderWidth: 1
+                }
+            }
+        };
+
+        function loadClientData() {
+            if (!clientData || Object.keys(clientData).length === 0) {
+                document.getElementById('clienteContexto').textContent = "Seleccione un cliente para ver su información.";
+                document.getElementById('clienteResumen').textContent = "";
+                return;
+            }
+            document.getElementById('clienteContexto').textContent = clientData.empresa_contexto || "N/A";
+            document.getElementById('clienteResumen').textContent = clientData.resumen_ejecutivo || "N/A";
+            document.getElementById('scoringActualText').textContent = clientData.scoring_global_actual || "N/A";
+            document.getElementById('scoringObjetivoText').textContent = clientData.scoring_objetivo_12m || "N/A";
+
+            if (clientData.transformacion_digital) {
+                document.getElementById('transformacionScoringText').textContent = clientData.transformacion_digital.scoring || "N/A";
+                const transformacionListEl = document.getElementById('transformacionCategoriasList');
+                transformacionListEl.innerHTML = '';
+                clientData.transformacion_digital.categorias.forEach(cat => {
+                    const li = document.createElement('li');
+                    li.textContent = `${cat.nombre}: ${cat.valor}`;
+                    transformacionListEl.appendChild(li);
+                });
+                createTransformacionChart();
+            }
+
+            if (clientData.procesos) {
+                document.getElementById('procesosScoringText').textContent = clientData.procesos.scoring || "N/A";
+                const procesosListEl = document.getElementById('procesosCategoriasList');
+                procesosListEl.innerHTML = '';
+                clientData.procesos.categorias.forEach(cat => {
+                    const li = document.createElement('li');
+                    li.textContent = `${cat.nombre}: ${cat.valor}`;
+                    procesosListEl.appendChild(li);
+                });
+                createProcesosChart();
+            }
+
+            const colaboracionList = document.getElementById('colaboracionPropuesta');
+            colaboracionList.innerHTML = '';
+            if (clientData.colaboracion_propuesta && clientData.colaboracion_propuesta.length > 0) {
+                clientData.colaboracion_propuesta.forEach(prop => {
+                    const li = document.createElement('li');
+                    li.textContent = prop;
+                    colaboracionList.appendChild(li);
+                });
+            } else {
+                colaboracionList.innerHTML = '<li>No hay propuestas específicas para este cliente.</li>';
+            }
+            createScoringGlobalChart();
+        }
+
+        function createScoringGlobalChart() {
+            const ctx = document.getElementById('scoringGlobalChart').getContext('2d');
+            if (scoringGlobalChartInstance) scoringGlobalChartInstance.destroy();
+            scoringGlobalChartInstance = new Chart(ctx, { type: 'bar', data: { labels: ['Scoring Global'], datasets: [{ label: 'Actual', data: [clientData.scoring_global_actual || 0], backgroundColor: '#658A80', borderColor: '#52756D', borderWidth: 1 }, { label: 'Objetivo 12m', data: [clientData.scoring_objetivo_12m || 0], backgroundColor: '#4C8EFA', borderColor: '#3C72D8', borderWidth: 1 }] }, options: { ...defaultChartOptions, indexAxis: 'y', scales: { x: { ...defaultChartOptions.scales.x, stacked: false }, y: { ...defaultChartOptions.scales.y, stacked: false, display: false } }, plugins: { ...defaultChartOptions.plugins, legend: { ...defaultChartOptions.plugins.legend, position: 'bottom' } } } });
+        }
+        function createTransformacionChart() {
+            const ctx = document.getElementById('transformacionChart').getContext('2d');
+            const labels = clientData.transformacion_digital.categorias.map(cat => cat.nombre.match(/\b(\w)/g).join('').toUpperCase());
+            const dataValues = clientData.transformacion_digital.categorias.map(cat => cat.valor);
+            if (transformacionChartInstance) transformacionChartInstance.destroy();
+            transformacionChartInstance = new Chart(ctx, { type: 'bar', data: { labels: labels, datasets: [{ label: 'Valoración', data: dataValues, backgroundColor: '#4839CD', borderColor: '#3A2D9E', borderWidth: 1, barThickness: 20, }] }, options: { ...defaultChartOptions, indexAxis: 'x', scales: { x: { ...defaultChartOptions.scales.x, grid: { display: false }, ticks: { color: '#9EA3A2', autoSkip: false, maxRotation: 45, minRotation: 45 } }, y: { ...defaultChartOptions.scales.y, max: 100, grid: { color: 'rgba(158,163,162,0.2)' } } }, plugins: { ...defaultChartOptions.plugins, legend: { display: false }, tooltip: { ...defaultChartOptions.plugins.tooltip, callbacks: { label: function (context) { let label = clientData.transformacion_digital.categorias[context.dataIndex].nombre || ''; if (label) { label += ': '; } if (context.parsed.y !== null) { label += context.parsed.y; } return label; } } } } } });
+        }
+        function createProcesosChart() {
+            const ctx = document.getElementById('procesosChart').getContext('2d');
+            const labels = clientData.procesos.categorias.map(cat => cat.nombre.match(/\b(\w)/g).join('').toUpperCase());
+            const dataValues = clientData.procesos.categorias.map(cat => cat.valor);
+            if (procesosChartInstance) procesosChartInstance.destroy();
+            procesosChartInstance = new Chart(ctx, { type: 'bar', data: { labels: labels, datasets: [{ label: 'Valoración', data: dataValues, backgroundColor: '#4C8EFA', borderColor: '#3C72D8', borderWidth: 1, barThickness: 20, }] }, options: { ...defaultChartOptions, indexAxis: 'x', scales: { x: { ...defaultChartOptions.scales.x, grid: { display: false }, ticks: { color: '#9EA3A2', autoSkip: false, maxRotation: 45, minRotation: 45 } }, y: { ...defaultChartOptions.scales.y, max: 100, grid: { color: 'rgba(158,163,162,0.2)' } } }, plugins: { ...defaultChartOptions.plugins, legend: { display: false }, tooltip: { ...defaultChartOptions.plugins.tooltip, callbacks: { label: function (context) { let label = clientData.procesos.categorias[context.dataIndex].nombre || ''; if (label) { label += ': '; } if (context.parsed.y !== null) { label += context.parsed.y; } return label; } } } } } });
+        }
+
+        function generateSafeId(str) {
+            if (typeof str !== 'string') return `invalid_id_${Math.random().toString(36).substring(2, 9)}`;
+            return str.toLowerCase().replace(/[^a-z0-9_]/g, '_');
+        }
+
+        function setupMainFilters() {
+            const quickFiltersContainer = document.getElementById('quickMainFiltersContainer');
+            const objetivoCardsContainer = document.getElementById('objetivoCardsContainer');
+            quickFiltersContainer.innerHTML = '';
+            objetivoCardsContainer.innerHTML = '';
+
+            const allButton = document.createElement('button');
+            allButton.classList.add('main-filter-button', 'active');
+            allButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12" /></svg>Todos los Objetivos`;
+            allButton.onclick = () => {
+                currentFilter = "All";
+                currentSubcategoryFilter = "AllSubcategories";
+                setActiveStep1Filter(allButton);
+                updateSubcategoryFilters();
+                renderProcessCatalog();
+            };
+            quickFiltersContainer.appendChild(allButton);
+
+            const suggestedButton = document.createElement('button');
+            suggestedButton.classList.add('main-filter-button');
+            suggestedButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 highlight-yellow"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z" /></svg>Sugeridas`;
+            suggestedButton.onclick = () => {
+                currentFilter = "Suggested";
+                currentSubcategoryFilter = "AllSubcategories";
+                setActiveStep1Filter(suggestedButton);
+                updateSubcategoryFilters();
+                renderProcessCatalog();
+            };
+            quickFiltersContainer.appendChild(suggestedButton);
+
+            if (catalogData && catalogData.categories) {
+                catalogData.categories.forEach(category => {
+                    const card = document.createElement('div');
+                    card.classList.add('objetivo-filter-card');
+                    card.innerHTML = `${getIconForObjetivo(category.categoryName)}<span>${category.categoryName}</span>`;
+                    card.dataset.categoryId = generateSafeId(category.categoryName);
+                    card.onclick = () => {
+                        currentFilter = card.dataset.categoryId;
+                        currentSubcategoryFilter = "AllSubcategories";
+                        setActiveStep1Filter(card);
+                        updateSubcategoryFilters();
+                        renderProcessCatalog();
+                    };
+                    objetivoCardsContainer.appendChild(card);
+                });
+            }
+        }
+
+        function setActiveStep1Filter(activeElement) {
+            document.querySelectorAll('#quickMainFiltersContainer .main-filter-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('#objetivoCardsContainer .objetivo-filter-card').forEach(card => card.classList.remove('active'));
+            activeElement.classList.add('active');
+        }
+
+
+        function updateSubcategoryFilters() {
+            const cardContainer = document.getElementById('subcategoryFilterCardContainer');
+            const sectionContainer = document.getElementById('subcategoryFilterSection');
+            cardContainer.innerHTML = '';
+
+            if (currentFilter === "All" || currentFilter === "Suggested" || !catalogData || !catalogData.categories) {
+                sectionContainer.classList.add('hidden');
+                return;
+            }
+            sectionContainer.classList.remove('hidden');
+
+            const selectedCategory = catalogData.categories.find(cat => generateSafeId(cat.categoryName) === currentFilter);
+
+            if (selectedCategory && selectedCategory.subcategories && selectedCategory.subcategories.length > 0) {
+                const allCard = document.createElement('div');
+                allCard.classList.add('subcategory-filter-card');
+                allCard.dataset.subcategoryId = "AllSubcategories";
+                allCard.innerHTML = `${getIconForSubcategory("Todos los Casos de Uso")}<span>Todos los Casos de Uso</span>`;
+                allCard.onclick = () => {
+                    currentSubcategoryFilter = "AllSubcategories";
+                    setActiveSubcategoryCard(allCard);
+                    renderProcessCatalog();
+                };
+                cardContainer.appendChild(allCard);
+
+                selectedCategory.subcategories.forEach(sub => {
+                    const subId = generateSafeId(sub.subcategoryName);
+                    const card = document.createElement('div');
+                    card.classList.add('subcategory-filter-card');
+                    card.dataset.subcategoryId = subId;
+                    card.innerHTML = `${getIconForSubcategory(sub.subcategoryName)}<span>${sub.subcategoryName}</span>`;
+                    card.onclick = () => {
+                        currentSubcategoryFilter = subId;
+                        setActiveSubcategoryCard(card);
+                        renderProcessCatalog();
+                    };
+                    cardContainer.appendChild(card);
+                });
+
+                const activeCardToSet = cardContainer.querySelector(`.subcategory-filter-card[data-subcategory-id="${currentSubcategoryFilter}"]`) || cardContainer.querySelector(`.subcategory-filter-card[data-subcategory-id="AllSubcategories"]`);
+                if (activeCardToSet) {
+                    setActiveSubcategoryCard(activeCardToSet);
+                }
+
+            } else {
+                const noSubcategoriesMsg = document.createElement('p');
+                noSubcategoriesMsg.textContent = "No hay casos de uso específicos para este objetivo.";
+                noSubcategoriesMsg.classList.add('text-sm', 'text-gray-500', 'italic', 'py-2', 'text-center', 'w-full');
+                cardContainer.appendChild(noSubcategoriesMsg);
+            }
+        }
+
+        function setActiveSubcategoryCard(activeCardElement) {
+            document.querySelectorAll('.subcategory-filter-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            if (activeCardElement) {
+                activeCardElement.classList.add('active');
+            }
+        }
+
+
+        function renderProcessCatalog() {
+            const catalogContainer = document.getElementById('catalogContainer');
+            catalogContainer.innerHTML = '';
+            let foundAnyProjectOverall = false;
+
+            if (!catalogData || !catalogData.categories || catalogData.categories.length === 0) {
+                catalogContainer.innerHTML = '<p class="text-center text-gray-400 py-4 md:col-span-2">Catálogo de proyectos no cargado o vacío. Verifique la conexión con el backend o el JSON de datos.</p>';
+                return;
+            }
+
+            catalogData.categories.forEach(category => {
+                const mainCategoryIdSafe = generateSafeId(category.categoryName);
+                let shouldDisplayThisMainCategory = false;
+
+                if (currentFilter === "All") {
+                    shouldDisplayThisMainCategory = true;
+                } else if (currentFilter === "Suggested") {
+                    if (category.subcategories.some(sub => sub.projects.some(proj => clientData.colaboracion_propuesta && clientData.colaboracion_propuesta.includes(proj.projectName)))) {
+                        shouldDisplayThisMainCategory = true;
+                    }
+                } else if (currentFilter === mainCategoryIdSafe) {
+                    shouldDisplayThisMainCategory = true;
+                }
+
+                if (shouldDisplayThisMainCategory) {
+                    const categoryFragment = document.createDocumentFragment();
+                    let hasVisibleProjectsInThisCategory = false;
+
+                    category.subcategories.forEach(subcategory => {
+                        const subcategoryIdSafe = generateSafeId(subcategory.subcategoryName);
+                        let projectsToDisplay = [...subcategory.projects];
+
+                        if (currentFilter === "Suggested") {
+                            projectsToDisplay = projectsToDisplay.filter(proj => clientData.colaboracion_propuesta && clientData.colaboracion_propuesta.includes(proj.projectName));
+                        }
+
+                        if (currentSubcategoryFilter !== "AllSubcategories") {
+                            if (currentFilter === mainCategoryIdSafe || currentFilter === "All") {
+                                if (currentSubcategoryFilter !== subcategoryIdSafe) {
+                                    projectsToDisplay = [];
+                                }
+                            } else if (currentFilter !== "Suggested") {
+                                projectsToDisplay = [];
+                            }
+                        }
+
+                        if (projectsToDisplay.length > 0) {
+                            hasVisibleProjectsInThisCategory = true;
+                            foundAnyProjectOverall = true;
+
+                            const subcategoryHeaderEl = document.createElement('h4');
+                            subcategoryHeaderEl.classList.add('subcategory-header');
+                            subcategoryHeaderEl.textContent = subcategory.subcategoryName;
+                            categoryFragment.appendChild(subcategoryHeaderEl);
+
+                            projectsToDisplay.forEach((project, projectIndex) => {
+                                const projectUniqueId = `${mainCategoryIdSafe}_${subcategoryIdSafe}_${generateSafeId(project.projectName)}_${projectIndex}`;
+                                project.id = projectUniqueId;
+                                project.originalCategoryName = category.categoryName;
+                                project.originalSubcategoryName = subcategory.subcategoryName;
+
+                                const solutionDiv = document.createElement('div');
+                                solutionDiv.classList.add('solution-card');
+                                solutionDiv.dataset.solutionId = project.id;
+
+                                const isSuggestedByData = clientData.colaboracion_propuesta && clientData.colaboracion_propuesta.includes(project.projectName);
+                                if (isSuggestedByData) {
+                                    solutionDiv.classList.add('suggested-highlight');
+                                }
+                                if (project.id === currentSelectedSolutionId) {
+                                    solutionDiv.classList.add('solution-card-selected');
+                                }
+
+                                const titleEl = document.createElement('h5');
+                                titleEl.classList.add('font-semibold', 'text-lg');
+                                titleEl.textContent = project.projectName;
+
+                                if (isSuggestedByData && currentFilter !== "Suggested") {
+                                    titleEl.style.color = '#F0CE09';
+                                    const suggestedSpan = document.createElement('span');
+                                    suggestedSpan.classList.add('text-xs', 'font-bold', 'highlight-yellow', 'ml-2');
+                                    suggestedSpan.textContent = '(Sugerido)';
+                                    titleEl.appendChild(suggestedSpan);
+                                } else {
+                                    titleEl.style.color = '#4C8EFA';
+                                }
+
+                                solutionDiv.appendChild(titleEl);
+                                solutionDiv.innerHTML += `
+                                            <p class="text-sm text-gray-300 mt-1 mb-3">${project.description}</p>
+                                            <p class="text-xs text-gray-400 mb-2">Tecnología: ${project.technology || 'No especificada'}</p>
+                                            <button class="text-xs btn-secondary py-1 px-2" onclick="selectSolutionForPilot('${project.id}')">Seleccionar para Piloto</button>
+                                        `;
+                                categoryFragment.appendChild(solutionDiv);
+                            });
+                        }
+                    });
+
+                    if (hasVisibleProjectsInThisCategory) {
+                        const categoryHeaderEl = document.createElement('h3');
+                        categoryHeaderEl.classList.add('category-header');
+                        categoryHeaderEl.textContent = category.categoryName;
+                        catalogContainer.appendChild(categoryHeaderEl);
+                        catalogContainer.appendChild(categoryFragment);
+                    }
+                }
+            });
+
+            if (!foundAnyProjectOverall) {
+                let message = "No hay soluciones disponibles para los filtros seleccionados.";
+                if (currentFilter === "Suggested") {
+                    message = 'No hay soluciones sugeridas que coincidan con los filtros.';
+                }
+                catalogContainer.innerHTML = `<p class="text-center text-gray-400 py-4 md:col-span-2">${message}</p>`;
+            }
+        }
+
+
+        function selectSolutionForPilot(solutionId) {
+            const solutionDetails = findSolutionByIdWithDetails(solutionId);
+            if (!solutionDetails) {
+                console.error("Solución no encontrada con ID:", solutionId);
+                return;
+            }
+            currentSelectedSolutionId = solutionId;
+            selectedPilot.originalProjectData = solutionDetails.project;
+            selectedPilot.originalCategoryName = solutionDetails.categoryName;
+            selectedPilot.originalSubcategoryName = solutionDetails.subcategoryName;
+
+            document.getElementById('selectedProcessName').value = solutionDetails.project.projectName;
+            document.getElementById('selectedProcessDescription').value = solutionDetails.project.description || "";
+            document.getElementById('selectedProcessTechnology').value = solutionDetails.project.technology || "";
+
+            renderProcessCatalog();
+        }
+
+        function findSolutionByIdWithDetails(solutionId) {
+            if (!catalogData || !catalogData.categories) return null;
+            for (const category of catalogData.categories) {
+                for (const subcategory of category.subcategories) {
+                    const foundProject = subcategory.projects.find(proj => proj.id === solutionId);
+                    if (foundProject) {
+                        return {
+                            project: foundProject,
+                            categoryName: category.categoryName,
+                            subcategoryName: subcategory.subcategoryName
+                        };
+                    }
+                }
+            }
+            return null;
+        }
+        function findSolutionById(solutionId) {
+            const details = findSolutionByIdWithDetails(solutionId);
+            return details ? details.project : null;
+        }
+
+
+        function prefillPilotDefinition(solution) { // solution es selectedPilot.originalProjectData
+            if (!solution) {
+                document.getElementById('pilotoNameInput').value = document.getElementById('selectedProcessName').value || "";
+                document.getElementById('pilotValueProposition').value = "";
+                document.getElementById('pilotTechType').value = "RPA";
+                document.getElementById('pilotSolutionDescription').value = document.getElementById('selectedProcessDescription').value || "";
+                selectedPilot.kpis = [];
+                renderKpiInputs();
+                return;
+            }
+
+            document.getElementById('pilotoNameInput').value = solution.projectName || "";
+            document.getElementById('pilotValueProposition').value = `Implementar la solución "${solution.projectName}" para optimizar el proceso X, mejorar la eficiencia en Y y aportar valor diferencial al negocio en Z. Esta iniciativa busca [Beneficio clave 1, ej: reducir tiempos de respuesta en un A%] y [Beneficio clave 2, ej: minimizar errores operativos en B%].`;
+            const techSelect = document.getElementById('pilotTechType');
+            const techString = (selectedPilot.selectedProcessTechnologyContent || solution.technology || "").toLowerCase(); // Priorizar el editable
+            if (techString.includes("rpa") && (techString.includes("cognitiva") || techString.includes("ia"))) techSelect.value = "RPA Cognitiva";
+            else if (techString.includes("ia generativa")) techSelect.value = "IA Generativa";
+            else if (techString.includes("ia predictiva") || techString.includes("predictivo") || techString.includes("machine learning")) techSelect.value = "IA Predictiva";
+            else if (techString.includes("rpa")) techSelect.value = "RPA";
+            else techSelect.value = "Combinada";
+
+            document.getElementById('pilotSolutionDescription').value = selectedPilot.selectedProcessDescriptionContent || solution.description || "";
+
+
+            if (solution.kpis && solution.kpis.length > 0) {
+                selectedPilot.kpis = solution.kpis.map((kpi, index) => ({
+                    id: `kpi-prefilled-${index}`,
+                    name: kpi.name,
+                    currentValue: "N/A",
+                    targetValue: kpi.value !== undefined ? `${kpi.value}${kpi.unit === '%' ? '%' : (kpi.unit && kpi.unit.trim() !== '%' ? ' ' + kpi.unit : '')}` : "",
+                    metric: kpi.unit || ""
+                }));
+                renderKpiInputs(selectedPilot.kpis);
+            } else {
+                selectedPilot.kpis = [];
+                renderKpiInputs();
+            }
+        }
+
+        let kpiIdCounter = 0;
+        function addKpiInput(kpi = { id: `kpi-new-${kpiIdCounter++}`, name: "", currentValue: "N/A", targetValue: "", metric: "" }) {
+            const kpiContainer = document.getElementById('kpiContainer');
+            const kpiDiv = document.createElement('div');
+            kpiDiv.classList.add('kpi-input-group', 'p-3', 'border', 'rounded-md', 'space-y-2');
+            kpiDiv.style.borderColor = '#4839CD';
+            kpiDiv.dataset.kpiId = kpi.id;
+            kpiDiv.innerHTML = `
+                    <div class="grid md:grid-cols-2 gap-3">
+                        <div><label for="kpiName-${kpi.id}" class="text-sm">Nombre del KPI:</label><input type="text" id="kpiName-${kpi.id}" value="${kpi.name}" placeholder="Ej: Reducción Tiempo Procesamiento"></div>
+                        <div><label for="kpiMetric-${kpi.id}" class="text-sm">Métrica / Unidad:</label><input type="text" id="kpiMetric-${kpi.id}" value="${kpi.metric || ''}" placeholder="Ej: %, Horas/doc, Nº"></div>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-3">
+                        <div><label for="kpiCurrent-${kpi.id}" class="text-sm">Valor Actual Estimado:</label><input type="text" id="kpiCurrent-${kpi.id}" value="${kpi.currentValue || 'N/A'}" placeholder="Ej: 20 min, 5%"></div>
+                        <div><label for="kpiTarget-${kpi.id}" class="text-sm">Valor Objetivo:</label><input type="text" id="kpiTarget-${kpi.id}" value="${kpi.targetValue || ''}" placeholder="Ej: 2 min, <1%"></div>
+                    </div>
+                    <button type="button" onclick="removeKpiInput('${kpi.id}')" class="text-xs text-red-400 hover:text-red-300 font-semibold">Eliminar KPI</button>`;
+            kpiContainer.appendChild(kpiDiv);
+        }
+
+        function renderKpiInputs(kpisArray = null) {
+            const kpiContainer = document.getElementById('kpiContainer');
+            kpiContainer.innerHTML = '';
+            kpiIdCounter = 0;
+            if (kpisArray && kpisArray.length > 0) {
+                kpisArray.forEach(kpi => {
+                    addKpiInput({
+                        id: kpi.id || `kpi-render-${kpiIdCounter++}`,
+                        name: kpi.name,
+                        currentValue: kpi.currentValue || "N/A",
+                        targetValue: kpi.targetValue,
+                        metric: kpi.metric || kpi.unit || ''
+                    });
+                });
+            } else {
+                addKpiInput();
+            }
+        }
+
+        function removeKpiInput(kpiId) {
+            const kpiDiv = document.querySelector(`.kpi-input-group[data-kpi-id="${kpiId}"]`);
+            if (kpiDiv) kpiDiv.remove();
+        }
+
+        function generateSummary() {
+            selectedPilot.name = document.getElementById('pilotoNameInput').value;
+            selectedPilot.valueProposition = document.getElementById('pilotValueProposition').value;
+            selectedPilot.techType = document.getElementById('pilotTechType').value;
+            selectedPilot.solutionDescription = document.getElementById('pilotSolutionDescription').value;
+
+            selectedPilot.currentDescription = document.getElementById('currentProcessDescription').value;
+            selectedPilot.selectedProcessDescriptionContent = document.getElementById('selectedProcessDescription').value;
+            selectedPilot.selectedProcessTechnologyContent = document.getElementById('selectedProcessTechnology').value;
+
+
+            selectedPilot.kpis = [];
+            document.querySelectorAll('.kpi-input-group').forEach(group => {
+                const id = group.dataset.kpiId;
+                const kpiNameInput = document.getElementById(`kpiName-${id}`);
+                if (kpiNameInput && kpiNameInput.value) {
+                    selectedPilot.kpis.push({ name: kpiNameInput.value, currentValue: document.getElementById(`kpiCurrent-${id}`).value, targetValue: document.getElementById(`kpiTarget-${id}`).value, metric: document.getElementById(`kpiMetric-${id}`).value, });
+                }
+            });
+
+            const pillsContainer = document.getElementById('summaryPillsContainer');
+            pillsContainer.innerHTML = '';
+
+            let objetivoNameForPill = "No especificado";
+            let casoUsoNameForPill = "No especificado";
+
+            if (selectedPilot.originalProjectData) { // Si se seleccionó un proyecto del catálogo
+                objetivoNameForPill = selectedPilot.originalCategoryName || "No especificado";
+                casoUsoNameForPill = selectedPilot.originalSubcategoryName || "No especificado";
+            } else { // Si se creó manualmente o se modificaron filtros
+                const activeMainFilterButton = document.querySelector('#quickMainFiltersContainer .main-filter-button.active');
+                const activeObjetivoCard = document.querySelector('#objetivoCardsContainer .objetivo-filter-card.active');
+
+                if (activeObjetivoCard) {
+                    objetivoNameForPill = activeObjetivoCard.querySelector('span').textContent.trim();
+                } else if (activeMainFilterButton) {
+                    objetivoNameForPill = activeMainFilterButton.textContent.replace(/<svg.*?>.*?<\/svg>/g, '').trim();
+                }
+
+
+                if (currentFilter !== "All" && currentFilter !== "Suggested") { // Solo mostrar caso de uso si un objetivo específico está activo
+                    const activeSubcategoryCard = document.querySelector('#subcategoryFilterCardContainer .subcategory-filter-card.active');
+                    if (activeSubcategoryCard) {
+                        const subText = activeSubcategoryCard.querySelector('span').textContent.trim();
+                        if (subText !== "Todos los Casos de Uso") {
+                            casoUsoNameForPill = subText;
+                        } else {
+                            casoUsoNameForPill = "Todos los Casos de Uso"; // Para la pastilla
+                        }
+                    }
+                }
+            }
+
+
+            const objetivoPill = document.createElement('div');
+            objetivoPill.classList.add('summary-pill');
+            objetivoPill.innerHTML = `${getIconForObjetivo(objetivoNameForPill)} Objetivo: ${objetivoNameForPill}`;
+            pillsContainer.appendChild(objetivoPill);
+
+            if (casoUsoNameForPill !== "No especificado" && casoUsoNameForPill !== "Todos los Casos de Uso") {
+                const casoUsoPill = document.createElement('div');
+                casoUsoPill.classList.add('summary-pill');
+                casoUsoPill.innerHTML = `${getIconForSubcategory(casoUsoNameForPill)} Caso de Uso: ${casoUsoNameForPill}`;
+                pillsContainer.appendChild(casoUsoPill);
+            } else if (currentFilter !== "All" && currentFilter !== "Suggested" && casoUsoNameForPill === "Todos los Casos de Uso") {
+                // Mostrar "Todos los Casos de Uso" si un objetivo específico está seleccionado y "Todos los Casos de Uso" está activo
+                const casoUsoPill = document.createElement('div');
+                casoUsoPill.classList.add('summary-pill');
+                casoUsoPill.innerHTML = `${getIconForSubcategory("Todos los Casos de Uso")} Caso de Uso: Todos los Casos de Uso`;
+                pillsContainer.appendChild(casoUsoPill);
+            }
+
+
+            document.getElementById('summaryProcessName').textContent = selectedPilot.name || "No definido";
+            document.getElementById('summarySelectedProcessDescription').textContent = selectedPilot.selectedProcessDescriptionContent || "No descrita";
+            document.getElementById('summarySelectedProcessTechnology').textContent = selectedPilot.selectedProcessTechnologyContent || "No especificada";
+            document.getElementById('summaryCurrentProcessDescription').textContent = selectedPilot.currentDescription || "No descrita";
+
+            const summaryFilesDiv = document.getElementById('summaryAttachedFiles');
+            summaryFilesDiv.innerHTML = '';
+            if (selectedPilot.attachedFileNames && selectedPilot.attachedFileNames.length > 0) {
+                const p = document.createElement('p'); p.classList.add('text-sm', 'highlight-gray', 'mt-1'); p.textContent = 'Archivos Adjuntos:';
+                const ul = document.createElement('ul'); ul.classList.add('list-disc', 'list-inside', 'text-sm', 'highlight-gray', 'pl-4');
+                selectedPilot.attachedFileNames.forEach(fileName => { const li = document.createElement('li'); li.textContent = fileName; ul.appendChild(li); });
+                summaryFilesDiv.appendChild(p); summaryFilesDiv.appendChild(ul);
+            }
+            document.getElementById('summaryPilotValueProposition').textContent = selectedPilot.valueProposition || "No definida";
+            document.getElementById('summaryPilotTechType').textContent = selectedPilot.techType || "No definido";
+            document.getElementById('summaryPilotSolutionDescription').textContent = selectedPilot.solutionDescription || "No descrita";
+
+            const kpiListDiv = document.getElementById('summaryKpiList');
+            kpiListDiv.innerHTML = '';
+            if (selectedPilot.kpis.length > 0) {
+                selectedPilot.kpis.forEach(kpi => {
+                    const kpiCard = document.createElement('div');
+                    kpiCard.classList.add('kpi-summary-card');
+                    kpiCard.innerHTML = `
+                            <div class="kpi-name">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-13a.75.75 0 00-1.5 0v5c0 .414.336.75.75.75h4a.75.75 0 000-1.5h-3.25V5z" clip-rule="evenodd" /></svg>
+                                <span>${kpi.name}</span>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2 mt-2 kpi-value-section">
+                                <div>
+                                    <div class="kpi-value-label">Actual Estimado:</div>
+                                    <div class="kpi-value">${kpi.currentValue || 'N/A'}</div>
+                                </div>
+                                <div>
+                                    <div class="kpi-value-label">Objetivo:</div>
+                                    <div class="kpi-value">${kpi.targetValue || 'N/A'} <span class="kpi-metric">${kpi.metric || ''}</span></div>
+                                </div>
+                            </div>
+                        `;
+                    kpiListDiv.appendChild(kpiCard);
+                });
+            } else {
+                kpiListDiv.innerHTML = "<p class='text-gray-400'>No se han definido KPIs.</p>";
+            }
+
+            const nextStepsUl = document.getElementById('summaryNextStepsList');
+            nextStepsUl.innerHTML = '';
+            const steps = [
+                { title: "Validación Técnica", description: "Detallar la solución y requisitos técnicos." },
+                { title: "Planificación", description: "Elaborar plan de implementación y cronograma detallado." },
+                { title: "Desarrollo", description: "Configuración y desarrollo del piloto." },
+                { title: "Pruebas", description: "Fase de pruebas exhaustivas y ajustes necesarios." },
+                { title: "Despliegue", description: "Implementación controlada y monitorización inicial." },
+                { title: "Evaluación", description: "Medición de KPIs y planificación de escalado." }
+            ];
+
+            steps.forEach((step, index) => {
+                const li = document.createElement('li');
+                li.classList.add('roadmap-step');
+                li.innerHTML = `
+                        <div class="roadmap-step-icon-wrapper">
+                            <div class="roadmap-step-icon">
+                                <span>${index + 1}</span>
+                            </div>
+                        </div>
+                        <div class="roadmap-step-content">
+                            <div class="roadmap-step-title">${step.title}</div>
+                            <div class="roadmap-step-description">${step.description}</div>
+                        </div>
+                    `;
+                nextStepsUl.appendChild(li);
+            });
+
+            navigateTo('sectionResumen', document.getElementById('navResumen'));
+        }
+
+    </script>
+</body>
+</html>
