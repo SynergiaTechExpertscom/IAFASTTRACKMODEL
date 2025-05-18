@@ -3,8 +3,9 @@ from django.http import JsonResponse
 from django.contrib.auth import authenticate, login as django_auth_login, logout as django_auth_logout
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.shortcuts import get_object_or_404, render
+from django.utils.decorators import method_decorator
 import json
-from .models import Cliente, ProyectoCatalog
+from .models import Cliente, ProyectoCatalog, ClienteFile
 
 @ensure_csrf_cookie # Para que Django envíe el cookie CSRF en la primera petición GET si es necesario
 def main_app_view(request):
@@ -31,25 +32,59 @@ def api_login(request):
             return JsonResponse({'success': False, 'message': 'Credenciales incorrectas o usuario no autorizado'}, status=401)
     return JsonResponse({'error': 'Metodo POST requerido'}, status=405)
 
+@csrf_exempt # Para desarrollo. En producción, el frontend debe enviar el token CSRF.
 def api_get_clients(request):
     # Aquí deberías añadir autenticación si es necesario
-    if not request.user.is_authenticated or not request.user.is_staff:
-        return JsonResponse({'error': 'No autorizado'}, status=401)
+    # if not request.user.is_authenticated or not request.user.is_staff:
+    #     return JsonResponse({'error': 'No autorizado'}, status=401)
     clientes = Cliente.objects.all().order_by('nombre_cliente')
     data = [{"id": cliente.id, "name": cliente.nombre_cliente} for cliente in clientes]
     return JsonResponse(data, safe=False)
 
+@csrf_exempt # Para desarrollo. En producción, el frontend debe enviar el token CSRF.
 def api_get_client_diagnostico(request, client_id):
-    if not request.user.is_authenticated or not request.user.is_staff:
-        return JsonResponse({'error': 'No autorizado'}, status=401)
+    # if not request.user.is_authenticated or not request.user.is_staff:
+    #     return JsonResponse({'error': 'No autorizado'}, status=401)
     cliente = get_object_or_404(Cliente, id=client_id)
     return JsonResponse(cliente.diagnostico_json)
 
+@csrf_exempt # Para desarrollo. En producción, el frontend debe enviar el token CSRF.
 def api_get_project_catalog(request):
-    if not request.user.is_authenticated or not request.user.is_staff:
-        return JsonResponse({'error': 'No autorizado'}, status=401)
+    # if not request.user.is_authenticated or not request.user.is_staff:
+    #     return JsonResponse({'error': 'No autorizado'}, status=401)
     try:
         catalogo = ProyectoCatalog.objects.latest('version')
         return JsonResponse(catalogo.datos_catalogo)
     except ProyectoCatalog.DoesNotExist:
         return JsonResponse({'error': 'Catalogo de proyectos no encontrado'}, status=404)
+
+@csrf_exempt
+def api_save_summary(request, client_id):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+        except Exception:
+            return JsonResponse({'success': False, 'message': 'JSON inválido'}, status=400)
+        cliente = get_object_or_404(Cliente, id=client_id)
+        cliente.resumen_json = data
+        cliente.save()
+        return JsonResponse({'success': True, 'message': 'Resumen guardado correctamente'})
+    return JsonResponse({'error': 'Método POST requerido'}, status=405)
+
+@csrf_exempt
+def api_upload_file(request, client_id):
+    if request.method == 'POST' and request.FILES:
+        cliente = get_object_or_404(Cliente, id=client_id)
+        files_info = []
+        for f in request.FILES.getlist('files'):
+            cliente_file = ClienteFile.objects.create(
+                cliente=cliente,
+                file=f,
+                nombre_original=f.name
+            )
+            files_info.append({
+                'nombre': cliente_file.nombre_original,
+                'url': cliente_file.file.url
+            })
+        return JsonResponse({'success': True, 'files': files_info})
+    return JsonResponse({'success': False, 'message': 'No files uploaded'}, status=400)

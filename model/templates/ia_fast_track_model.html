@@ -875,6 +875,10 @@
                         </ul>
                     </div>
                 </div>
+                <div class="text-center mt-6">
+                    <button id="saveSummaryButton" class="btn-primary px-8 py-3 text-lg">Guardar</button>
+                    <div id="saveSummaryMessage" class="mt-4 text-center text-sm"></div>
+                </div>
             </section>
         </main>
 
@@ -1049,10 +1053,10 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        // Incluir CSRF token si está disponible y es requerido por Django
                         ...(csrfToken && { 'X-CSRFToken': csrfToken })
                     },
-                    body: JSON.stringify({ username, password })
+                    body: JSON.stringify({ username, password }),
+                    credentials: 'include' // <-- ¡IMPORTANTE!
                 });
 
                 const data = await response.json();
@@ -1062,10 +1066,12 @@
                     document.getElementById('appSubtitle').textContent = "Panel de Administración de Pilotos IA";
                     await fetchClientsAndDisplay(); // Carga lista de clientes y navega
                 } else {
+                    alert(data.message);
                     errorMessageDiv.textContent = data.message || "Error de login desconocido.";
                     errorMessageDiv.classList.remove('hidden');
                 }
             } catch (error) {
+                alert(error);
                 console.error("Error en la petición de login:", error);
                 errorMessageDiv.textContent = "Error de conexión al intentar iniciar sesión. (¿Está el backend Django funcionando?)";
                 errorMessageDiv.classList.remove('hidden');
@@ -1694,7 +1700,7 @@
             if (kpiDiv) kpiDiv.remove();
         }
 
-        function generateSummary() {
+        async function generateSummary() {
             selectedPilot.name = document.getElementById('pilotoNameInput').value;
             selectedPilot.valueProposition = document.getElementById('pilotValueProposition').value;
             selectedPilot.techType = document.getElementById('pilotTechType').value;
@@ -1772,14 +1778,13 @@
             document.getElementById('summarySelectedProcessTechnology').textContent = selectedPilot.selectedProcessTechnologyContent || "No especificada";
             document.getElementById('summaryCurrentProcessDescription').textContent = selectedPilot.currentDescription || "No descrita";
 
-            const summaryFilesDiv = document.getElementById('summaryAttachedFiles');
-            summaryFilesDiv.innerHTML = '';
-            if (selectedPilot.attachedFileNames && selectedPilot.attachedFileNames.length > 0) {
-                const p = document.createElement('p'); p.classList.add('text-sm', 'highlight-gray', 'mt-1'); p.textContent = 'Archivos Adjuntos:';
-                const ul = document.createElement('ul'); ul.classList.add('list-disc', 'list-inside', 'text-sm', 'highlight-gray', 'pl-4');
-                selectedPilot.attachedFileNames.forEach(fileName => { const li = document.createElement('li'); li.textContent = fileName; ul.appendChild(li); });
-                summaryFilesDiv.appendChild(p); summaryFilesDiv.appendChild(ul);
-            }
+            // Si ya tienes archivos subidos y referenciados en el resumen, pásalos aquí.
+            // Si no, puedes pasar un array vacío o los nombres seleccionados.
+            // Al guardar el resumen
+            let archivos_adjuntos = await uploadFilesIfAny();
+            selectedPilot.archivos_adjuntos = archivos_adjuntos;
+
+            renderSummaryAttachedFiles(selectedPilot.archivos_adjuntos || []);
             document.getElementById('summaryPilotValueProposition').textContent = selectedPilot.valueProposition || "No definida";
             document.getElementById('summaryPilotTechType').textContent = selectedPilot.techType || "No definido";
             document.getElementById('summaryPilotSolutionDescription').textContent = selectedPilot.solutionDescription || "No descrita";
@@ -1843,6 +1848,121 @@
             navigateTo('sectionResumen', document.getElementById('navResumen'));
         }
 
+        document.addEventListener('DOMContentLoaded', () => {
+            // ... tu código existente ...
+            const saveBtn = document.getElementById('saveSummaryButton');
+            if (saveBtn) {
+                saveBtn.addEventListener('click', saveSummary);
+            }
+        });
+
+
+        // Guardar resumen
+        async function saveSummary() {
+            const messageDiv = document.getElementById('saveSummaryMessage');
+            messageDiv.textContent = '';
+            if (!currentSelectedClientId) {
+                messageDiv.textContent = 'No hay cliente seleccionado.';
+                return;
+            }
+
+            // 1. Subir archivos y obtener referencias
+            let archivos_adjuntos = await uploadFilesIfAny();
+
+            // 2. Estructura coherente del resumen
+            const resumen = {
+                cliente: document.getElementById('summaryCompanyName').textContent,
+                objetivo: document.querySelector('#summaryPillsContainer .summary-pill')?.textContent || "",
+                caso_uso: (document.querySelectorAll('#summaryPillsContainer .summary-pill').length > 1)
+                    ? document.querySelectorAll('#summaryPillsContainer .summary-pill')[1].textContent
+                    : "",
+                proceso: document.getElementById('summaryProcessName').textContent,
+                descripcion_proyecto: document.getElementById('summarySelectedProcessDescription').textContent,
+                tecnologia: document.getElementById('summarySelectedProcessTechnology').textContent,
+                descripcion_proceso_actual: document.getElementById('summaryCurrentProcessDescription').textContent,
+                archivos_adjuntos: archivos_adjuntos, // [{nombre, url}, ...]
+                propuesta_valor: document.getElementById('summaryPilotValueProposition').textContent,
+                tipo_tecnologia: document.getElementById('summaryPilotTechType').textContent,
+                descripcion_solucion: document.getElementById('summaryPilotSolutionDescription').textContent,
+                kpis: selectedPilot.kpis || [],
+                pasos: Array.from(document.querySelectorAll('#summaryNextStepsList .roadmap-step')).map(li => ({
+                    titulo: li.querySelector('.roadmap-step-title')?.textContent || "",
+                    descripcion: li.querySelector('.roadmap-step-description')?.textContent || ""
+                }))
+            };
+
+            // 3. Guardar el resumen
+            try {
+                const response = await fetch(`/api/client/${currentSelectedClientId}/guardar_resumen/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(csrfToken && { 'X-CSRFToken': csrfToken })
+                    },
+                    body: JSON.stringify(resumen)
+                });
+                const data = await response.json();
+                if (response.ok && data.success) {
+                    messageDiv.textContent = 'Resumen guardado correctamente.';
+                    messageDiv.style.color = '#4C8EFA';
+                    // Actualiza la UI para mostrar los enlaces de descarga
+                    renderSummaryAttachedFiles(archivos_adjuntos);
+                } else {
+                    messageDiv.textContent = data.message || 'Error al guardar el resumen.';
+                    messageDiv.style.color = '#F87171';
+                }
+            } catch (error) {
+                messageDiv.textContent = 'Error de conexión al guardar el resumen.';
+                messageDiv.style.color = '#F87171';
+            }
+        }
+
+        //Subir archivos
+        async function uploadFilesIfAny() {
+            const fileInput = document.getElementById('currentProcessFiles');
+            if (!fileInput.files.length) return [];
+
+            const formData = new FormData();
+            for (const file of fileInput.files) {
+                formData.append('files', file);
+            }
+            const response = await fetch(`/api/client/${currentSelectedClientId}/upload_file/`, {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();
+            if (data.success) {
+                // Guarda la referencia en selectedPilot para el resumen
+                selectedPilot.archivos_adjuntos = data.files;
+                return data.files; // [{nombre, url}, ...]
+            }
+            return [];
+        }
+
+        function renderSummaryAttachedFiles(archivos_adjuntos) {
+            const summaryFilesDiv = document.getElementById('summaryAttachedFiles');
+            summaryFilesDiv.innerHTML = '';
+            if (archivos_adjuntos && archivos_adjuntos.length > 0) {
+                const p = document.createElement('p');
+                p.classList.add('text-sm', 'highlight-gray', 'mt-1');
+                p.textContent = 'Archivos Adjuntos:';
+                const ul = document.createElement('ul');
+                ul.classList.add('list-disc', 'list-inside', 'text-sm', 'highlight-gray', 'pl-4');
+                archivos_adjuntos.forEach(file => {
+                    const li = document.createElement('li');
+                    const a = document.createElement('a');
+                    a.href = file.url;
+                    a.textContent = file.nombre;
+                    a.target = '_blank';
+                    a.rel = 'noopener noreferrer';
+                    a.download = file.nombre;
+                    li.appendChild(a);
+                    ul.appendChild(li);
+                });
+                summaryFilesDiv.appendChild(p);
+                summaryFilesDiv.appendChild(ul);
+            }
+        }
     </script>
 </body>
 </html>

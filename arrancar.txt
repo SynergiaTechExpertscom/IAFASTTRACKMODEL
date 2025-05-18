@@ -1,1 +1,6 @@
 python manage.py runserver
+
+
+//ACTUALIZAR DB
+python manage.py makemigrations model
+python manage.py migrate

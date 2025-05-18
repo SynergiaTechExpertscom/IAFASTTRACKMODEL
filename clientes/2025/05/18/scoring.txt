@@ -1,0 +1,160 @@
+Modelo Detallado de Scoring para Assessment de Madurez Tecnológica
+Objetivo General: Medir el nivel de madurez digital y eficiencia operativa de una empresa (0-100), a partir de entrevistas estructuradas.
+
+Scoring Global Fórmula:
+
+Scoring Global = 60% Transformación Digital + 40% Procesos
+Nota: Todos los valores de las subcategorías se evalúan inicialmente en una escala de 1-5. El promedio de los ítems de cada subcategoría se normaliza a una escala 0-100 usando: Valor normalizado = ((valor_promedio_1_a_5 - 1) / 4) * 100. Luego, estos valores normalizados se ponderan según el peso de la subcategoría y la dimensión.
+Dimensión 1: Transformación Digital (Peso Global: 60%)
+Evalúa el grado de madurez tecnológica y digital de la empresa.
+
+1.1. Digitalización de Procesos (Peso en Dimensión: 20%) 
+Descripción: Grado de conversión de procesos manuales y/o basados en papel a formatos y flujos de trabajo digitales.    
+
+* **Ítem 1.1.1: Digitalización de procesos clave de cara al cliente (onboarding, solicitudes, soporte básico).**
+    * Nivel 1 (Muy Bajo): Procesos predominantemente manuales, alta dependencia del papel, email no estructurado. Interacción con cliente requiere intervención humana constante.
+    * Nivel 5 (Muy Alto): Autoservicio digital completo para clientes en procesos clave. Flujos de trabajo digitales y automatizados. Mínima intervención humana para tareas estándar. Datos generados digitalmente.
+* **Ítem 1.1.2: Digitalización de procesos internos operativos (back-office).**
+    * Nivel 1 (Muy Bajo): Operaciones internas dependen de documentación física, hojas de cálculo aisladas, y comunicación manual.
+    * Nivel 5 (Muy Alto): Procesos internos mayoritariamente sin papel, gestionados en plataformas digitales integradas, con flujos de trabajo definidos y trazables.
+* **Ítem 1.1.3: Acceso y gestión digital de la información y documentación.**
+    * Nivel 1 (Muy Bajo): Documentos importantes almacenados físicamente o en sistemas de archivos locales/personales, difíciles de buscar y compartir.
+    * Nivel 5 (Muy Alto): Sistema de gestión documental (DMS/ECM) centralizado, con control de versiones, permisos, búsqueda avanzada y acceso móvil seguro.
+* **Ítem 1.1.4: Adopción de herramientas digitales por parte de los empleados.**
+    * Nivel 1 (Muy Bajo): Baja adopción o uso inconsistente de las herramientas digitales disponibles; preferencia por métodos tradicionales.
+    * Nivel 5 (Muy Alto): Alta competencia y uso proactivo de herramientas digitales por parte de los empleados en sus tareas diarias, fomentado por la empresa.
+1.2. Automatización de Procesos (Peso en Dimensión: 25%) 
+Descripción: Uso de herramientas y tecnologías para reducir tareas repetitivas, minimizar errores humanos y optimizar la eficiencia.    
+
+* **Ítem 1.2.1: Nivel de automatización en tareas repetitivas y basadas en reglas.**
+    * Nivel 1 (Muy Bajo): Prácticamente todas las tareas repetitivas se realizan manualmente.
+    * Nivel 5 (Muy Alto): Amplia implementación de RPA (Robotic Process Automation) o scripts para tareas repetitivas en múltiples departamentos. La IA se usa para automatizar decisiones simples.
+* **Ítem 1.2.2: Integración y automatización de flujos de trabajo entre sistemas/departamentos.**
+    * Nivel 1 (Muy Bajo): Sistemas aislados (silos), transferencia de información manual o mediante procesos de importación/exportación propensos a errores.
+    * Nivel 5 (Muy Alto): Sistemas integrados mediante APIs o plataformas de integración (iPaaS/ESB), permitiendo flujos de trabajo automatizados end-to-end entre departamentos.
+* **Ítem 1.2.3: Automatización de la comunicación y notificaciones (internas y externas).**
+    * Nivel 1 (Muy Bajo): Comunicaciones y alertas gestionadas manualmente (emails individuales, llamadas).
+    * Nivel 5 (Muy Alto): Sistemas automatizados para notificaciones (ej. estado de pedidos, alertas de sistema, recordatorios internos) basados en eventos y reglas de negocio.
+* **Ítem 1.2.4: Uso de BPM (Business Process Management) para modelar y optimizar procesos automatizados.**
+    * Nivel 1 (Muy Bajo): Procesos no documentados formalmente o modelados de forma ad-hoc y estática.
+    * Nivel 5 (Muy Alto): Uso de herramientas BPM para modelar, ejecutar, monitorizar y optimizar continuamente los procesos de negocio, con foco en la automatización.
+1.3. Monitoreo y Gestión de Datos (Peso en Dimensión: 20%) 
+Descripción: Capacidad para recopilar, almacenar, procesar, visualizar y tomar decisiones basadas en datos fiables y oportunos.    
+
+* **Ítem 1.3.1: Disponibilidad y calidad de datos para la toma de decisiones.**
+    * Nivel 1 (Muy Bajo): Datos dispersos, inconsistentes, de baja calidad o inaccesibles. Decisiones basadas en intuición o datos parciales.
+    * Nivel 5 (Muy Alto): Datos centralizados (o federados), limpios, gobernados y fácilmente accesibles. Cultura de toma de decisiones basada en datos (Data-Driven).
+* **Ítem 1.3.2: Uso de herramientas de Business Intelligence (BI) y visualización.**
+    * Nivel 1 (Muy Bajo): Reportes básicos generados manualmente (ej. Excel), con baja frecuencia y poca capacidad de análisis interactivo.
+    * Nivel 5 (Muy Alto): Uso extensivo de plataformas de BI modernas (ej. Power BI, Tableau) con dashboards interactivos, autoservicio para usuarios de negocio y acceso en tiempo real a KPIs.
+* **Ítem 1.3.3: Gobierno de Datos (Data Governance).**
+    * Nivel 1 (Muy Bajo): Sin políticas formales de gobierno de datos, roles o responsabilidades no definidos. Problemas de seguridad y cumplimiento.
+    * Nivel 5 (Muy Alto): Marco de gobierno de datos implementado, con políticas claras, roles definidos (Data Stewards, etc.), gestión de metadatos, linaje de datos y cumplimiento normativo (RGPD, etc.).
+* **Ítem 1.3.4: Capacidad de análisis de datos en tiempo real o cercano al real.**
+    * Nivel 1 (Muy Bajo): Análisis de datos retrospectivo, con alta latencia entre la generación del dato y su análisis.
+    * Nivel 5 (Muy Alto): Capacidad para procesar y analizar flujos de datos en tiempo real (streaming analytics), permitiendo la toma de decisiones y acciones inmediatas.
+1.4. Inteligencia Artificial (IA) y Analítica Avanzada (Peso en Dimensión: 20%) 
+Descripción: Adopción estratégica y efectiva de IA (predictiva, generativa) y técnicas de analítica avanzada para obtener insights, automatizar decisiones complejas y crear nuevas capacidades.    
+
+* **Ítem 1.4.1: Uso de IA Predictiva (Machine Learning para forecasting, segmentación, detección de anomalías).**
+    * Nivel 1 (Muy Bajo): Sin uso o uso experimental muy limitado de modelos predictivos.
+    * Nivel 5 (Muy Alto): IA Predictiva integrada en procesos clave (ej. predicción de demanda, churn de clientes, mantenimiento predictivo, scoring de riesgo), con modelos reentrenados y monitorizados.
+* **Ítem 1.4.2: Adopción de IA Generativa (para creación de contenido, chatbots avanzados, co-pilotos, etc.).**
+    * Nivel 1 (Muy Bajo): Sin exploración o solo conocimiento teórico de la IA Generativa.
+    * Nivel 5 (Muy Alto): Proyectos piloto o en producción utilizando IA Generativa para mejorar la eficiencia, personalizar la experiencia o crear nuevos productos/servicios, con consideraciones éticas y de gobernanza.
+* **Ítem 1.4.3: Integración de IA en la toma de decisiones de negocio.**
+    * Nivel 1 (Muy Bajo): La IA no influye en las decisiones estratégicas u operativas.
+    * Nivel 5 (Muy Alto): Los insights y predicciones de la IA son un componente clave en la toma de decisiones a diferentes niveles de la organización. Se confía en las recomendaciones de la IA.
+* **Ítem 1.4.4: Disponibilidad de talento y experimentación en IA.**
+    * Nivel 1 (Muy Bajo): Sin personal con conocimientos en IA, ni iniciativas para formarlo o contratarlo. Sin cultura de experimentación.
+    * Nivel 5 (Muy Alto): Equipos dedicados (o roles con tiempo asignado) para IA y Data Science. Fomento de la experimentación, formación continua y colaboración con ecosistema externo (universidades, startups).
+1.5. Infraestructura Tecnológica (Peso en Dimensión: 15%) 
+Descripción: Modernidad, escalabilidad, seguridad y eficiencia del stack tecnológico, incluyendo sistemas, redes y uso de la nube.    
+
+* **Ítem 1.5.1: Modernización de sistemas core y adopción de la nube.**
+    * Nivel 1 (Muy Bajo): Sistemas legacy predominantes, infraestructura mayoritariamente on-premise, con altos costes de mantenimiento y baja flexibilidad.
+    * Nivel 5 (Muy Alto): Arquitectura moderna (microservicios, APIs), uso estratégico de servicios cloud (IaaS, PaaS, SaaS) para escalabilidad, agilidad y optimización de costes. Plan de migración de sistemas legacy claro.
+* **Ítem 1.5.2: Escalabilidad y rendimiento de la infraestructura.**
+    * Nivel 1 (Muy Bajo): La infraestructura sufre con picos de demanda, tiempos de respuesta lentos, dificultades para escalar.
+    * Nivel 5 (Muy Alto): Capacidad para escalar recursos dinámicamente según la demanda (auto-scaling), alta disponibilidad y rendimiento optimizado.
+* **Ítem 1.5.3: Ciberseguridad y cumplimiento normativo.**
+    * Nivel 1 (Muy Bajo): Medidas de seguridad básicas o desactualizadas, baja concienciación, incidentes frecuentes o alto riesgo percibido.
+    * Nivel 5 (Muy Alto): Estrategia de ciberseguridad robusta y proactiva (Zero Trust, DevSecOps), auditorías regulares, herramientas avanzadas de detección y respuesta, cumplimiento normativo gestionado.
+* **Ítem 1.5.4: Conectividad y redes.**
+    * Nivel 1 (Muy Bajo): Red interna lenta, inestable o con cuellos de botella. Conectividad externa limitada o de baja calidad.
+    * Nivel 5 (Muy Alto): Redes de alta velocidad, fiables y seguras. Uso de tecnologías modernas (SD-WAN, etc.) y conectividad optimizada para servicios cloud y trabajo remoto.
+Dimensión 2: Procesos de Negocio (Peso Global: 40%) 
+Evalúa la eficiencia, digitalización y orientación al cliente de los procesos clave del negocio.    
+
+2.1. Ventas y Comercial (Peso en Dimensión: 20%) 
+Descripción: Eficiencia y digitalización del ciclo comercial completo, desde la captación de leads hasta el cierre y la gestión de la relación con el cliente (CRM).    
+
+* **Ítem 2.1.1: Gestión de Relaciones con Clientes (CRM).**
+    * Nivel 1 (Muy Bajo): No se usa CRM o se usan hojas de cálculo/sistemas aislados. Visión fragmentada del cliente.
+    * Nivel 5 (Muy Alto): CRM moderno y centralizado, integrado con otros sistemas, proporciona visión 360º del cliente, automatiza tareas de seguimiento y personaliza la interacción.
+* **Ítem 2.1.2: Digitalización del proceso de ventas (captación, cualificación, propuesta, cierre).**
+    * Nivel 1 (Muy Bajo): Procesos de venta mayoritariamente manuales, presenciales o telefónicos, con poca tecnología de apoyo.
+    * Nivel 5 (Muy Alto): Proceso de ventas altamente digitalizado con herramientas para cada etapa (ej. marketing automation, sales intelligence, CPQ, firma electrónica).
+* **Ítem 2.1.3: Uso de datos y analítica para optimizar la actividad comercial.**
+    * Nivel 1 (Muy Bajo): Pocos datos sobre rendimiento de ventas o actividad comercial. Decisiones basadas en experiencia o intuición.
+    * Nivel 5 (Muy Alto): Uso de analítica de ventas para identificar oportunidades, predecir resultados, optimizar embudos y personalizar ofertas. KPIs de ventas claros y monitorizados.
+2.2. Atención al Cliente (Peso en Dimensión: 15%) 
+Descripción: Calidad, eficiencia y personalización de la experiencia de atención al cliente a través de múltiples canales.    
+
+* **Ítem 2.2.1: Estrategia omnicanal y consistencia de la experiencia.**
+    * Nivel 1 (Muy Bajo): Canales de atención limitados y desconectados. Experiencia de cliente inconsistente.
+    * Nivel 5 (Muy Alto): Experiencia de cliente fluida y consistente a través de múltiples canales integrados (web, móvil, chat, teléfono, rrss), con historial compartido.
+* **Ítem 2.2.2: Nivel de automatización en atención al cliente (chatbots, FAQs dinámicas, autoservicio).**
+    * Nivel 1 (Muy Bajo): Atención totalmente manual y reactiva.
+    * Nivel 5 (Muy Alto): Uso extensivo de portales de autoservicio, FAQs inteligentes y chatbots con IA para resolver consultas frecuentes 24/7, escalando a agentes humanos solo cuando es necesario.
+* **Ítem 2.2.3: Medición y gestión de la satisfacción del cliente (NPS, CSAT, CES).**
+    * Nivel 1 (Muy Bajo): No se mide la satisfacción del cliente o se hace de forma esporádica y no sistemática.
+    * Nivel 5 (Muy Alto): Medición continua de la satisfacción del cliente con métricas clave, análisis de feedback y procesos de mejora continua basados en los resultados.
+2.3. Operaciones y Producción (Peso en Dimensión: 20%) 
+Descripción: Optimización de flujos de trabajo, trazabilidad, eficiencia y uso de tecnología en los procesos operativos o productivos principales.    
+
+* **Ítem 2.3.1: Digitalización y optimización de la cadena de valor principal.**
+    * Nivel 1 (Muy Bajo): Procesos operativos clave con alta dependencia manual, poca visibilidad y eficiencia subóptima.
+    * Nivel 5 (Muy Alto): Cadena de valor principal altamente digitalizada, optimizada y monitorizada en tiempo real (ej. mediante ERP moderno, MES, SCM).
+* **Ítem 2.3.2: Trazabilidad y visibilidad end-to-end de operaciones/producción.**
+    * Nivel 1 (Muy Bajo): Difícil rastrear productos, pedidos o estados de los procesos. Poca visibilidad global.
+    * Nivel 5 (Muy Alto): Trazabilidad completa de productos/servicios y visibilidad en tiempo real del estado de las operaciones, permitiendo una gestión proactiva.
+* **Ítem 2.3.3: Uso de tecnología para mejorar la eficiencia y calidad (sensores, IoT, analítica operativa).**
+    * Nivel 1 (Muy Bajo): Mínima aplicación de tecnología avanzada en operaciones.
+    * Nivel 5 (Muy Alto): Uso de sensores, IoT, y analítica de datos para optimizar el uso de recursos, predecir fallos, mejorar la calidad y reducir desperdicios.
+2.4. Administración y Finanzas (Peso en Dimensión: 15%) 
+Descripción: Nivel de automatización y digitalización en la gestión contable, financiera, documental y de reporting.    
+
+* **Ítem 2.4.1: Automatización de procesos financieros y contables (facturación, cobros, pagos, cierres).**
+    * Nivel 1 (Muy Bajo): Procesos financieros y contables mayoritariamente manuales, basados en papel y hojas de cálculo.
+    * Nivel 5 (Muy Alto): Alta automatización de la facturación (e-invoicing), gestión de cobros y pagos, conciliaciones bancarias y procesos de cierre, a menudo integrados con el ERP.
+* **Ítem 2.4.2: Gestión documental y flujos de aprobación digitales.**
+    * Nivel 1 (Muy Bajo): Documentos financieros y administrativos gestionados en papel o archivos dispersos. Aprobaciones manuales.
+    * Nivel 5 (Muy Alto): Sistema de gestión documental para el área financiera/administrativa con flujos de aprobación digitales, seguros y trazables.
+* **Ítem 2.4.3: Reporting financiero y análisis de rendimiento.**
+    * Nivel 1 (Muy Bajo): Reporting financiero manual, lento y propenso a errores. Poca capacidad de análisis.
+    * Nivel 5 (Muy Alto): Generación automatizada de informes financieros, dashboards de KPIs financieros en tiempo real y herramientas de análisis para planificación financiera y control de gestión (FP&A).
+2.5. Colaboración y Comunicación Interna (Peso en Dimensión: 15%) 
+Descripción: Uso efectivo de herramientas digitales para fomentar el trabajo colaborativo, la comunicación y el intercambio de conocimiento internamente.    
+
+* **Ítem 2.5.1: Adopción de plataformas colaborativas modernas.**
+    * Nivel 1 (Muy Bajo): Comunicación basada principalmente en email y reuniones presenciales. Uso limitado o nulo de herramientas colaborativas.
+    * Nivel 5 (Muy Alto): Uso extensivo y efectivo de plataformas colaborativas integrales (ej. Microsoft Teams, Google Workspace, Slack) para comunicación, gestión de proyectos, compartición de documentos y trabajo en equipo.
+* **Ítem 2.5.2: Acceso a la información y gestión del conocimiento interno.**
+    * Nivel 1 (Muy Bajo): Conocimiento reside en individuos o silos. Dificultad para encontrar información o documentación interna.
+    * Nivel 5 (Muy Alto): Intranet moderna, base de conocimiento centralizada o wiki corporativa bien estructurada y actualizada, facilitando el acceso y la compartición del conocimiento.
+* **Ítem 2.5.3: Fomento de la comunicación y cultura digital interna.**
+    * Nivel 1 (Muy Bajo): Comunicación interna jerárquica y unidireccional. Poca cultura de colaboración digital.
+    * Nivel 5 (Muy Alto): Canales de comunicación interna diversos y bidireccionales. Cultura que fomenta la transparencia, la colaboración abierta y el uso de herramientas digitales.
+2.6. Agilidad Organizacional (Peso en Dimensión: 15%) 
+Descripción: Capacidad de la organización para adaptarse rápidamente a los cambios, implementar nuevas iniciativas con velocidad y operar con metodologías ágiles.    
+
+* **Ítem 2.6.1: Adopción de metodologías ágiles (Scrum, Kanban, etc.) en proyectos y operaciones.**
+    * Nivel 1 (Muy Bajo): Procesos de desarrollo y gestión de proyectos tradicionales, en cascada, con ciclos largos.
+    * Nivel 5 (Muy Alto): Amplia adopción de metodologías ágiles en desarrollo de software y progresivamente en otras áreas de negocio. Equipos auto-organizados y entregas iterativas.
+* **Ítem 2.6.2: Velocidad de implementación de nuevas tecnologías o iniciativas.**
+    * Nivel 1 (Muy Bajo): Mucho tiempo para pasar de la idea a la implementación. Procesos de toma de decisión y ejecución lentos.
+    * Nivel 5 (Muy Alto): Capacidad para prototipar, probar e implementar nuevas soluciones o mejoras tecnológicas rápidamente (ej. mediante DevOps, CI/CD).
+* **Ítem 2.6.3: Adaptabilidad y respuesta al cambio (mercado, tecnología, cliente).**
+    * Nivel 1 (Muy Bajo): Alta resistencia al cambio, dificultad para adaptarse a nuevas condiciones del mercado o demandas del cliente.
+    * Nivel 5 (Muy Alto): Cultura organizacional que abraza el cambio y la mejora continua. Capacidad para pivotar estrategias o procesos rápidamente según sea necesario.

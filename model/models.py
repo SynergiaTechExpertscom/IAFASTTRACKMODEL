@@ -15,9 +15,21 @@ class ProyectoCatalog(models.Model):
 
 class Cliente(models.Model):
     nombre_cliente = models.CharField(max_length=255, unique=True)
-    diagnostico_json = models.JSONField()
+    diagnostico_json = models.JSONField(null=True, blank=True) 
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
-
+    resumen_json = models.JSONField(null=True, blank=True) 
     def __str__(self):
         return self.nombre_cliente
+
+class ClienteFile(models.Model):
+    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE, related_name='archivos')
+    file = models.FileField(upload_to='clientes/%Y/%m/%d/')
+    nombre_original = models.CharField(max_length=255)
+    fecha_subida = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.nombre_original
+
+    def get_url(self):
+        return self.file.url
