@@ -13,6 +13,19 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 
 import os
 import posixpath
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+STATIC_URL = '/static/'
+
+# En producción necesitas estas:
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # destino para collectstatic
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
+
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -28,24 +41,6 @@ SECRET_KEY = '4cfeccdb-b04b-4b34-9255-d6f2e681c463'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'console': {
-            'level': 'DEBUG',
-            'class': 'logging.StreamHandler',
-        },
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['console'],
-            'level': 'DEBUG',
-            'propagate': True,
-        },
-    },
-}
 
 ALLOWED_HOSTS = ['https://ia-fast-track-hggfakg6fch5h2bd.francecentral-01.azurewebsites.net', 'ia-fast-track-hggfakg6fch5h2bd.francecentral-01.azurewebsites.net', '127.0.0.1', 'localhost']
 
@@ -98,12 +93,32 @@ WSGI_APPLICATION = 'IAFASTTRACKMODEL.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+
+# Detect environment: use 'PRODUCTION' env var or DEBUG flag
+if os.environ.get('PRODUCTION', '').lower() == 'true' or not DEBUG:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'nombre_base_datos',
+            'USER': 'usuario@servidor',
+            'PASSWORD': 'contraseña',
+            'HOST': 'servidor.postgres.database.azure.com',
+            'PORT': '5432',
+        }
     }
-}
+    db_info = DATABASES['default']
+    conn_str = f"ENGINE={db_info['ENGINE']}; NAME={db_info['NAME']}; USER={db_info['USER']}; HOST={db_info['HOST']}; PORT={db_info['PORT']}"
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        }
+    }
+    db_info = DATABASES['default']
+    conn_str = f"ENGINE={db_info['ENGINE']}; NAME={db_info['NAME']}"
+
+print(f"Conectando a la base de datos: {conn_str}")
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
