@@ -4,3 +4,13 @@ python manage.py runserver
 //ACTUALIZAR DB
 python manage.py makemigrations model
 python manage.py migrate
+
+# IMPORTANTE para producción en Azure:
+# 1. Ejecuta el siguiente comando ANTES de desplegar:
+python manage.py collectstatic
+
+# Esto recopilará todos los archivos estáticos en la carpeta indicada por STATIC_ROOT (por defecto: staticfiles).
+# Asegúrate de que el servidor web de Azure esté configurado para servir archivos estáticos desde esa carpeta.
+
+# Si usas Azure App Service, revisa la documentación para servir archivos estáticos correctamente:
+# https://learn.microsoft.com/en-us/azure/app-service/configure-language-python#static-files

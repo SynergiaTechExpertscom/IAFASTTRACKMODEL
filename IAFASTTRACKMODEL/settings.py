@@ -12,23 +12,20 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
-import posixpath
+import logging  # Import logging
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Configura logging básico si no hay configuración previa
+logging.basicConfig(level=logging.INFO)
+
+# Configuración de archivos estáticos
 STATIC_URL = '/static/'
-
-# En producción necesitas estas:
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # destino para collectstatic
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
-]
 
-
-
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# Si tienes archivos estáticos personalizados, descomenta y ajusta la siguiente línea:
+# STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -144,8 +141,3 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/2.1/howto/static-files/
-STATIC_URL = '/static/'
-STATIC_ROOT = posixpath.join(*(BASE_DIR.split(os.path.sep) + ['static']))
