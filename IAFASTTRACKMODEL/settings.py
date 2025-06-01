@@ -29,6 +29,24 @@ SECRET_KEY = '4cfeccdb-b04b-4b34-9255-d6f2e681c463'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}
+
 ALLOWED_HOSTS = ['https://ia-fast-track-hggfakg6fch5h2bd.francecentral-01.azurewebsites.net', 'ia-fast-track-hggfakg6fch5h2bd.francecentral-01.azurewebsites.net', '127.0.0.1', 'localhost']
 
 # Application references
