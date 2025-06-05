@@ -906,6 +906,7 @@ function getCategoryColors(categoryName) {
                     card.style.borderColor = colors.border;
                     card.innerHTML = `${getIconForObjetivo(category.categoryName)}<span style="color: ${colors.text};">${category.categoryName}</span>`;
                     card.querySelector('svg').style.fill = colors.iconFill;
+                    card.querySelector('svg').style.stroke = colors.iconFill;
 
                     card.dataset.categoryId = generateSafeId(category.categoryName);
                     card.onclick = () => {
@@ -948,6 +949,7 @@ function getCategoryColors(categoryName) {
                     el.style.borderColor = colors.border;
                     el.querySelector('span').style.color = colors.text;
                     el.querySelector('svg').style.fill = colors.iconFill;
+                    el.querySelector('svg').style.stroke = colors.iconFill;
                 } else { // For "All" and "Sugeridos" buttons
                     el.style.backgroundColor = 'rgba(76, 142, 250, 0.3)';
                     el.style.borderColor = '#4C8EFA';
@@ -995,6 +997,7 @@ function getCategoryColors(categoryName) {
                 allCard.style.backgroundColor = `rgba(${parseInt(categoryColors.bg.slice(1, 3), 16)}, ${parseInt(categoryColors.bg.slice(3, 5), 16)}, ${parseInt(categoryColors.bg.slice(5, 7), 16)}, 0.15)`;
                 allCard.style.borderColor = categoryColors.border;
                 allCard.querySelector('svg').style.fill = categoryColors.iconFill;
+                allCard.querySelector('svg').style.stroke = categoryColors.iconFill;
                 allCard.querySelector('span').style.color = categoryColors.text;
 
                 allCard.onclick = () => {
@@ -1013,6 +1016,7 @@ function getCategoryColors(categoryName) {
                     card.style.backgroundColor = `rgba(${parseInt(categoryColors.bg.slice(1, 3), 16)}, ${parseInt(categoryColors.bg.slice(3, 5), 16)}, ${parseInt(categoryColors.bg.slice(5, 7), 16)}, 0.15)`;
                     card.style.borderColor = categoryColors.border;
                     card.querySelector('svg').style.fill = categoryColors.iconFill;
+                    card.querySelector('svg').style.stroke = categoryColors.iconFill;
                     card.querySelector('span').style.color = categoryColors.text;
                     card.onclick = () => {
                         currentSubcategoryFilter = subId;
@@ -1047,6 +1051,7 @@ function getCategoryColors(categoryName) {
                 card.style.borderColor = categoryColors.border;
                 card.querySelector('span').style.color = categoryColors.text;
                 card.querySelector('svg').style.fill = categoryColors.iconFill;
+                card.querySelector('svg').style.stroke = categoryColors.iconFill;
             });
             if (activeCardElement) {
                 activeCardElement.classList.add('active');
@@ -1609,7 +1614,10 @@ function getCategoryColors(categoryName) {
 
                 const summaryHeaderIconContainer = document.getElementById('summaryHeaderIconContainer');
                 summaryHeaderIconContainer.innerHTML = getIconForObjetivo(pilotCategoryName);
-                summaryHeaderIconContainer.querySelectorAll('svg').forEach(svg => svg.style.fill = colors.iconFill);
+                summaryHeaderIconContainer.querySelectorAll('svg').forEach(svg => {
+                    svg.style.fill = colors.iconFill;
+                    svg.style.stroke = colors.iconFill;
+                });
 
                 const summaryCardContent = document.getElementById('summaryCardContent');
                 summaryCardContent.style.borderColor = colors.border;
@@ -1618,43 +1626,64 @@ function getCategoryColors(categoryName) {
                 summaryProblemaTitle.style.color = colors.text;
                 summaryProblemaTitle.style.borderBottomColor = colors.border;
                 const problemaIcon = summaryProblemaTitle.querySelector('svg');
-                if (problemaIcon) problemaIcon.style.fill = colors.iconFill;
+                if (problemaIcon) {
+                    problemaIcon.style.fill = colors.iconFill;
+                    problemaIcon.style.stroke = colors.iconFill;
+                }
 
                 const summarySolucionTitle = document.getElementById('summarySolucionTitle');
                 summarySolucionTitle.style.color = colors.text;
                 summarySolucionTitle.style.borderBottomColor = colors.border;
                 const solucionIcon = summarySolucionTitle.querySelector('svg');
-                if (solucionIcon) solucionIcon.style.fill = colors.iconFill;
+                if (solucionIcon) {
+                    solucionIcon.style.fill = colors.iconFill;
+                    solucionIcon.style.stroke = colors.iconFill;
+                }
 
                 const summaryValorTitle = document.getElementById('summaryValorTitle');
                 summaryValorTitle.style.color = colors.text;
                 summaryValorTitle.style.borderBottomColor = colors.border;
                 const valorIcon = summaryValorTitle.querySelector('svg');
-                if (valorIcon) valorIcon.style.fill = colors.iconFill;
+                if (valorIcon) {
+                    valorIcon.style.fill = colors.iconFill;
+                    valorIcon.style.stroke = colors.iconFill;
+                }
 
                 const summaryFasesTitle = document.getElementById('summaryFasesTitle');
                 summaryFasesTitle.style.color = colors.text;
                 summaryFasesTitle.style.borderBottomColor = colors.border;
                 const fasesIcon = summaryFasesTitle.querySelector('svg');
-                if (fasesIcon) fasesIcon.style.fill = colors.iconFill;
+                if (fasesIcon) {
+                    fasesIcon.style.fill = colors.iconFill;
+                    fasesIcon.style.stroke = colors.iconFill;
+                }
 
                 const summaryKpiTitle = document.getElementById('summaryKpiTitle');
                 summaryKpiTitle.style.color = colors.text;
                 summaryKpiTitle.style.borderBottomColor = colors.border;
                 const kpiIcon = summaryKpiTitle.querySelector('svg');
-                if (kpiIcon) kpiIcon.style.fill = colors.iconFill;
+                if (kpiIcon) {
+                    kpiIcon.style.fill = colors.iconFill;
+                    kpiIcon.style.stroke = colors.iconFill;
+                }
 
                 const summaryRoiTitle = document.getElementById('summaryRoiTitle');
                 summaryRoiTitle.style.color = colors.text;
                 summaryRoiTitle.style.borderBottomColor = colors.border;
                 const roiIcon = summaryRoiTitle.querySelector('svg');
-                if (roiIcon) roiIcon.style.fill = colors.iconFill;
+                if (roiIcon) {
+                    roiIcon.style.fill = colors.iconFill;
+                    roiIcon.style.stroke = colors.iconFill;
+                }
 
                 const summaryPitchTitle = document.getElementById('summaryPitchTitle');
                 summaryPitchTitle.style.color = colors.text;
                 summaryPitchTitle.style.borderBottomColor = colors.border;
                 const pitchIcon = summaryPitchTitle.querySelector('svg');
-                if (pitchIcon) pitchIcon.style.fill = colors.iconFill;
+                if (pitchIcon) {
+                    pitchIcon.style.fill = colors.iconFill;
+                    pitchIcon.style.stroke = colors.iconFill;
+                }
 
 
                 document.querySelectorAll('#sectionResumen .summary-list li').forEach(li => li.style.borderLeftColor = colors.iconFill);
@@ -1710,7 +1739,10 @@ function getCategoryColors(categoryName) {
                                         <h5>${techItem}</h5>
                                     `;
                             const svgInCard = card.querySelector('svg');
-                            if (svgInCard) svgInCard.style.fill = colors.iconFill;
+                            if (svgInCard) {
+                                svgInCard.style.fill = colors.iconFill;
+                                svgInCard.style.stroke = colors.iconFill;
+                            }
 
                             solucionComponentsContainer.appendChild(card);
                         }
