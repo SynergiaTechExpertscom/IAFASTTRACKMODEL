@@ -1617,37 +1617,44 @@ function getCategoryColors(categoryName) {
                 const summaryProblemaTitle = document.getElementById('summaryProblemaTitle');
                 summaryProblemaTitle.style.color = colors.text;
                 summaryProblemaTitle.style.borderBottomColor = colors.border;
-                summaryProblemaTitle.querySelector('svg').style.fill = colors.iconFill;
+                const problemaIcon = summaryProblemaTitle.querySelector('svg');
+                if (problemaIcon) problemaIcon.style.fill = colors.iconFill;
 
                 const summarySolucionTitle = document.getElementById('summarySolucionTitle');
                 summarySolucionTitle.style.color = colors.text;
                 summarySolucionTitle.style.borderBottomColor = colors.border;
-                summarySolucionTitle.querySelector('svg').style.fill = colors.iconFill;
+                const solucionIcon = summarySolucionTitle.querySelector('svg');
+                if (solucionIcon) solucionIcon.style.fill = colors.iconFill;
 
                 const summaryValorTitle = document.getElementById('summaryValorTitle');
                 summaryValorTitle.style.color = colors.text;
                 summaryValorTitle.style.borderBottomColor = colors.border;
-                summaryValorTitle.querySelector('svg').style.fill = colors.iconFill;
+                const valorIcon = summaryValorTitle.querySelector('svg');
+                if (valorIcon) valorIcon.style.fill = colors.iconFill;
 
                 const summaryFasesTitle = document.getElementById('summaryFasesTitle');
                 summaryFasesTitle.style.color = colors.text;
                 summaryFasesTitle.style.borderBottomColor = colors.border;
-                summaryFasesTitle.querySelector('svg').style.fill = colors.iconFill;
+                const fasesIcon = summaryFasesTitle.querySelector('svg');
+                if (fasesIcon) fasesIcon.style.fill = colors.iconFill;
 
                 const summaryKpiTitle = document.getElementById('summaryKpiTitle');
                 summaryKpiTitle.style.color = colors.text;
                 summaryKpiTitle.style.borderBottomColor = colors.border;
-                summaryKpiTitle.querySelector('svg').style.fill = colors.iconFill;
+                const kpiIcon = summaryKpiTitle.querySelector('svg');
+                if (kpiIcon) kpiIcon.style.fill = colors.iconFill;
 
                 const summaryRoiTitle = document.getElementById('summaryRoiTitle');
                 summaryRoiTitle.style.color = colors.text;
                 summaryRoiTitle.style.borderBottomColor = colors.border;
-                summaryRoiTitle.querySelector('svg').style.fill = colors.iconFill;
+                const roiIcon = summaryRoiTitle.querySelector('svg');
+                if (roiIcon) roiIcon.style.fill = colors.iconFill;
 
                 const summaryPitchTitle = document.getElementById('summaryPitchTitle');
                 summaryPitchTitle.style.color = colors.text;
                 summaryPitchTitle.style.borderBottomColor = colors.border;
-                summaryPitchTitle.querySelector('svg').style.fill = colors.iconFill;
+                const pitchIcon = summaryPitchTitle.querySelector('svg');
+                if (pitchIcon) pitchIcon.style.fill = colors.iconFill;
 
 
                 document.querySelectorAll('#sectionResumen .summary-list li').forEach(li => li.style.borderLeftColor = colors.iconFill);
