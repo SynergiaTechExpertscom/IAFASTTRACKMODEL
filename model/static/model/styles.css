@@ -26,6 +26,10 @@
             width: 100%;
         }
 
+        .icon-white {
+            filter: brightness(0) invert(1);
+        }
+
             .main-container > header, .main-container > footer {
                 max-width: 100%;
             }
