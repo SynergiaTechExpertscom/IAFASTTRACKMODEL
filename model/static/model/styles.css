@@ -26,9 +26,16 @@
             width: 100%;
         }
 
-        .icon-white {
-            filter: brightness(0) invert(1);
-        }
+.icon-white {
+    filter: brightness(0) invert(1);
+}
+
+.icon-standard {
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+}
 
             .main-container > header, .main-container > footer {
                 max-width: 100%;
