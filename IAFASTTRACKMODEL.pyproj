@@ -50,6 +50,7 @@
     <Compile Include="model\__init__.py" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="app.yaml" />
     <Content Include="arrancar.txt" />
     <Content Include="db.sqlite3" />
     <Content Include="mcp.json" />
