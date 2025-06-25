@@ -1,6 +1,6 @@
 runtime: python310
 entrypoint: gunicorn -b :$PORT main:app
 
-# (Opcional) configuración extra:
+# (Opcional) configuraciÃ³n extra:
 # env_variables:
 #   ENV: production

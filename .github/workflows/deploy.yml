@@ -1,4 +1,4 @@
-﻿name: Deploy to GAE
+name: Deploy to GAE
 
 on:
   push:
