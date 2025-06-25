@@ -1,7 +1,8 @@
 runtime: python310
-entrypoint: gunicorn -b :$PORT main:app
+entrypoint: gunicorn -b :$PORT IAFASTTRACKMODEL.wsgi:application
 
 automatic_scaling:
   min_instances: 0          # ajusta según tráfico (p.ej., 1 para evitar cold starts)
   max_instances: 10         # establece el tope que consideres adecuado
   target_cpu_utilization: 0.65  # opcional: define cuando suele escalar
+
