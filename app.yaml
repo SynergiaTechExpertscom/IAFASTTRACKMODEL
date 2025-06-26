@@ -6,3 +6,5 @@ automatic_scaling:
   max_instances: 10         # establece el tope que consideres adecuado
   target_cpu_utilization: 0.65  # opcional: define cuando suele escalar
 
+env_variables:
+  PRODUCTION: "true"

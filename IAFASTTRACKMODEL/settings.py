@@ -99,14 +99,13 @@ WSGI_APPLICATION = 'IAFASTTRACKMODEL.wsgi.application'
 # Detect environment: use 'PRODUCTION' env var or DEBUG flag
 if os.environ.get('PRODUCTION', '').lower() == 'true' or not DEBUG:
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': 'nombre_base_datos',
-            'USER': 'usuario@servidor',
-            'PASSWORD': 'contraseña',
-            'HOST': 'servidor.postgres.database.azure.com',
-            'PORT': '5432',
-        }
+      'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'HOST': '/cloudsql/iafasttrackmodel:europe-west1:aifasttrackmodel',  # socket Unix logging
+        'NAME': 'aifasttrackmodel',
+        'USER': 'aifasttrackmodel',
+        'PASSWORD': 'Choflas_3',
+      }
     }
     db_info = DATABASES['default']
     conn_str = f"ENGINE={db_info['ENGINE']}; NAME={db_info['NAME']}; USER={db_info['USER']}; HOST={db_info['HOST']}; PORT={db_info['PORT']}"
