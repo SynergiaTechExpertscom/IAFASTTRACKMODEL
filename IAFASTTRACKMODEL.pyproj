@@ -4,7 +4,9 @@
     <Name>IAFASTTRACKMODEL</Name>
     <RootNamespace>IAFASTTRACKMODEL</RootNamespace>
     <InterpreterId>MSBuild|env|$(MSBuildProjectFullPath)</InterpreterId>
-    <Environment>PYTHONUTF8=1</Environment>
+    <Environment>PYTHONUTF8=1
+PRODUCTION=true
+path=C:\Users\tomih\AppData\Local\Programs\Python\Python39</Environment>
   </PropertyGroup>
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>

@@ -101,7 +101,8 @@ if os.environ.get('PRODUCTION', '').lower() == 'true' or not DEBUG:
     DATABASES = {
       'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'HOST': '/cloudsql/iafasttrackmodel:europe-west1:aifasttrackmodel',  # socket Unix logging
+        'HOST': '35.195.92.90',  # socket Unix logging
+        'PORT': '3306',
         'NAME': 'aifasttrackmodel',
         'USER': 'aifasttrackmodel',
         'PASSWORD': 'Choflas_3',
