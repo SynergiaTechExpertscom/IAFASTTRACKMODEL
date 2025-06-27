@@ -99,15 +99,15 @@ def api_upload_file(request, client_id):
         return JsonResponse({'success': True, 'files': files_info})
     return JsonResponse({'success': False, 'message': 'No files uploaded'}, status=400)
 
-def descargar_pdf(request):
-    # Renderiza la plantilla a HTML
-    html = render_to_string('pdf_template.html', {})  # Crea pdf_template.html si no existe
+def descargar_pdf(request, client_id):
+    cliente = get_object_or_404(Cliente, id=client_id)
+    resumen_json = cliente.resumen_json or {}
+    context = {"cliente": cliente, "resumen": resumen_json}
+    html = render_to_string('pdf_template.html', context)
     result = io.BytesIO()
-    # Convierte HTML a PDF
     pisa_status = pisa.CreatePDF(html, dest=result)
     if pisa_status.err:
         return HttpResponse('Error al generar PDF', status=500)
-    # Devuelve el PDF como respuesta
     response = HttpResponse(result.getvalue(), content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="reporte.pdf"'
     return response
