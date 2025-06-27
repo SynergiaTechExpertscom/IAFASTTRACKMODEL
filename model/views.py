@@ -16,7 +16,7 @@ def main_app_view(request):
     Sirve el archivo HTML principal.
     """
     return render(request, 'ia_fast_track_model.html')
-
+ 
 @csrf_exempt  # Para desarrollo. En producción, el frontend debe enviar el token CSRF.
 def api_login(request):
     if request.method == 'POST':
