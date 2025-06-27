@@ -1,4 +1,6 @@
 # encoding: iso-8859-1 
+import logging
+from venv import logger
 from django.http import JsonResponse, HttpResponse
 from django.contrib.auth import authenticate, login as django_auth_login, logout as django_auth_logout
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
@@ -100,14 +102,20 @@ def api_upload_file(request, client_id):
     return JsonResponse({'success': False, 'message': 'No files uploaded'}, status=400)
 
 def descargar_pdf(request, client_id):
-    cliente = get_object_or_404(Cliente, id=client_id)
-    resumen_json = cliente.resumen_json or {}
-    context = {"cliente": cliente, "resumen": resumen_json}
-    html = render_to_string('pdf_template.html', context)
-    result = io.BytesIO()
-    pisa_status = pisa.CreatePDF(html, dest=result)
-    if pisa_status.err:
-        return HttpResponse('Error al generar PDF', status=500)
-    response = HttpResponse(result.getvalue(), content_type='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename="reporte.pdf"'
-    return response
+    try:
+        logging.info(f"Descargando PDF para cliente ID: {client_id}")
+        cliente = get_object_or_404(Cliente, id=client_id)
+        resumen_json = cliente.resumen_json or {}
+        context = {"cliente": cliente, "resumen": resumen_json}
+        html = render_to_string('pdf_template.html', context)
+        result = io.BytesIO()
+        pisa_status = pisa.CreatePDF(html, dest=result)
+        if pisa_status.err:
+            logging.error("Error al generar PDF con xhtml2pdf")
+            return HttpResponse('Error al generar PDF', status=500)
+        response = HttpResponse(result.getvalue(), content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="reporte.pdf"'
+        return response
+    except Exception as e:
+        logging.exception(f"Excepción al generar PDF: {e}")
+        return HttpResponse('Error interno al generar PDF', status=500)
