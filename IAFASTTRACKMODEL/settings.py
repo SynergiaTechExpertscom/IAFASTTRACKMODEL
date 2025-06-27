@@ -11,9 +11,13 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
+from math import log
 import os
 import logging  # Import logging
 from pathlib import Path
+from re import L
+import pymysql
+pymysql.install_as_MySQLdb()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -98,20 +102,21 @@ WSGI_APPLICATION = 'IAFASTTRACKMODEL.wsgi.application'
 
 # Detect environment: use 'PRODUCTION' env var or DEBUG flag
 if os.environ.get('PRODUCTION', '').lower() == 'true' or not DEBUG:
-
+    logging.info("Running in production mode")  
     DATABASES = {
-      'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'HOST': '35.195.92.90',  # socket Unix logging
-        'PORT': '3306',
-        'NAME': 'aifasttrackmodel',
-        'USER': 'aifasttrackmodel',
-        'PASSWORD': 'Choflas_3',
-      }
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'HOST': '35.195.92.90',
+            'PORT': '3306',
+            'NAME': 'aifasttrackmodel',
+            'USER': 'aifasttrackmodel',
+            'PASSWORD': 'Choflas_3'
+        }
     }
     db_info = DATABASES['default']
     conn_str = f"ENGINE={db_info['ENGINE']}; NAME={db_info['NAME']}; USER={db_info['USER']}; HOST={db_info['HOST']}; PORT={db_info['PORT']}"
 else:
+    logging.info("Running in development mode") 
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
