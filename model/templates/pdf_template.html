@@ -4,39 +4,146 @@
     <meta charset="utf-8">
     <title>Resumen del Piloto</title>
     <style>
-        body { font-family: Arial, sans-serif; }
-        h1 { text-align: center; }
-        h2 { color: #4839CD; }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000417;
+            color: #ffffff;
+        }
+        #summaryHeaderBackground {
+            padding: 1rem;
+            border-radius: 0.75rem 0.75rem 0 0;
+            background-color: {{ colors.bg }};
+            color: {{ colors.text }};
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .card {
+            background-color: #1f2937;
+            border: 1px solid {{ colors.border }};
+            padding: 1rem 1.5rem;
+            border-radius: 0 0 0.75rem 0.75rem;
+        }
+        .section-header-title {
+            border-bottom: 2px solid {{ colors.border }};
+            color: {{ colors.text }};
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.25rem;
+        }
+        .section-header-title svg {
+            width: 1.25rem;
+            height: 1.25rem;
+            margin-right: 0.5rem;
+            fill: {{ colors.iconFill }};
+        }
+        .summary-kpi-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 0.5rem;
+        }
+        .summary-kpi-table th, .summary-kpi-table td {
+            border: 1px solid {{ colors.border }};
+            padding: 0.5rem;
+            text-align: left;
+            font-size: 0.8rem;
+        }
+        .summary-kpi-table th {
+            background-color: rgba(255,255,255,0.1);
+            color: {{ colors.text }};
+        }
+        .summary-kpi-table td {
+            color: #bdc1c6;
+        }
+        .summary-kpi-table td.kpi-impact-positive {
+            color: #34D399;
+            font-weight: bold;
+        }
+        .summary-pitch {
+            background-color: rgba(30,41,59,0.5);
+            border-left: 4px solid {{ colors.iconFill }};
+            padding: 1rem;
+            margin-top: 0.5rem;
+            font-style: italic;
+            color: #E0E0E0;
+            border-radius: 0.25rem;
+        }
     </style>
 </head>
 <body>
-    <h1>{{ cliente.nombre_cliente }}</h1>
-    <h2>{{ resumen.nombre_piloto }}</h2>
-    <p><strong>Categoría:</strong> {{ resumen.categoria_piloto }}{% if resumen.subcategoria_piloto %} - {{ resumen.subcategoria_piloto }}{% endif %}</p>
-    <h3>Problema Actual</h3>
-    <p>{{ resumen.problema_actual_descripcion }}</p>
-    <h3>Solución Propuesta</h3>
-    <p>{{ resumen.solucion_descripcion }}</p>
-    <p><strong>Tecnologías:</strong> {{ resumen.solucion_tecnologias }}</p>
-    <h3>Propuesta de Valor</h3>
-    <p>{{ resumen.propuesta_valor }}</p>
-    <h3>KPIs</h3>
-    <ul>
-    {% for kpi in resumen.kpis %}
-        <li>{{ kpi.nombre }}: hoy {{ kpi.valor_actual }}, meta {{ kpi.valor_objetivo }}, impacto {{ kpi.impacto_esperado }}</li>
-    {% empty %}
-        <li>No hay KPIs definidos.</li>
-    {% endfor %}
-    </ul>
-    <h3>ROI Indicativo</h3>
-    <ul>
-    {% for roi in resumen.roi_indicativo %}
-        <li>{{ roi.nombre }}: {{ roi.valor }}</li>
-    {% empty %}
-        <li>No se ha estimado ROI.</li>
-    {% endfor %}
-    </ul>
-    <h3>Pitch de Ventas</h3>
-    <blockquote>{{ resumen.pitch_ventas }}</blockquote>
+    <div id="summaryHeaderBackground">
+        <div>
+            <h2>{{ resumen.nombre_piloto }}</h2>
+            <p>{{ resumen.categoria_piloto }}{% if resumen.subcategoria_piloto %} / {{ resumen.subcategoria_piloto }}{% endif %}</p>
+        </div>
+        <div>{{ category_icon|safe }}</div>
+    </div>
+    <div class="card">
+        <div class="mb-4">
+            <h4 class="section-header-title">
+                {{ ICONS.clientes|default:'' }} Problema Actual
+            </h4>
+            <p>{{ resumen.problema_actual_descripcion }}</p>
+        </div>
+        <div class="mb-4">
+            <h4 class="section-header-title">
+                {{ ICONS.generativa|default:'' }} Solución IA Fast Track
+            </h4>
+            <p>{{ resumen.solucion_descripcion }}</p>
+            <p><strong>Tecnologías:</strong> {{ resumen.solucion_tecnologias }}</p>
+        </div>
+        <div class="mb-4">
+            <h4 class="section-header-title">
+                {{ ICONS.optimizacion|default:'' }} Propuesta de Valor
+            </h4>
+            <p>{{ resumen.propuesta_valor }}</p>
+        </div>
+        <div class="mb-4">
+            <h4 class="section-header-title">
+                {{ ICONS.predictiva|default:'' }} KPIs Objetivo (90 días)
+            </h4>
+            <table class="summary-kpi-table">
+                <thead>
+                    <tr>
+                        <th>KPI</th>
+                        <th>Hoy</th>
+                        <th>Meta 90d</th>
+                        <th>Impacto</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for kpi in resumen.kpis %}
+                    <tr>
+                        <td>{{ kpi.nombre }}</td>
+                        <td>{{ kpi.valor_actual }}</td>
+                        <td>{{ kpi.valor_objetivo }}</td>
+                        <td class="kpi-impact-positive">{{ kpi.impacto_esperado }}</td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="4">No hay KPIs definidos.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="mb-4">
+            <h4 class="section-header-title">
+                {{ ICONS.finance|default:'' }} ROI Indicativo
+            </h4>
+            <ul>
+            {% for roi in resumen.roi_indicativo %}
+                <li><strong>{{ roi.nombre }}:</strong> {{ roi.valor }}</li>
+            {% empty %}
+                <li>No se ha estimado ROI.</li>
+            {% endfor %}
+            </ul>
+        </div>
+        <div class="mb-4">
+            <h4 class="section-header-title">
+                {{ ICONS.campaign|default:'' }} Pitch para Ventas
+            </h4>
+            <blockquote class="summary-pitch">{{ resumen.pitch_ventas }}</blockquote>
+        </div>
+    </div>
 </body>
 </html>
