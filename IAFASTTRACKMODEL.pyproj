@@ -36,10 +36,6 @@ path=C:\Users\tomih\AppData\Local\Programs\Python\Python39</Environment>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="manage.py" />
-    <Compile Include="IAFASTTRACKMODEL\__init__.py" />
-    <Compile Include="IAFASTTRACKMODEL\settings.py" />
-    <Compile Include="IAFASTTRACKMODEL\urls.py" />
-    <Compile Include="IAFASTTRACKMODEL\wsgi.py" />
     <Compile Include="model\admin.py" />
     <Compile Include="model\apps.py" />
     <Compile Include="model\migrations\__init__.py" />
@@ -56,6 +52,26 @@ path=C:\Users\tomih\AppData\Local\Programs\Python\Python39</Environment>
     <Content Include="arrancar.txt" />
     <Content Include="db.sqlite3" />
     <Content Include="mcp.json" />
+    <Content Include="model\static\model\app.js" />
+    <Content Include="model\static\model\icons\arrow-path-rounded-square.svg" />
+    <Content Include="model\static\model\icons\arrow-trending-up.svg" />
+    <Content Include="model\static\model\icons\briefcase.svg" />
+    <Content Include="model\static\model\icons\chart-bar.svg" />
+    <Content Include="model\static\model\icons\cog-8-tooth.svg" />
+    <Content Include="model\static\model\icons\cpu-chip.svg" />
+    <Content Include="model\static\model\icons\currency-dollar.svg" />
+    <Content Include="model\static\model\icons\megaphone.svg" />
+    <Content Include="model\static\model\icons\presentation-chart-line.svg" />
+    <Content Include="model\static\model\icons\question-mark-circle.svg" />
+    <Content Include="model\static\model\icons\rocket-launch.svg" />
+    <Content Include="model\static\model\icons\server-stack.svg" />
+    <Content Include="model\static\model\icons\shield-exclamation.svg" />
+    <Content Include="model\static\model\icons\sparkles.svg" />
+    <Content Include="model\static\model\icons\squares-2x2.svg" />
+    <Content Include="model\static\model\icons\tag.svg" />
+    <Content Include="model\static\model\icons\truck.svg" />
+    <Content Include="model\static\model\icons\user-group.svg" />
+    <Content Include="model\static\model\styles.css" />
     <Content Include="model\templates\ia_fast_track_model.html">
       <Publish>True</Publish>
     </Content>
@@ -187,9 +203,11 @@ path=C:\Users\tomih\AppData\Local\Programs\Python\Python39</Environment>
     <Content Include="static\admin\js\vendor\xregexp\xregexp.min.js" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="IAFASTTRACKMODEL\" />
     <Folder Include="model\" />
     <Folder Include="model\migrations\" />
+    <Folder Include="model\static\" />
+    <Folder Include="model\static\model\" />
+    <Folder Include="model\static\model\icons\" />
     <Folder Include="model\templates\" />
     <Folder Include="static\" />
     <Folder Include="static\admin\" />
