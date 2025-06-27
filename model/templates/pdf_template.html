@@ -2,10 +2,41 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Reporte PDF</title>
+    <title>Resumen del Piloto</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        h1 { text-align: center; }
+        h2 { color: #4839CD; }
+    </style>
 </head>
 <body>
-    <h1>Este es un PDF de ejemplo</h1>
-    <p>Contenido generado para la descarga en PDF.</p>
+    <h1>{{ cliente.nombre_cliente }}</h1>
+    <h2>{{ resumen.nombre_piloto }}</h2>
+    <p><strong>Categoría:</strong> {{ resumen.categoria_piloto }}{% if resumen.subcategoria_piloto %} - {{ resumen.subcategoria_piloto }}{% endif %}</p>
+    <h3>Problema Actual</h3>
+    <p>{{ resumen.problema_actual_descripcion }}</p>
+    <h3>Solución Propuesta</h3>
+    <p>{{ resumen.solucion_descripcion }}</p>
+    <p><strong>Tecnologías:</strong> {{ resumen.solucion_tecnologias }}</p>
+    <h3>Propuesta de Valor</h3>
+    <p>{{ resumen.propuesta_valor }}</p>
+    <h3>KPIs</h3>
+    <ul>
+    {% for kpi in resumen.kpis %}
+        <li>{{ kpi.nombre }}: hoy {{ kpi.valor_actual }}, meta {{ kpi.valor_objetivo }}, impacto {{ kpi.impacto_esperado }}</li>
+    {% empty %}
+        <li>No hay KPIs definidos.</li>
+    {% endfor %}
+    </ul>
+    <h3>ROI Indicativo</h3>
+    <ul>
+    {% for roi in resumen.roi_indicativo %}
+        <li>{{ roi.nombre }}: {{ roi.valor }}</li>
+    {% empty %}
+        <li>No se ha estimado ROI.</li>
+    {% endfor %}
+    </ul>
+    <h3>Pitch de Ventas</h3>
+    <blockquote>{{ resumen.pitch_ventas }}</blockquote>
 </body>
 </html>

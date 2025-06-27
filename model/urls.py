@@ -13,5 +13,5 @@ urlpatterns = [
     path('api/proyectos/catalog/', views.api_get_project_catalog, name='api_get_project_catalog'),
     path('api/client/<int:client_id>/guardar_resumen/', views.api_save_summary, name='api_save_summary'),
     path('api/client/<int:client_id>/upload_file/', views.api_upload_file, name='api_upload_file'),
-    path('descargar-pdf/', views.descargar_pdf, name='descargar_pdf'),
+    path('descargar-pdf/<int:client_id>/', views.descargar_pdf, name='descargar_pdf'),
 ]
