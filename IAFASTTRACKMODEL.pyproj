@@ -6,7 +6,11 @@
     <InterpreterId>MSBuild|env|$(MSBuildProjectFullPath)</InterpreterId>
     <Environment>PYTHONUTF8=1
 PRODUCTION=true
-path=C:\Users\tomih\AppData\Local\Programs\Python\Python39</Environment>
+path=C:\Users\tomih\AppData\Local\Programs\Python\Python39
+DB_USER=aifasttrackmodel
+DB_PASSWORD=Choflas_3
+DB_NAME=aifasttrackmodel
+DB_CONNECTION_NAME=iafasttrackmodel:europe-west1:aifasttrackmodel</Environment>
   </PropertyGroup>
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
