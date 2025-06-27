@@ -52,30 +52,215 @@ path=C:\Users\tomih\AppData\Local\Programs\Python\Python39</Environment>
     <Content Include="arrancar.txt" />
     <Content Include="db.sqlite3" />
     <Content Include="mcp.json" />
-    <Content Include="model\static\model\app.js" />
-    <Content Include="model\static\model\icons\arrow-path-rounded-square.svg" />
-    <Content Include="model\static\model\icons\arrow-trending-up.svg" />
-    <Content Include="model\static\model\icons\briefcase.svg" />
-    <Content Include="model\static\model\icons\chart-bar.svg" />
-    <Content Include="model\static\model\icons\cog-8-tooth.svg" />
-    <Content Include="model\static\model\icons\cpu-chip.svg" />
-    <Content Include="model\static\model\icons\currency-dollar.svg" />
-    <Content Include="model\static\model\icons\megaphone.svg" />
-    <Content Include="model\static\model\icons\presentation-chart-line.svg" />
-    <Content Include="model\static\model\icons\question-mark-circle.svg" />
-    <Content Include="model\static\model\icons\rocket-launch.svg" />
-    <Content Include="model\static\model\icons\server-stack.svg" />
-    <Content Include="model\static\model\icons\shield-exclamation.svg" />
-    <Content Include="model\static\model\icons\sparkles.svg" />
-    <Content Include="model\static\model\icons\squares-2x2.svg" />
-    <Content Include="model\static\model\icons\tag.svg" />
-    <Content Include="model\static\model\icons\truck.svg" />
-    <Content Include="model\static\model\icons\user-group.svg" />
-    <Content Include="model\static\model\styles.css" />
+    <Content Include="model\static\model\app.js">
+      <Publish>True</Publish>
+    </Content>
+    <Content Include="model\static\model\icons\arrow-path-rounded-square.svg">
+      <Publish>True</Publish>
+    </Content>
+    <Content Include="model\static\model\icons\arrow-trending-up.svg">
+      <Publish>True</Publish>
+    </Content>
+    <Content Include="model\static\model\icons\briefcase.svg">
+      <Publish>True</Publish>
+    </Content>
+    <Content Include="model\static\model\icons\chart-bar.svg">
+      <Publish>True</Publish>
+    </Content>
+    <Content Include="model\static\model\icons\cog-8-tooth.svg">
+      <Publish>True</Publish>
+    </Content>
+    <Content Include="model\static\model\icons\cpu-chip.svg">
+      <Publish>True</Publish>
+    </Content>
+    <Content Include="model\static\model\icons\currency-dollar.svg">
+      <Publish>True</Publish>
+    </Content>
+    <Content Include="model\static\model\icons\megaphone.svg">
+      <Publish>True</Publish>
+    </Content>
+    <Content Include="model\static\model\icons\presentation-chart-line.svg">
+      <Publish>True</Publish>
+    </Content>
+    <Content Include="model\static\model\icons\question-mark-circle.svg">
+      <Publish>True</Publish>
+    </Content>
+    <Content Include="model\static\model\icons\rocket-launch.svg">
+      <Publish>True</Publish>
+    </Content>
+    <Content Include="model\static\model\icons\server-stack.svg">
+      <Publish>True</Publish>
+    </Content>
+    <Content Include="model\static\model\icons\shield-exclamation.svg">
+      <Publish>True</Publish>
+    </Content>
+    <Content Include="model\static\model\icons\sparkles.svg">
+      <Publish>True</Publish>
+    </Content>
+    <Content Include="model\static\model\icons\squares-2x2.svg">
+      <Publish>True</Publish>
+    </Content>
+    <Content Include="model\static\model\icons\tag.svg">
+      <Publish>True</Publish>
+    </Content>
+    <Content Include="model\static\model\icons\truck.svg">
+      <Publish>True</Publish>
+    </Content>
+    <Content Include="model\static\model\icons\user-group.svg">
+      <Publish>True</Publish>
+    </Content>
+    <Content Include="model\static\model\styles.css">
+      <Publish>True</Publish>
+    </Content>
     <Content Include="model\templates\ia_fast_track_model.html">
       <Publish>True</Publish>
     </Content>
     <Content Include="requirements.txt" />
+    <Content Include="staticfiles\admin\css\autocomplete.css" />
+    <Content Include="staticfiles\admin\css\base.css" />
+    <Content Include="staticfiles\admin\css\changelists.css" />
+    <Content Include="staticfiles\admin\css\dark_mode.css" />
+    <Content Include="staticfiles\admin\css\dashboard.css" />
+    <Content Include="staticfiles\admin\css\forms.css" />
+    <Content Include="staticfiles\admin\css\login.css" />
+    <Content Include="staticfiles\admin\css\nav_sidebar.css" />
+    <Content Include="staticfiles\admin\css\responsive.css" />
+    <Content Include="staticfiles\admin\css\responsive_rtl.css" />
+    <Content Include="staticfiles\admin\css\rtl.css" />
+    <Content Include="staticfiles\admin\css\vendor\select2\LICENSE-SELECT2.md" />
+    <Content Include="staticfiles\admin\css\vendor\select2\select2.css" />
+    <Content Include="staticfiles\admin\css\vendor\select2\select2.min.css" />
+    <Content Include="staticfiles\admin\css\widgets.css" />
+    <Content Include="staticfiles\admin\img\calendar-icons.svg" />
+    <Content Include="staticfiles\admin\img\gis\move_vertex_off.svg" />
+    <Content Include="staticfiles\admin\img\gis\move_vertex_on.svg" />
+    <Content Include="staticfiles\admin\img\icon-addlink.svg" />
+    <Content Include="staticfiles\admin\img\icon-alert.svg" />
+    <Content Include="staticfiles\admin\img\icon-calendar.svg" />
+    <Content Include="staticfiles\admin\img\icon-changelink.svg" />
+    <Content Include="staticfiles\admin\img\icon-clock.svg" />
+    <Content Include="staticfiles\admin\img\icon-deletelink.svg" />
+    <Content Include="staticfiles\admin\img\icon-no.svg" />
+    <Content Include="staticfiles\admin\img\icon-unknown-alt.svg" />
+    <Content Include="staticfiles\admin\img\icon-unknown.svg" />
+    <Content Include="staticfiles\admin\img\icon-viewlink.svg" />
+    <Content Include="staticfiles\admin\img\icon-yes.svg" />
+    <Content Include="staticfiles\admin\img\inline-delete.svg" />
+    <Content Include="staticfiles\admin\img\LICENSE" />
+    <Content Include="staticfiles\admin\img\README.txt" />
+    <Content Include="staticfiles\admin\img\search.svg" />
+    <Content Include="staticfiles\admin\img\selector-icons.svg" />
+    <Content Include="staticfiles\admin\img\sorting-icons.svg" />
+    <Content Include="staticfiles\admin\img\tooltag-add.svg" />
+    <Content Include="staticfiles\admin\img\tooltag-arrowright.svg" />
+    <Content Include="staticfiles\admin\js\actions.js" />
+    <Content Include="staticfiles\admin\js\admin\DateTimeShortcuts.js" />
+    <Content Include="staticfiles\admin\js\admin\RelatedObjectLookups.js" />
+    <Content Include="staticfiles\admin\js\autocomplete.js" />
+    <Content Include="staticfiles\admin\js\calendar.js" />
+    <Content Include="staticfiles\admin\js\cancel.js" />
+    <Content Include="staticfiles\admin\js\change_form.js" />
+    <Content Include="staticfiles\admin\js\collapse.js" />
+    <Content Include="staticfiles\admin\js\core.js" />
+    <Content Include="staticfiles\admin\js\filters.js" />
+    <Content Include="staticfiles\admin\js\inlines.js" />
+    <Content Include="staticfiles\admin\js\jquery.init.js" />
+    <Content Include="staticfiles\admin\js\nav_sidebar.js" />
+    <Content Include="staticfiles\admin\js\popup_response.js" />
+    <Content Include="staticfiles\admin\js\prepopulate.js" />
+    <Content Include="staticfiles\admin\js\prepopulate_init.js" />
+    <Content Include="staticfiles\admin\js\SelectBox.js" />
+    <Content Include="staticfiles\admin\js\SelectFilter2.js" />
+    <Content Include="staticfiles\admin\js\theme.js" />
+    <Content Include="staticfiles\admin\js\urlify.js" />
+    <Content Include="staticfiles\admin\js\vendor\jquery\jquery.js" />
+    <Content Include="staticfiles\admin\js\vendor\jquery\jquery.min.js" />
+    <Content Include="staticfiles\admin\js\vendor\jquery\LICENSE.txt" />
+    <Content Include="staticfiles\admin\js\vendor\select2\i18n\af.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\i18n\ar.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\i18n\az.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\i18n\bg.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\i18n\bn.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\i18n\bs.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\i18n\ca.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\i18n\cs.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\i18n\da.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\i18n\de.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\i18n\dsb.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\i18n\el.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\i18n\en.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\i18n\es.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\i18n\et.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\i18n\eu.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\i18n\fa.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\i18n\fi.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\i18n\fr.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\i18n\gl.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\i18n\he.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\i18n\hi.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\i18n\hr.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\i18n\hsb.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\i18n\hu.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\i18n\hy.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\i18n\id.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\i18n\is.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\i18n\it.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\i18n\ja.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\i18n\ka.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\i18n\km.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\i18n\ko.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\i18n\lt.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\i18n\lv.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\i18n\mk.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\i18n\ms.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\i18n\nb.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\i18n\ne.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\i18n\nl.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\i18n\pl.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\i18n\ps.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\i18n\pt-BR.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\i18n\pt.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\i18n\ro.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\i18n\ru.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\i18n\sk.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\i18n\sl.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\i18n\sq.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\i18n\sr-Cyrl.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\i18n\sr.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\i18n\sv.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\i18n\th.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\i18n\tk.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\i18n\tr.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\i18n\uk.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\i18n\vi.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\i18n\zh-CN.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\i18n\zh-TW.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\LICENSE.md" />
+    <Content Include="staticfiles\admin\js\vendor\select2\select2.full.js" />
+    <Content Include="staticfiles\admin\js\vendor\select2\select2.full.min.js" />
+    <Content Include="staticfiles\admin\js\vendor\xregexp\LICENSE.txt" />
+    <Content Include="staticfiles\admin\js\vendor\xregexp\xregexp.js" />
+    <Content Include="staticfiles\admin\js\vendor\xregexp\xregexp.min.js" />
+    <Content Include="staticfiles\model\app.js" />
+    <Content Include="staticfiles\model\icons\arrow-path-rounded-square.svg" />
+    <Content Include="staticfiles\model\icons\arrow-trending-up.svg" />
+    <Content Include="staticfiles\model\icons\briefcase.svg" />
+    <Content Include="staticfiles\model\icons\chart-bar.svg" />
+    <Content Include="staticfiles\model\icons\cog-8-tooth.svg" />
+    <Content Include="staticfiles\model\icons\cpu-chip.svg" />
+    <Content Include="staticfiles\model\icons\currency-dollar.svg" />
+    <Content Include="staticfiles\model\icons\megaphone.svg" />
+    <Content Include="staticfiles\model\icons\presentation-chart-line.svg" />
+    <Content Include="staticfiles\model\icons\question-mark-circle.svg" />
+    <Content Include="staticfiles\model\icons\rocket-launch.svg" />
+    <Content Include="staticfiles\model\icons\server-stack.svg" />
+    <Content Include="staticfiles\model\icons\shield-exclamation.svg" />
+    <Content Include="staticfiles\model\icons\sparkles.svg" />
+    <Content Include="staticfiles\model\icons\squares-2x2.svg" />
+    <Content Include="staticfiles\model\icons\tag.svg" />
+    <Content Include="staticfiles\model\icons\truck.svg" />
+    <Content Include="staticfiles\model\icons\user-group.svg" />
+    <Content Include="staticfiles\model\styles.css" />
     <Content Include="static\admin\css\autocomplete.css" />
     <Content Include="static\admin\css\base.css" />
     <Content Include="static\admin\css\changelists.css" />
@@ -209,6 +394,22 @@ path=C:\Users\tomih\AppData\Local\Programs\Python\Python39</Environment>
     <Folder Include="model\static\model\" />
     <Folder Include="model\static\model\icons\" />
     <Folder Include="model\templates\" />
+    <Folder Include="staticfiles\" />
+    <Folder Include="staticfiles\admin\" />
+    <Folder Include="staticfiles\admin\css\" />
+    <Folder Include="staticfiles\admin\css\vendor\" />
+    <Folder Include="staticfiles\admin\css\vendor\select2\" />
+    <Folder Include="staticfiles\admin\img\" />
+    <Folder Include="staticfiles\admin\img\gis\" />
+    <Folder Include="staticfiles\admin\js\" />
+    <Folder Include="staticfiles\admin\js\admin\" />
+    <Folder Include="staticfiles\admin\js\vendor\" />
+    <Folder Include="staticfiles\admin\js\vendor\jquery\" />
+    <Folder Include="staticfiles\admin\js\vendor\select2\" />
+    <Folder Include="staticfiles\admin\js\vendor\select2\i18n\" />
+    <Folder Include="staticfiles\admin\js\vendor\xregexp\" />
+    <Folder Include="staticfiles\model\" />
+    <Folder Include="staticfiles\model\icons\" />
     <Folder Include="static\" />
     <Folder Include="static\admin\" />
     <Folder Include="static\admin\css\" />
