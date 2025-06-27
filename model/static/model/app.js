@@ -161,6 +161,12 @@ function getCategoryColors(categoryName) {
             if (saveBtn) {
                 saveBtn.addEventListener('click', saveSummary);
             }
+            const pdfBtn = document.getElementById('downloadPdfButton');
+            if (pdfBtn) {
+                pdfBtn.addEventListener('click', () => {
+                    window.print();
+                });
+            }
         });
 
         const navButtons = document.querySelectorAll('.nav-button');

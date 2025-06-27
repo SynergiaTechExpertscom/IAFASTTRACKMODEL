@@ -750,8 +750,24 @@
             max-width: 90%;
         }
 
-        @media (min-width: 640px) {
-            #generalUserMessage {
-                max-width: 384px;
-            }
-        }
+@media (min-width: 640px) {
+    #generalUserMessage {
+        max-width: 384px;
+    }
+}
+
+@media print {
+    body {
+        background: white;
+        -webkit-print-color-adjust: exact;
+    }
+    header, footer, nav, #mainNav, #saveSummaryButton, #downloadPdfButton, #saveSummaryMessage {
+        display: none !important;
+    }
+    .page-section {
+        display: none !important;
+    }
+    #sectionResumen {
+        display: block !important;
+    }
+}
