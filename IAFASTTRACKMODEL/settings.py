@@ -106,7 +106,7 @@ if os.environ.get('PRODUCTION', '').lower() == 'true' or not DEBUG:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
-            'HOST': 'iafasttrackmodel:europe-west1:aifasttrackmodel',
+            'HOST': '/cloudsql/iafasttrackmodel:europe-west1:aifasttrackmodel',
             'PORT': '3306',
             'NAME': 'aifasttrackmodel',
             'USER': 'aifasttrackmodel',
