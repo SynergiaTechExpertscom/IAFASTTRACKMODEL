@@ -98,6 +98,7 @@ WSGI_APPLICATION = 'IAFASTTRACKMODEL.wsgi.application'
 
 # Detect environment: use 'PRODUCTION' env var or DEBUG flag
 if os.environ.get('PRODUCTION', '').lower() == 'true' or not DEBUG:
+
     DATABASES = {
       'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
