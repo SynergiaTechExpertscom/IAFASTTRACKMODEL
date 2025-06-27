@@ -112,7 +112,8 @@ if os.environ.get('PRODUCTION', '').lower() == 'true' or not DEBUG:
             'PASSWORD': os.getenv('DB_PASSWORD'),
         }
     }
-
+    db_info = DATABASES['default']
+    conn_str = f"ENGINE={db_info['ENGINE']}; NAME={db_info['NAME']}; USER={db_info['USER']}; HOST={db_info['HOST']}"
 
     # DATABASES = {
     #     'default': {
@@ -124,8 +125,8 @@ if os.environ.get('PRODUCTION', '').lower() == 'true' or not DEBUG:
     #         'PASSWORD': 'Choflas_3',
     #     }
     # }
-    db_info = DATABASES['default']
-    conn_str = f"ENGINE={db_info['ENGINE']}; NAME={db_info['NAME']}; USER={db_info['USER']}; HOST={db_info['HOST']}; PORT={db_info['PORT']}"
+    # db_info = DATABASES['default']
+    # conn_str = f"ENGINE={db_info['ENGINE']}; NAME={db_info['NAME']}; USER={db_info['USER']}; HOST={db_info['HOST']}; PORT={db_info['PORT']}"
 else:
     logging.info("Running in development mode") 
     DATABASES = {
