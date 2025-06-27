@@ -164,7 +164,11 @@ function getCategoryColors(categoryName) {
             const pdfBtn = document.getElementById('downloadPdfButton');
             if (pdfBtn) {
                 pdfBtn.addEventListener('click', () => {
-                    window.print();
+                    if (!currentSelectedClientId) {
+                        alert('No hay cliente seleccionado.');
+                        return;
+                    }
+                    window.open(`/descargar-pdf/${currentSelectedClientId}/`, '_blank');
                 });
             }
         });
