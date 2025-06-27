@@ -119,6 +119,7 @@ DB_CONNECTION_NAME=iafasttrackmodel:europe-west1:aifasttrackmodel</Environment>
     <Content Include="model\templates\ia_fast_track_model.html">
       <Publish>True</Publish>
     </Content>
+    <Content Include="model\templates\pdf_template.html" />
     <Content Include="requirements.txt" />
     <Content Include="staticfiles\admin\css\autocomplete.css" />
     <Content Include="staticfiles\admin\css\base.css" />
