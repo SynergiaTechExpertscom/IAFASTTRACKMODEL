@@ -10,7 +10,7 @@ automatic_scaling:
 env_variables:
   PRODUCTION: "true"
   DB_USER: aifasttrackmodel
-  DB_PASSWORD: tu_contraseña_segura
+  DB_PASSWORD: Choflas_3
   DB_NAME: aifasttrackmodel
   DB_CONNECTION_NAME: iafasttrackmodel:europe-west1:aifasttrackmodel
 
