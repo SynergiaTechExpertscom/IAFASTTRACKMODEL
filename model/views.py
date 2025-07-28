@@ -109,7 +109,10 @@ def descargar_pdf(request, client_id):
         cliente = get_object_or_404(Cliente, id=client_id)
         resumen_json = cliente.resumen_json or {}
         from django.contrib.staticfiles import finders
-        from cairosvg import svg2png
+        try:
+            from cairosvg import svg2png
+        except Exception:
+            svg2png = None
 
         def icon_b64(filename):
             try:
@@ -119,9 +122,12 @@ def descargar_pdf(request, client_id):
                         return base64.b64encode(f.read()).decode()
 
                 svg_path = finders.find(f"model/icons/{filename}.svg")
-                if svg_path:
-                    png_bytes = svg2png(url=svg_path)
-                    return base64.b64encode(png_bytes).decode()
+                if svg_path and svg2png:
+                    try:
+                        png_bytes = svg2png(url=svg_path)
+                        return base64.b64encode(png_bytes).decode()
+                    except Exception as e:
+                        logger.error(f"Error converting SVG {filename}: {e}")
             except Exception as e:
                 print(f'Error loading icon {filename}: {str(e)}')
             return '' 
