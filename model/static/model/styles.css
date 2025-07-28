@@ -758,7 +758,8 @@
 
 @media print {
     body {
-        background: white;
+        background: #000417;
+        color: #FFFFFF;
         -webkit-print-color-adjust: exact;
     }
     header, footer, nav, #mainNav, #saveSummaryButton, #downloadPdfButton, #saveSummaryMessage {
