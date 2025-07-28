@@ -15,14 +15,14 @@ import base64
 import os
 from django.conf import settings
 
-@ensure_csrf_cookie  # Para que Django envíe el cookie CSRF en la primera petición GET si es necesario
+@ensure_csrf_cookie  # Para que Django envÃ­e el cookie CSRF en la primera peticiÃ³n GET si es necesario
 def main_app_view(request):
     """
     Sirve el archivo HTML principal.
     """
     return render(request, 'ia_fast_track_model.html')
 
-@csrf_exempt  # Para desarrollo. En producción, el frontend debe enviar el token CSRF.
+@csrf_exempt  # Para desarrollo. En producciÃ³n, el frontend debe enviar el token CSRF.
 def api_login(request):
     if request.method == 'POST':
         try:
@@ -41,28 +41,28 @@ def api_login(request):
     return JsonResponse({'error': 'Metodo POST requerido'}, status=405)
 
 def api_get_clients(request):
-    # Aquí deberías añadir autenticación si es necesario
+    # AquÃ­ deberÃ­as aÃ±adir autenticaciÃ³n si es necesario
     # if not request.user.is_authenticated or not request.user.is_staff:
     #     return JsonResponse({'error': 'No autorizado'}, status=401)
     clientes = Cliente.objects.all().order_by('nombre_cliente')
     data = [{"id": cliente.id, "name": cliente.nombre_cliente} for cliente in clientes]
     return JsonResponse(data, safe=False)
 
-@csrf_exempt  # Para desarrollo. En producción, el frontend debe enviar el token CSRF.
+@csrf_exempt  # Para desarrollo. En producciÃ³n, el frontend debe enviar el token CSRF.
 def api_get_client_diagnostico(request, client_id):
     # if not request.user.is_authenticated or not request.user.is_staff:
     #     return JsonResponse({'error': 'No autorizado'}, status=401)
     cliente = get_object_or_404(Cliente, id=client_id)
     return JsonResponse(cliente.diagnostico_json)
 
-@csrf_exempt  # Para desarrollo. En producción, el frontend debe enviar el token CSRF.
+@csrf_exempt  # Para desarrollo. En producciÃ³n, el frontend debe enviar el token CSRF.
 def api_get_client_resume(request, client_id):
     # if not request.user.is_authenticated or not request.user.is_staff:
     #     return JsonResponse({'error': 'No autorizado'}, status=401)
     cliente = get_object_or_404(Cliente, id=client_id)
     return JsonResponse(cliente.resumen_json)
 
-@csrf_exempt  # Para desarrollo. En producción, el frontend debe enviar el token CSRF.
+@csrf_exempt  # Para desarrollo. En producciÃ³n, el frontend debe enviar el token CSRF.
 def api_get_project_catalog(request):
     # if not request.user.is_authenticated or not request.user.is_staff:
     #     return JsonResponse({'error': 'No autorizado'}, status=401)
@@ -77,7 +77,7 @@ def api_save_summary(request, client_id):
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
-            # Aquí deberías guardar el resumen en el modelo correspondiente
+            # AquÃ­ deberÃ­as guardar el resumen en el modelo correspondiente
             # Por ejemplo:
             cliente = get_object_or_404(Cliente, id=client_id)
             cliente.resumen_json = data
@@ -108,16 +108,23 @@ def descargar_pdf(request, client_id):
     try:
         cliente = get_object_or_404(Cliente, id=client_id)
         resumen_json = cliente.resumen_json or {}
+        from django.contrib.staticfiles import finders
+        from cairosvg import svg2png
 
-        # Updated to use PNG files directly instead of converting SVG
         def icon_b64(filename):
             try:
-                path = os.path.join(settings.STATIC_ROOT, f"model/icons/{filename}.png")
-                with open(path, 'rb') as f:
-                    return base64.b64encode(f.read()).decode()
+                png_path = finders.find(f"model/icons/{filename}.png")
+                if png_path:
+                    with open(png_path, "rb") as f:
+                        return base64.b64encode(f.read()).decode()
+
+                svg_path = finders.find(f"model/icons/{filename}.svg")
+                if svg_path:
+                    png_bytes = svg2png(url=svg_path)
+                    return base64.b64encode(png_bytes).decode()
             except Exception as e:
-                print(f"Error loading icon {filename}: {str(e)}")
-                return ''
+                print(f'Error loading icon {filename}: {str(e)}')
+            return '' 
 
         icons = {
             "icon_problema": icon_b64("shield-exclamation"),
@@ -125,18 +132,20 @@ def descargar_pdf(request, client_id):
             "icon_valor": icon_b64("sparkles"),
             "icon_fases": icon_b64("arrow-path-rounded-square"),
             "icon_kpi": icon_b64("presentation-chart-line"),
-            "icon_roi": icon_b64("currency-dollar"), 
+            "icon_roi": icon_b64("currency-dollar"),
             "icon_pitch": icon_b64("megaphone"),
         }
 
         # Logos
         def logo_b64(filename):
             try:
-                with open(os.path.join(settings.STATIC_ROOT, filename), "rb") as f:
-                    return base64.b64encode(f.read()).decode()
+                path = finders.find(filename)
+                if path:
+                    with open(path, "rb") as f:
+                        return base64.b64encode(f.read()).decode()
             except Exception as e:
                 print(f"Error loading logo {filename}: {str(e)}")
-                return ""
+            return ""
 
         logos = {
             "logo_fast_track": logo_b64("logo-fast-track.png"),
