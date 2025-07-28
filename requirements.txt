@@ -28,7 +28,6 @@ cryptography
 svglib
 pyhanko-certvalidator
 pyHanko
-
 cairosvg>=2.8.2
 cairocffi>=1.7.1
 
