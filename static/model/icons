@@ -1,0 +1,11 @@
+# Convierte manualmente todos los iconos SVG usados en el PDF a PNG.
+# Guarda los archivos como:
+# - shield-exclamation.png
+# - rocket-launch.png
+# - sparkles.png
+# - arrow-path-rounded-square.png
+# - presentation-chart-line.png
+# - currency-dollar.png
+# - megaphone.png
+# en la carpeta static/model/icons/
+# Elimina los SVG si no se usan en ningún otro lugar.

@@ -2,3 +2,32 @@ django>=3.2.14
 gunicorn==20.1.0
 pymysql==1.1.0
 xhtml2pdf
+python-bidi
+asn1crypto
+arabic-reshaper
+urllib3
+uritools
+tzlocal
+sqlparse
+six
+pyyaml
+pypdf
+pymysql
+oscrypto
+lxml
+idna
+gunicorn
+charset-normalizer
+certifi
+asgiref
+requests
+reportlab
+html5lib
+django
+cryptography
+svglib
+pyhanko-certvalidator
+pyHanko
+
+# Elimina cairosvg si solo usas PNG
+# cairosvg

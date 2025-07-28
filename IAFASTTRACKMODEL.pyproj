@@ -5,7 +5,7 @@
     <RootNamespace>IAFASTTRACKMODEL</RootNamespace>
     <InterpreterId>MSBuild|env|$(MSBuildProjectFullPath)</InterpreterId>
     <Environment>PYTHONUTF8=1
-PRODUCTION=true
+PRODUCTION=false
 path=C:\Users\tomih\AppData\Local\Programs\Python\Python39
 DB_USER=aifasttrackmodel
 DB_PASSWORD=Choflas_3
@@ -400,6 +400,7 @@ DB_CONNECTION_NAME=iafasttrackmodel:europe-west1:aifasttrackmodel</Environment>
     <Content Include="static\admin\js\vendor\xregexp\LICENSE.txt" />
     <Content Include="static\admin\js\vendor\xregexp\xregexp.js" />
     <Content Include="static\admin\js\vendor\xregexp\xregexp.min.js" />
+    <Content Include="static\model\icons" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="model\" />
@@ -438,6 +439,7 @@ DB_CONNECTION_NAME=iafasttrackmodel:europe-west1:aifasttrackmodel</Environment>
     <Folder Include="static\admin\js\vendor\select2\" />
     <Folder Include="static\admin\js\vendor\select2\i18n\" />
     <Folder Include="static\admin\js\vendor\xregexp\" />
+    <Folder Include="static\model\" />
   </ItemGroup>
   <ItemGroup>
     <Interpreter Include="env\">
