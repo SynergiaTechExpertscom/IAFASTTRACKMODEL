@@ -5,7 +5,7 @@
     <RootNamespace>IAFASTTRACKMODEL</RootNamespace>
     <InterpreterId>MSBuild|env|$(MSBuildProjectFullPath)</InterpreterId>
     <Environment>PYTHONUTF8=1
-PRODUCTION=false
+PRODUCTION=true
 path=C:\Users\tomih\AppData\Local\Programs\Python\Python39
 DB_USER=aifasttrackmodel
 DB_PASSWORD=Choflas_3

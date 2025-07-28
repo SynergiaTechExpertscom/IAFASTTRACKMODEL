@@ -30,4 +30,3 @@ pyhanko-certvalidator
 pyHanko
 
 # Elimina cairosvg si solo usas PNG
-# cairosvg
