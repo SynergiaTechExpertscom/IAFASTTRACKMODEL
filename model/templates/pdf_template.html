@@ -69,6 +69,10 @@
             margin-left: 24px;
             color: #CBD5E1;
         }
+        ol.summary-list {
+            margin-left: 24px;
+            color: #CBD5E1;
+        }
         .summary-pitch {
             font-style: italic;
             border-left: 4px solid #4839CD;
@@ -153,6 +157,18 @@
                 Propuesta de Valor
             </div>
             <p>{{ resumen.propuesta_valor }}</p>
+        </div>
+
+        <div class="card">
+            <div class="section-title">
+                <img src="data:image/png;base64,{{ icon_fases }}" alt="Fases" style="height:22px;">
+                Fases &amp; Calendario
+            </div>
+            <ol class="summary-list">
+                <li><strong>Diagnóstico Exprés</strong>: Mapeo de procesos y sistemas (&lt; 2 semanas).</li>
+                <li><strong>Piloto Funcional</strong>: Desarrollo de la solución central y validación (&lt; 4 semanas).</li>
+                <li><strong>Medición y Ajustes</strong>: Monitorización de KPIs, feedback y optimización (90 días).</li>
+            </ol>
         </div>
 
         <div class="card">
