@@ -29,4 +29,7 @@ svglib
 pyhanko-certvalidator
 pyHanko
 
-# Elimina cairosvg si solo usas PNG
+cairosvg>=2.8.2
+cairocffi>=1.7.1
+
+# Si trabajas exclusivamente con iconos PNG puedes eliminar cairosvg y cairocffi
