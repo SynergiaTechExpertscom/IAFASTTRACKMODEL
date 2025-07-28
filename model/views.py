@@ -11,6 +11,9 @@ import json
 import io
 from xhtml2pdf import pisa
 from .models import Cliente, ProyectoCatalog, ClienteFile
+import base64
+import os
+from django.conf import settings
 
 @ensure_csrf_cookie  # Para que Django envíe el cookie CSRF en la primera petición GET si es necesario
 def main_app_view(request):
@@ -103,19 +106,55 @@ def api_upload_file(request, client_id):
 
 def descargar_pdf(request, client_id):
     try:
-        logging.info(f"Descargando PDF para cliente ID: {client_id}")
         cliente = get_object_or_404(Cliente, id=client_id)
         resumen_json = cliente.resumen_json or {}
-        context = {"cliente": cliente, "resumen": resumen_json}
-        html = render_to_string('pdf_template.html', context)
+
+        # Cargar iconos en base64 (solo los usados en Resumen)
+        def icon_b64(filename):
+            try:
+                with open(os.path.join(settings.STATIC_ROOT, f"model/icons/{filename}"), "rb") as f:
+                    return base64.b64encode(f.read()).decode()
+            except Exception:
+                return ""
+
+        icons = {
+            "icon_problema": icon_b64("shield-exclamation.png"),
+            "icon_solucion": icon_b64("rocket-launch.png"),
+            "icon_valor": icon_b64("sparkles.png"),
+            "icon_fases": icon_b64("arrow-path-rounded-square.png"),
+            "icon_kpi": icon_b64("presentation-chart-line.png"),
+            "icon_roi": icon_b64("currency-dollar.png"),
+            "icon_pitch": icon_b64("megaphone.png"),
+        }
+
+        # Logos
+        def logo_b64(filename):
+            try:
+                with open(os.path.join(settings.STATIC_ROOT, filename), "rb") as f:
+                    return base64.b64encode(f.read()).decode()
+            except Exception:
+                return ""
+
+        logos = {
+            "logo_fast_track": logo_b64("logo-fast-track.png"),
+            "logo_synergia": logo_b64("logo_synergia.png"),
+            "logo_edge": logo_b64("logo-edge.png"),
+        }
+
+        context = {
+            "cliente": cliente,
+            "resumen": resumen_json,
+            **icons,
+            **logos,
+        }
+
+        html = render_to_string("pdf_template.html", context)
         result = io.BytesIO()
         pisa_status = pisa.CreatePDF(html, dest=result)
         if pisa_status.err:
-            logging.error("Error al generar PDF con xhtml2pdf")
-            return HttpResponse('Error al generar PDF', status=500)
-        response = HttpResponse(result.getvalue(), content_type='application/pdf')
-        response['Content-Disposition'] = 'attachment; filename="reporte.pdf"'
+            return HttpResponse("Error al generar PDF", status=500)
+        response = HttpResponse(result.getvalue(), content_type="application/pdf")
+        response["Content-Disposition"] = f'attachment; filename="{cliente.nombre_cliente}_resumen.pdf"'
         return response
     except Exception as e:
-        logging.exception(f"Excepción al generar PDF: {e}")
-        return HttpResponse('Error interno al generar PDF', status=500)
+        return HttpResponse(f"Error al generar PDF: {str(e)}", status=500)

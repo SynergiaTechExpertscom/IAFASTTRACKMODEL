@@ -1,56 +1,158 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <meta charset="utf-8">
-    <title>Resumen del Piloto</title>
+    <meta charset="UTF-8">
+    <title>{{ cliente.nombre_cliente }} - Resumen del Piloto</title>
     <style>
-        body { font-family: Arial, sans-serif; }
-        h1 { text-align: center; }
-        h2 { color: #4839CD; }
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            background-color: #1E293B;
+            color: #FFFFFF;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 32px;
+            background: #1E293B;
+        }
+        .header-logos {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fff;
+            border-radius: 8px;
+            padding: 12px 24px;
+            margin-bottom: 24px;
+        }
+        .logo {
+            height: 40px;
+        }
+        .logo-group {
+            display: flex;
+            gap: 16px;
+        }
+        .main-title {
+            font-size: 2.2em;
+            font-weight: bold;
+            color: #4839CD;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #CBD5E1;
+            font-size: 1.1em;
+            margin-bottom: 32px;
+        }
+        .card {
+            background: #0F172A;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            page-break-inside: avoid;
+        }
+        .section-title {
+            color: #4839CD;
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #334155;
+            padding-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .summary-list {
+            margin-left: 24px;
+            color: #CBD5E1;
+        }
+        .summary-pitch {
+            font-style: italic;
+            border-left: 4px solid #4839CD;
+            padding: 12px;
+            background: #1E293B;
+            color: #CBD5E1;
+        }
+        .kpi-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+            background: #1E293B;
+        }
+        .kpi-table th, .kpi-table td {
+            border: 1px solid #334155;
+            padding: 8px;
+            color: #CBD5E1;
+        }
+        .kpi-table th {
+            background: #2D3748;
+            color: #fff;
+            font-weight: bold;
+        }
+        .footer {
+            text-align: center;
+            color: #64748B;
+            margin-top: 32px;
+            font-size: 0.95em;
+            padding-top: 16px;
+            border-top: 1px solid #334155;
+        }
+        .technology {
+            color: #94A3B8;
+            font-size: 0.95em;
+            margin-top: 8px;
+        }
+        .roadmap-container {
+            margin-top: 8px;
+            margin-bottom: 8px;
+        }
+        .roadmap-line {
+            height: 2px;
+            background: #4839CD;
+            margin-bottom: 8px;
+        }
+        .fases-list {
+            margin-left: 24px;
+            color: #CBD5E1;
+        }
+        @page { margin: 1cm; }
     </style>
 </head>
 <body>
-    <h1>{{ cliente.nombre_cliente }}</h1>
-    <h2>{{ resumen.nombre_piloto }}</h2>
-    <p><strong>Categoría:</strong> {{ resumen.categoria_piloto }}{% if resumen.subcategoria_piloto %} - {{ resumen.subcategoria_piloto }}{% endif %}</p>
-    <h3>Problema Actual</h3>
-    <p>{{ resumen.problema_actual_descripcion }}</p>
-    <h3>Solución Propuesta</h3>
-    <p>{{ resumen.solucion_descripcion }}</p>
-    <p><strong>Tecnologías:</strong> {{ resumen.solucion_tecnologias }}</p>
-    <h3>Propuesta de Valor</h3>
-    <p>{{ resumen.propuesta_valor }}</p>
-    <h3>KPIs</h3>
-    <ul>
-    {% for kpi in resumen.kpis %}
-        <li>{{ kpi.nombre }}: hoy {{ kpi.valor_actual }}, meta {{ kpi.valor_objetivo }}, impacto {{ kpi.impacto_esperado }}</li>
-    {% empty %}
-        <li>No hay KPIs definidos.</li>
-    {% endfor %}
-    </ul>
-    <h3>ROI Indicativo</h3>
-    <ul>
-    {% for roi in resumen.roi_indicativo %}
-        <li>{{ roi.nombre }}: {{ roi.valor }}</li>
-    {% empty %}
-        <li>No se ha estimado ROI.</li>
-    {% endfor %}
-    </ul>
-    <h3>Pitch de Ventas</h3>
-    <blockquote>{{ resumen.pitch_ventas }}</blockquote>
-</body>
-</html>
+    <div class="container">
+        <div class="header-logos">
+            <img src="data:image/png;base64,{{ logo_fast_track }}" alt="IA FAST TRACK" class="logo">
+            <div class="logo-group">
+                <img src="data:image/png;base64,{{ logo_synergia }}" alt="Synergia Tech Experts" class="logo">
+                <img src="data:image/png;base64,{{ logo_edge }}" alt="Edge Expertise" class="logo">
+            </div>
+        </div>
+        <div class="main-title">{{ resumen.nombre_piloto }}</div>
+        <div class="subtitle">{{ resumen.categoria_piloto }}{% if resumen.subcategoria_piloto %} - {{ resumen.subcategoria_piloto }}{% endif %}</div>
 
-<!-- Asegúrate de que este archivo esté presente en el despliegue y accesible -->
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <title>Reporte PDF</title>
-</head>
-<body>
-    <h1>Reporte para {{ cliente.nombre_cliente }}</h1>
-    <p>Contenido generado para la descarga en PDF.</p>
-    <pre>{{ resumen|safe }}</pre>
-</body>
-</html>
+        <div class="card">
+            <div class="section-title">
+                <img src="data:image/png;base64,{{ icon_problema }}" alt="Problema" style="height:22px;">
+                Problema Actual
+            </div>
+            {% if resumen.problema_actual_descripcion %}
+            <ul class="summary-list">
+                <li>{{ resumen.problema_actual_descripcion }}</li>
+            </ul>
+            {% else %}
+            <p>No hay descripción del problema actual.</p>
+            {% endif %}
+        </div>
+
+        <div class="card">
+            <div class="section-title">
+                <img src="data:image/png;base64,{{ icon_solucion }}" alt="Solución" style="height:22px;">
+                Solución IA Fast Track
+            </div>
+            {% if resumen.solucion_descripcion %}
+            <p>{{ resumen.solucion_descripcion }}</p>
+            {% endif %}
+            <div class="technology

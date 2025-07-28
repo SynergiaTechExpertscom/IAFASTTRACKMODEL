@@ -56,6 +56,15 @@ DB_CONNECTION_NAME=iafasttrackmodel:europe-west1:aifasttrackmodel</Environment>
     <Content Include="arrancar.txt" />
     <Content Include="db.sqlite3" />
     <Content Include="mcp.json" />
+    <Content Include="model\static\logo_synergia.png">
+      <Publish>True</Publish>
+    </Content>
+    <Content Include="model\static\logo-edge.png">
+      <Publish>True</Publish>
+    </Content>
+    <Content Include="model\static\logo-fast-track.png">
+      <Publish>True</Publish>
+    </Content>
     <Content Include="model\static\model\app.js">
       <Publish>True</Publish>
     </Content>
