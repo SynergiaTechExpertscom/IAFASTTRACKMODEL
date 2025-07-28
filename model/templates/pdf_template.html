@@ -105,19 +105,6 @@
             font-size: 0.95em;
             margin-top: 8px;
         }
-        .roadmap-container {
-            margin-top: 8px;
-            margin-bottom: 8px;
-        }
-        .roadmap-line {
-            height: 2px;
-            background: #4839CD;
-            margin-bottom: 8px;
-        }
-        .fases-list {
-            margin-left: 24px;
-            color: #CBD5E1;
-        }
         @page { margin: 1cm; }
     </style>
 </head>
@@ -155,4 +142,70 @@
             {% if resumen.solucion_descripcion %}
             <p>{{ resumen.solucion_descripcion }}</p>
             {% endif %}
-            <div class="technology
+            {% if resumen.solucion_tecnologias %}
+            <div class="technology"><strong>Tecnologías:</strong> {{ resumen.solucion_tecnologias }}</div>
+            {% endif %}
+        </div>
+
+        <div class="card">
+            <div class="section-title">
+                <img src="data:image/png;base64,{{ icon_valor }}" alt="Valor" style="height:22px;">
+                Propuesta de Valor
+            </div>
+            <p>{{ resumen.propuesta_valor }}</p>
+        </div>
+
+        <div class="card">
+            <div class="section-title">
+                <img src="data:image/png;base64,{{ icon_kpi }}" alt="KPIs" style="height:22px;">
+                KPIs Objetivo (90 días)
+            </div>
+            <table class="kpi-table">
+                <thead>
+                    <tr>
+                        <th>KPI</th>
+                        <th>Hoy</th>
+                        <th>Meta 90d</th>
+                        <th>Impacto</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for kpi in resumen.kpis %}
+                    <tr>
+                        <td>{{ kpi.nombre }}</td>
+                        <td>{{ kpi.valor_actual }}</td>
+                        <td>{{ kpi.valor_objetivo }}</td>
+                        <td>{{ kpi.impacto_esperado }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <div class="section-title">
+                <img src="data:image/png;base64,{{ icon_roi }}" alt="ROI" style="height:22px;">
+                ROI Indicativo
+            </div>
+            <ul class="summary-list">
+                {% for item in resumen.roi_indicativo %}
+                <li>{{ item.nombre }}: {{ item.valor }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="card">
+            <div class="section-title">
+                <img src="data:image/png;base64,{{ icon_pitch }}" alt="Pitch" style="height:22px;">
+                Pitch para Ventas
+            </div>
+            <p class="summary-pitch">{{ resumen.pitch_ventas }}</p>
+        </div>
+
+        <div class="footer">
+            &copy; 2025 IA FAST TRACK MODEL - Una colaboración de Synergia Tech Experts y Edge Expertise.
+        </div>
+    </div>
+</body>
+</html>
+
