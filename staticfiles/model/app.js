@@ -161,6 +161,16 @@ function getCategoryColors(categoryName) {
             if (saveBtn) {
                 saveBtn.addEventListener('click', saveSummary);
             }
+            const pdfBtn = document.getElementById('downloadPdfButton');
+            if (pdfBtn) {
+                pdfBtn.addEventListener('click', () => {
+                    if (!currentSelectedClientId) {
+                        alert('No hay cliente seleccionado.');
+                        return;
+                    }
+                    window.open(`/descargar-pdf/${currentSelectedClientId}/`, '_blank');
+                });
+            }
         });
 
         const navButtons = document.querySelectorAll('.nav-button');
