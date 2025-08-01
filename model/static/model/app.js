@@ -8,7 +8,7 @@
         let currentSelectedSolutionId = null;
         let selectedPilots = [];
         let currentPilotIndex = -1;
-        let selectedPilot = {
+        const emptyPilotTemplate = {
             name: "",
             description: "",
             technology: "",
@@ -28,6 +28,7 @@
             originalSubcategoryName: null,
             archivos_adjuntos: []
         };
+        let selectedPilot = { ...emptyPilotTemplate };
         let csrfToken = null;
 
         let scoringGlobalChartInstance = null;
@@ -136,6 +137,7 @@ function getCategoryColors(categoryName) {
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('mainNav').classList.add('hidden');
             navigateTo('sectionLogin');
+            renderSelectedProjectsList();
 
             const loginForm = document.getElementById('loginForm');
             loginForm.addEventListener('submit', handleLogin);
@@ -733,6 +735,8 @@ function getCategoryColors(categoryName) {
             selectedPilots.push(newPilot);
             currentPilotIndex = selectedPilots.length - 1;
             selectedPilot = newPilot;
+            renderSelectedProjectsList();
+            renderAnalysisTabs();
 
             navigateTo(sectionId, document.getElementById(sectionId.replace('section', 'nav')));
         }
@@ -1333,6 +1337,8 @@ function getCategoryColors(categoryName) {
                     selectedPilot = selectedPilots[currentPilotIndex] || selectedPilot;
                 }
                 renderProcessCatalog();
+                renderSelectedProjectsList();
+                renderAnalysisTabs();
                 return;
             }
 
@@ -1361,6 +1367,8 @@ function getCategoryColors(categoryName) {
             selectedPilot = newPilot;
 
             renderProcessCatalog();
+            renderSelectedProjectsList();
+            renderAnalysisTabs();
         }
 
         function findSolutionByIdWithDetails(solutionId) {
@@ -2038,4 +2046,40 @@ function getCategoryColors(categoryName) {
                 btn.onclick = () => { switchPilot(idx); generateSummary(); };
                 tabsContainer.appendChild(btn);
             });
+        }
+
+        function renderSelectedProjectsList() {
+            const list = document.getElementById('selectedProjectsList');
+            if (!list) return;
+            list.innerHTML = '';
+            if (selectedPilots.length === 0) {
+                const li = document.createElement('li');
+                li.textContent = 'No hay proyectos seleccionados.';
+                li.classList.add('text-sm', 'text-gray-400');
+                list.appendChild(li);
+                return;
+            }
+            selectedPilots.forEach((p, idx) => {
+                const li = document.createElement('li');
+                li.className = 'selected-project-item';
+                li.innerHTML = `<span>${p.name || `Proyecto ${idx + 1}`}</span>`;
+                const btn = document.createElement('button');
+                btn.className = 'remove-btn';
+                btn.textContent = 'Quitar';
+                btn.onclick = () => removeSelectedProject(idx);
+                li.appendChild(btn);
+                list.appendChild(li);
+            });
+        }
+
+        function removeSelectedProject(index) {
+            if (index < 0 || index >= selectedPilots.length) return;
+            selectedPilots.splice(index, 1);
+            if (currentPilotIndex >= selectedPilots.length) {
+                currentPilotIndex = selectedPilots.length - 1;
+            }
+            selectedPilot = selectedPilots[currentPilotIndex] || { ...emptyPilotTemplate };
+            renderProcessCatalog();
+            renderSelectedProjectsList();
+            renderAnalysisTabs();
         }
