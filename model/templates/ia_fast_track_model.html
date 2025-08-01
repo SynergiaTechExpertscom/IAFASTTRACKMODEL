@@ -136,6 +136,37 @@
                     <div id="catalogContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[60vh] overflow-y-auto catalog-scroll pr-2 mt-6">
                     </div>
                 </div>
+                <div class="card mt-6">
+                    <h3 class="text-xl font-semibold mb-2 highlight-accent">Selección del Proceso a Pilotar</h3>
+                    <div class="mb-4">
+                        <label for="selectedProcessName" class="block mb-1">Nombre del Proceso Seleccionado para Piloto:</label>
+                        <input type="text" id="selectedProcessName" placeholder="Ej: Automatización de Facturación de Carga o introduzca uno nuevo">
+                    </div>
+                    <div class="mb-4">
+                        <label for="selectedProcessDescription" class="block mb-1">Descripción del Proyecto Piloto (si se desvía del catálogo):</label>
+                        <textarea id="selectedProcessDescription" rows="3" placeholder="Descripción del proyecto seleccionado o a definir."></textarea>
+                    </div>
+                    <div class="mb-4">
+                        <label for="selectedProcessTechnologyCheckboxes" class="block mb-1">Tecnología Principal:</label>
+                        <div id="selectedProcessTechnologyCheckboxes" class="checkbox-group-container">
+                        </div>
+                        <p class="text-xs text-gray-400 mt-1">Seleccione una o varias tecnologías.</p>
+                    </div>
+
+                    <label for="currentProcessDescription" class="block mb-2">Descripción Detallada del Proceso Actual del Cliente:</label>
+                    <textarea id="currentProcessDescription" rows="4" placeholder="Describa los pasos manuales, sistemas involucrados, volumen, frecuencia, personas dedicadas, etc." class="mb-2"></textarea>
+
+                    <div class="custom-file-input-container">
+                        <label for="currentProcessFiles" class="block mb-1 text-sm font-medium">Adjuntar Archivos (opcional):</label>
+                        <input type="file" id="currentProcessFiles" multiple class="custom-file-input">
+                        <div id="fileListDisplay">
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-6">
+                        <button onclick="navigateToSectionWithPrefill('sectionAnalisis')" class="btn-primary px-8 py-3 text-lg">Analizar Proyectos &raquo;</button>
+                    </div>
+                </div>
             </section>
 
             <section id="sectionAnalisis" class="page-section hidden">
@@ -166,23 +197,11 @@
                     </div>
 
                     <div class="mb-6">
-                        <label for="selectedProcessTechnologyCheckboxes" class="block mb-1 text-lg highlight-accent font-semibold">
+                        <label for="pilotTechnology" class="block mb-1 text-lg highlight-accent font-semibold">
                             <img src='{% static "model/icons/cpu-chip.svg" %}' alt='' class='icon-standard icon-white'>
                             Tecnologías Clave:
                         </label>
-                        <div id="selectedProcessTechnologyCheckboxes" class="checkbox-group-container"></div>
-                        <p class="text-xs text-gray-400 mt-1">Seleccione una o varias tecnologías.</p>
-                    </div>
-
-                    <div class="mb-6">
-                        <label for="currentProcessDescription" class="block mb-1 text-lg highlight-accent font-semibold">Descripción Detallada del Proceso Actual del Cliente:</label>
-                        <textarea id="currentProcessDescription" rows="4" placeholder="Describa los pasos manuales, sistemas involucrados, volumen, frecuencia, personas dedicadas, etc." class="mb-2"></textarea>
-                    </div>
-
-                    <div class="mb-6 custom-file-input-container">
-                        <label for="currentProcessFiles" class="block mb-1 text-sm font-medium">Adjuntar Archivos (opcional):</label>
-                        <input type="file" id="currentProcessFiles" multiple class="custom-file-input">
-                        <div id="fileListDisplay"></div>
+                        <input type="text" id="pilotTechnology" placeholder="Ej: OCR, LLM, RPA, Python, Power Automate" class="mb-2">
                     </div>
 
                     <div class="mb-6">
