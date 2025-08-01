@@ -365,4 +365,3 @@ FodyWeavers.xsd
 # Ignorar base de datos SQLite
 #/db.sqlite3
 /db.sqlite3
-/db.sqlite3
