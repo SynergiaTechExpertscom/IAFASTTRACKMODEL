@@ -21,14 +21,19 @@ pymysql.install_as_MySQLdb()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Configura logging básico si no hay configuración previa
+# ---- Azure OpenAI configuration ----
+AZURE_OPENAI_ENDPOINT = os.getenv("AZURE_OPENAI_ENDPOINT", "")
+AZURE_OPENAI_MODEL = os.getenv("AZURE_OPENAI_MODEL", "")
+AZURE_OPENAI_API_KEY = os.getenv("AZURE_OPENAI_API_KEY", "")
+
+# Configura logging bÃ¡sico si no hay configuraciÃ³n previa
 logging.basicConfig(level=logging.INFO)
 
-# Configuración de archivos estáticos
+# ConfiguraciÃ³n de archivos estÃ¡ticos
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # destino para collectstatic
 
-# Si tienes archivos estáticos personalizados, descomenta y ajusta la siguiente línea:
+# Si tienes archivos estÃ¡ticos personalizados, descomenta y ajusta la siguiente lÃ­nea:
 # STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 MEDIA_URL = '/media/'
