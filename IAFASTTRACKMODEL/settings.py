@@ -21,10 +21,10 @@ pymysql.install_as_MySQLdb()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# ---- Azure OpenAI configuration ----
-AZURE_OPENAI_ENDPOINT = os.getenv("AZURE_OPENAI_ENDPOINT", "")
-AZURE_OPENAI_MODEL = os.getenv("AZURE_OPENAI_MODEL", "")
-AZURE_OPENAI_API_KEY = os.getenv("AZURE_OPENAI_API_KEY", "")
+# ---- OpenAI configuration ----
+OPENAI_ENDPOINT = os.getenv("OPENAI_ENDPOINT", "")
+OPENAI_MODEL = os.getenv("OPENAI_MODEL", "")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 
 # Configura logging básico si no hay configuración previa
 logging.basicConfig(level=logging.INFO)
