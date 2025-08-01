@@ -33,3 +33,14 @@ class ClienteFile(models.Model):
 
     def get_url(self):
         return self.file.url
+
+
+class OpenAIConfig(models.Model):
+    """Almacena la configuración para conectar con la API de OpenAI."""
+
+    endpoint = models.CharField(max_length=255)
+    model_name = models.CharField(max_length=255)
+    api_key = models.CharField(max_length=255)
+
+    def __str__(self):
+        return "OpenAI Config"

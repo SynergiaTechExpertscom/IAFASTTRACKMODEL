@@ -10,7 +10,7 @@ from django.template.loader import render_to_string
 import json
 import io
 from xhtml2pdf import pisa
-from .models import Cliente, ProyectoCatalog, ClienteFile
+from .models import Cliente, ProyectoCatalog, ClienteFile, OpenAIConfig
 import base64
 import os
 from django.conf import settings
@@ -95,11 +95,14 @@ def api_ai_search_projects(request):
             for proj in sub.get('projects', []):
                 project_names.append(proj.get('projectName'))
 
+    config = OpenAIConfig.objects.first()
+    api_base = config.endpoint if config else settings.OPENAI_ENDPOINT
+    api_key = config.api_key if config else settings.OPENAI_API_KEY
+    model_name = config.model_name if config else settings.OPENAI_MODEL
+
     import openai
-    openai.api_type = 'azure'
-    openai.api_base = settings.AZURE_OPENAI_ENDPOINT
-    openai.api_version = '2023-07-01-preview'
-    openai.api_key = settings.AZURE_OPENAI_API_KEY
+    openai.api_base = api_base
+    openai.api_key = api_key
 
     system_msg = 'Eres un asistente que recomienda proyectos del catalogo.'
     user_msg = (
@@ -110,7 +113,7 @@ def api_ai_search_projects(request):
     )
     try:
         ai_resp = openai.ChatCompletion.create(
-            engine=settings.AZURE_OPENAI_MODEL,
+            model=model_name,
             messages=[{'role': 'system', 'content': system_msg}, {'role': 'user', 'content': prompt + '\n' + user_msg}],
             temperature=0.0,
         )
@@ -139,7 +142,7 @@ def api_ai_search_projects(request):
     if not results:
         try:
             other_resp = openai.ChatCompletion.create(
-                engine=settings.AZURE_OPENAI_MODEL,
+                model=model_name,
                 messages=[{'role': 'system', 'content': 'Propón un nuevo proyecto en JSON con campos name, description y technology basado en la necesidad.'}, {'role': 'user', 'content': prompt}],
                 temperature=0.3,
             )
