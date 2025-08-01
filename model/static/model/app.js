@@ -175,6 +175,10 @@ function getCategoryColors(categoryName) {
                     window.open(`/descargar-pdf/${currentSelectedClientId}/`, '_blank');
                 });
             }
+            const aiBtn = document.getElementById('aiSearchButton');
+            if (aiBtn) {
+                aiBtn.addEventListener('click', handleIaSearch);
+            }
         });
 
         const navButtons = document.querySelectorAll('.nav-button');
@@ -1945,6 +1949,63 @@ function getCategoryColors(categoryName) {
                 label.appendChild(document.createTextNode(tech));
                 checkboxesContainer.appendChild(label);
             });
+        }
+
+        async function handleIaSearch() {
+            const prompt = document.getElementById('aiPromptInput').value.trim();
+            if (!prompt) return;
+            try {
+                const response = await fetch('/api/buscar_proyectos_ia/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(csrfToken && { 'X-CSRFToken': csrfToken })
+                    },
+                    body: JSON.stringify({ prompt })
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    if (Array.isArray(data.projects)) {
+                        data.projects.forEach(p => {
+                            if (!selectedPilots.some(sp => sp.solutionId === p.id)) {
+                                selectSolutionForPilot(p.id);
+                            }
+                        });
+                    }
+                    if (!data.projects || data.projects.length === 0) {
+                        if (data.otro) {
+                            const newPilot = {
+                                solutionId: `custom_${selectedPilots.length}`,
+                                name: data.otro.name || 'Otro',
+                                description: data.otro.description || '',
+                                technology: data.otro.technology || '',
+                                valueProposition: '',
+                                salesPitch: '',
+                                kpis: [],
+                                monthlyROI: [],
+                                currentProcessDescription: '',
+                                attachedFileNames: [],
+                                selectedProcessNameContent: data.otro.name || '',
+                                selectedProcessDescriptionContent: data.otro.description || '',
+                                selectedProcessTechnologyContent: data.otro.technology ? data.otro.technology.split(/[,;]/).map(t => t.trim()) : [],
+                                originalProjectData: null,
+                                originalCategoryName: 'Otros',
+                                originalSubcategoryName: 'Otro',
+                                archivos_adjuntos: []
+                            };
+                            selectedPilots.push(newPilot);
+                            currentPilotIndex = selectedPilots.length - 1;
+                            selectedPilot = newPilot;
+                            renderSelectedProjectsList();
+                            renderAnalysisTabs();
+                        }
+                    }
+                }
+            } catch (err) {
+                console.error('Error buscando proyectos IA:', err);
+            }
+            document.getElementById('aiPromptInput').value = '';
+            renderProcessCatalog();
         }
 
         function renderAnalysisTabs() {

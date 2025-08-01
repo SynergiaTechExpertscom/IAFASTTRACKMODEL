@@ -73,6 +73,84 @@ def api_get_project_catalog(request):
         return JsonResponse({'error': 'Catalogo de proyectos no encontrado'}, status=404)
 
 @csrf_exempt
+def api_ai_search_projects(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Metodo POST requerido'}, status=405)
+    try:
+        data = json.loads(request.body)
+        prompt = data.get('prompt', '')
+    except Exception:
+        return JsonResponse({'error': 'JSON invalido'}, status=400)
+    if not prompt:
+        return JsonResponse({'error': 'Prompt vacio'}, status=400)
+    try:
+        catalogo = ProyectoCatalog.objects.latest('version')
+        catalog = catalogo.datos_catalogo
+    except ProyectoCatalog.DoesNotExist:
+        return JsonResponse({'error': 'Catalogo no disponible'}, status=500)
+
+    project_names = []
+    for cat in catalog.get('categories', []):
+        for sub in cat.get('subcategories', []):
+            for proj in sub.get('projects', []):
+                project_names.append(proj.get('projectName'))
+
+    import openai
+    openai.api_type = 'azure'
+    openai.api_base = settings.AZURE_OPENAI_ENDPOINT
+    openai.api_version = '2023-07-01-preview'
+    openai.api_key = settings.AZURE_OPENAI_API_KEY
+
+    system_msg = 'Eres un asistente que recomienda proyectos del catalogo.'
+    user_msg = (
+        'Lista de proyectos disponibles: ' + ', '.join(project_names) +
+        '. En base a la necesidad del usuario sugiere hasta tres nombres de proyectos del catalogo. '
+        'Responde solo con JSON {"projects": ["nombre1", "nombre2"]}. '
+        'Si no hay coincidencias deja la lista vacia.'
+    )
+    try:
+        ai_resp = openai.ChatCompletion.create(
+            engine=settings.AZURE_OPENAI_MODEL,
+            messages=[{'role': 'system', 'content': system_msg}, {'role': 'user', 'content': prompt + '\n' + user_msg}],
+            temperature=0.0,
+        )
+        text = ai_resp['choices'][0]['message']['content']
+        ai_data = json.loads(text)
+    except Exception:
+        ai_data = {'projects': []}
+
+    results = []
+    for pname in ai_data.get('projects', []):
+        for cat in catalog.get('categories', []):
+            for sub in cat.get('subcategories', []):
+                for proj in sub.get('projects', []):
+                    if proj.get('projectName', '').lower() == pname.lower():
+                        results.append({
+                            'id': proj.get('id'),
+                            'projectName': proj.get('projectName'),
+                            'description': proj.get('description'),
+                            'technology': proj.get('technology'),
+                            'categoryName': cat.get('categoryName'),
+                            'subcategoryName': sub.get('subcategoryName'),
+                        })
+                        break
+
+    other_data = None
+    if not results:
+        try:
+            other_resp = openai.ChatCompletion.create(
+                engine=settings.AZURE_OPENAI_MODEL,
+                messages=[{'role': 'system', 'content': 'Propón un nuevo proyecto en JSON con campos name, description y technology basado en la necesidad.'}, {'role': 'user', 'content': prompt}],
+                temperature=0.3,
+            )
+            other_text = other_resp['choices'][0]['message']['content']
+            other_data = json.loads(other_text)
+        except Exception:
+            other_data = None
+
+    return JsonResponse({'projects': results, 'otro': other_data})
+
+@csrf_exempt
 def api_save_summary(request, client_id):
     if request.method == 'POST':
         try:

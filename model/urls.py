@@ -11,6 +11,7 @@ urlpatterns = [
     path('api/client/<int:client_id>/diagnostico/', views.api_get_client_diagnostico, name='api_get_client_diagnostico'),
     path('api/client/<int:client_id>/resume/', views.api_get_client_resume, name='api_get_client_resume'),
     path('api/proyectos/catalog/', views.api_get_project_catalog, name='api_get_project_catalog'),
+    path('api/buscar_proyectos_ia/', views.api_ai_search_projects, name='api_ai_search_projects'),
     path('api/client/<int:client_id>/guardar_resumen/', views.api_save_summary, name='api_save_summary'),
     path('api/client/<int:client_id>/upload_file/', views.api_upload_file, name='api_upload_file'),
     path('descargar-pdf/<int:client_id>/', views.descargar_pdf, name='descargar_pdf'),

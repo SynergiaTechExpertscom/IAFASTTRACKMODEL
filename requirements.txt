@@ -33,3 +33,4 @@ cairosvg>=2.8.2
 cairocffi>=1.7.1
 
 # Si trabajas exclusivamente con iconos PNG puedes eliminar cairosvg y cairocffi
+openai>=1.0.0
