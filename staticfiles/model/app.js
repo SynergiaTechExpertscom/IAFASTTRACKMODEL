@@ -1082,90 +1082,91 @@ function getCategoryColors(categoryName) {
             }
 
             if (currentFilter === "Suggested") {
-                const suggestedColors = getCategoryColors("Sugeridos");
-                const categoryHeaderEl = document.createElement('h3');
-                categoryHeaderEl.classList.add('category-header');
-                categoryHeaderEl.textContent = "Sugeridos";
-                categoryHeaderEl.style.color = suggestedColors.text;
-                categoryHeaderEl.style.borderBottomColor = suggestedColors.border;
-                catalogContainer.appendChild(categoryHeaderEl);
-
-                const subcategoryHeaderEl = document.createElement('h4');
-                subcategoryHeaderEl.classList.add('subcategory-header');
-                subcategoryHeaderEl.textContent = "Proyectos Sugeridos";
-                subcategoryHeaderEl.style.color = suggestedColors.text;
-                subcategoryHeaderEl.style.borderBottomColor = suggestedColors.border;
-                catalogContainer.appendChild(subcategoryHeaderEl);
-
                 if (clientData.colaboracion_propuesta && clientData.colaboracion_propuesta.length > 0) {
+                    const grouped = {};
                     clientData.colaboracion_propuesta.forEach((projectName, idx) => {
                         const projectDetails = findProjectByNameAcrossAllCategories(projectName);
                         let project, categoryName, subcategoryName, projectUniqueId;
-
                         if (projectDetails) {
                             project = projectDetails.project;
                             categoryName = projectDetails.categoryName;
                             subcategoryName = projectDetails.subcategoryName;
                             projectUniqueId = project.id;
                         } else {
-                            // Sugerido no está en catálogo: crea objeto mínimo y asigna ID único y estable
-                            project = {
-                                projectName: projectName,
-                                description: "",
-                                technology: "",
-                            };
+                            project = { projectName: projectName, description: "", technology: "" };
                             categoryName = "Sugeridos";
-                            subcategoryName = "";
+                            subcategoryName = "Sin Categoría";
                             projectUniqueId = `suggested_${idx}`;
                         }
+                        project.originalCategoryName = categoryName;
+                        project.originalSubcategoryName = subcategoryName;
+                        project.id = projectUniqueId;
+                        if (!grouped[categoryName]) grouped[categoryName] = {};
+                        if (!grouped[categoryName][subcategoryName]) grouped[categoryName][subcategoryName] = [];
+                        grouped[categoryName][subcategoryName].push(project);
+                    });
 
-                        foundAnyProjectOverall = true;
+                    Object.keys(grouped).forEach(catName => {
+                        const categoryColors = getCategoryColors(catName);
+                        const categoryHeaderEl = document.createElement('h3');
+                        categoryHeaderEl.classList.add('category-header');
+                        categoryHeaderEl.textContent = catName;
+                        categoryHeaderEl.style.color = categoryColors.text;
+                        categoryHeaderEl.style.borderBottomColor = categoryColors.border;
+                        catalogContainer.appendChild(categoryHeaderEl);
 
-                        const solutionDiv = document.createElement('div');
-                        solutionDiv.classList.add('solution-card');
-                        solutionDiv.dataset.solutionId = projectUniqueId;
+                        const subcats = grouped[catName];
+                        Object.keys(subcats).forEach(subcatName => {
+                            const subcategoryHeaderEl = document.createElement('h4');
+                            subcategoryHeaderEl.classList.add('subcategory-header');
+                            subcategoryHeaderEl.textContent = subcatName;
+                            subcategoryHeaderEl.style.color = categoryColors.text;
+                            subcategoryHeaderEl.style.borderBottomColor = categoryColors.border;
+                            catalogContainer.appendChild(subcategoryHeaderEl);
 
-                        // Marcar como seleccionado si corresponde
-                        if (projectUniqueId === currentSelectedSolutionId ||
-                            (selectedPilot.name === project.projectName &&
-                                selectedPilot.originalCategoryName === categoryName &&
-                                selectedPilot.originalSubcategoryName === subcategoryName)
-                        ) {
-                            solutionDiv.classList.add('solution-card-selected');
-                            solutionDiv.style.borderColor = suggestedColors.iconFill;
-                        } else {
-                            solutionDiv.style.borderColor = suggestedColors.border;
-                        }
+                            subcats[subcatName].forEach(project => {
+                                foundAnyProjectOverall = true;
+                                const solutionDiv = document.createElement('div');
+                                solutionDiv.classList.add('solution-card');
+                                solutionDiv.dataset.solutionId = project.id;
 
-                        // Título
-                        const titleEl = document.createElement('h5');
-                        titleEl.classList.add('font-semibold', 'text-lg', 'mb-1');
-                        titleEl.textContent = project.projectName;
-                        titleEl.style.color = suggestedColors.iconFill;
-                        solutionDiv.appendChild(titleEl);
+                                if (project.id === currentSelectedSolutionId ||
+                                    (selectedPilot.name === project.projectName &&
+                                     selectedPilot.originalCategoryName === project.originalCategoryName &&
+                                     selectedPilot.originalSubcategoryName === project.originalSubcategoryName)) {
+                                    solutionDiv.classList.add('solution-card-selected');
+                                    solutionDiv.style.borderColor = categoryColors.iconFill;
+                                } else {
+                                    solutionDiv.style.borderColor = categoryColors.border;
+                                }
 
-                        // Contexto de categoría/subcategoría
-                        const contextP = document.createElement('p');
-                        contextP.classList.add('text-xs', 'text-gray-400', 'mb-2', 'italic');
-                        contextP.textContent = `(De: ${categoryName} / ${subcategoryName})`;
-                        solutionDiv.appendChild(contextP);
+                                const titleEl = document.createElement('h5');
+                                titleEl.classList.add('font-semibold', 'text-lg', 'mb-1');
+                                titleEl.textContent = project.projectName;
+                                titleEl.style.color = categoryColors.iconFill;
+                                solutionDiv.appendChild(titleEl);
 
-                        // Descripción y tecnología
-                        solutionDiv.innerHTML += `
+                                const contextP = document.createElement('p');
+                                contextP.classList.add('text-xs', 'text-gray-400', 'mb-2', 'italic');
+                                contextP.textContent = `(De: ${project.originalCategoryName} / ${project.originalSubcategoryName})`;
+                                solutionDiv.appendChild(contextP);
+
+                                solutionDiv.innerHTML += `
                 <p class="text-sm text-gray-300 mt-1 mb-3">${project.description || "Sin descripción."}</p>
                 <p class="text-xs text-gray-400 mb-2"><strong>Tecnología:</strong> ${project.technology || 'No especificada'}</p>
             `;
 
-                        // Botón de selección
-                        const selectBtn = document.createElement('button');
-                        selectBtn.className = "text-xs btn-secondary py-1 px-2 mt-auto";
-                        selectBtn.style.backgroundColor = suggestedColors.bg;
-                        selectBtn.style.borderColor = suggestedColors.border;
-                        selectBtn.textContent = "Seleccionar para Piloto";
-                        selectBtn.onclick = () => selectSolutionForPilot(projectUniqueId);
-                        solutionDiv.appendChild(selectBtn);
+                                const selectBtn = document.createElement('button');
+                                selectBtn.className = "text-xs btn-secondary py-1 px-2 mt-auto";
+                                selectBtn.style.backgroundColor = categoryColors.bg;
+                                selectBtn.style.borderColor = categoryColors.border;
+                                selectBtn.textContent = "Seleccionar para Piloto";
+                                selectBtn.onclick = () => selectSolutionForPilot(project.id);
+                                solutionDiv.appendChild(selectBtn);
 
-                        catalogContainer.appendChild(solutionDiv);
+                                catalogContainer.appendChild(solutionDiv);
+                            });
+                        });
                     });
                 } else {
                     catalogContainer.innerHTML += `<p class="text-center text-gray-400 py-4 md:col-span-2">No hay proyectos sugeridos en el diagnóstico del cliente.</p>`;
