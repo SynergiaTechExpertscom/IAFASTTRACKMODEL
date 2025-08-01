@@ -732,8 +732,12 @@ function getCategoryColors(categoryName) {
 
 
             const newPilot = JSON.parse(JSON.stringify(selectedPilot));
-            selectedPilots.push(newPilot);
-            currentPilotIndex = selectedPilots.length - 1;
+            if (currentPilotIndex === -1) {
+                selectedPilots.push(newPilot);
+                currentPilotIndex = selectedPilots.length - 1;
+            } else {
+                selectedPilots[currentPilotIndex] = newPilot;
+            }
             selectedPilot = newPilot;
             renderSelectedProjectsList();
             renderAnalysisTabs();
