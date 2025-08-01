@@ -753,10 +753,20 @@
             transition: color 0.3s ease;
         }
 
-            .remove-btn:hover {
-                color: #EF4444;
-                text-decoration: underline;
-            }
+        .remove-btn:hover {
+            color: #EF4444;
+            text-decoration: underline;
+        }
+
+        .selected-project-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: rgba(76, 142, 250, 0.1);
+            border: 1px solid #4C8EFA;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.375rem;
+        }
 
         #generalUserMessage {
             position: fixed;
