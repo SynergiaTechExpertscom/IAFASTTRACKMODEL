@@ -112,6 +112,14 @@
 
             <section id="sectionOportunidades" class="page-section hidden">
                 <h2 class="text-2xl font-semibold mb-4 highlight-teal">Identificación de Oportunidades <span id="oportunidadesSectionCompanyName" class="highlight-accent"></span></h2>
+                <div class="card mb-6">
+                    <h3 class="text-xl font-semibold mb-2 highlight-accent">¿Cuál es tu necesidad?</h3>
+                    <textarea id="aiPromptInput" rows="3" placeholder="Describe brevemente tu necesidad"></textarea>
+                    <button id="aiSearchButton" class="btn-secondary flex items-center gap-2 mt-2">
+                        <img src="{% static 'model/icons/sparkles.svg' %}" alt="" class="h-5 w-5">
+                        Busca con IA
+                    </button>
+                </div>
                 <div class="card">
                     <h3 class="text-xl font-semibold mb-2 highlight-accent">Catálogo de Soluciones IA FAST TRACK</h3>
                     <p class="text-gray-300 mb-6">Explore las soluciones potenciales. Las soluciones <span class="highlight-yellow font-bold">Sugeridas</span> por el diagnóstico IA están resaltadas. La solución <span class="highlight-purple font-bold">seleccionada para el piloto</span> se marcará con un borde distintivo.</p>
