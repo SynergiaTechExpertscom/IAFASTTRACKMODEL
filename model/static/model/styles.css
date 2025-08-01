@@ -70,11 +70,28 @@
                 background-color: rgba(72, 57, 205, 0.2);
             }
 
-            .nav-button.active {
-                background-color: #000417;
-                color: #F0CE09;
-                border-color: #4839CD;
-                border-bottom-color: #000417;
+        .nav-button.active {
+            background-color: #000417;
+            color: #F0CE09;
+            border-color: #4839CD;
+            border-bottom-color: #000417;
+        }
+
+        .tab-button {
+            font-size: 0.875rem;
+            font-weight: 600;
+            padding: 0.25rem 0.75rem;
+            border: 1px solid #374151;
+            border-bottom: none;
+            border-radius: 0.5rem 0.5rem 0 0;
+            margin-right: 0.5rem;
+            background-color: transparent;
+            color: #9EA3A2;
+            cursor: pointer;
+        }
+
+            .tab-button:hover {
+                background-color: rgba(72,57,205,0.2);
             }
 
         .card {

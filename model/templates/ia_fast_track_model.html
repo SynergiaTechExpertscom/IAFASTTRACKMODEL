@@ -33,7 +33,7 @@
         <nav id="mainNav" class="w-full max-w-7xl mb-8 nav-menu flex-wrap justify-center gap-0 hidden">
             <button id="navCliente" class="nav-button">1. Info Cliente</button>
             <button id="navOportunidades" class="nav-button">2. Oportunidades</button>
-            <button id="navDefinicion" class="nav-button">3. Definición Piloto</button>
+            <button id="navAnalisis" class="nav-button">3. Análisis</button>
             <button id="navResumen" class="nav-button">4. Resumen</button>
         </nav>
 
@@ -164,12 +164,13 @@
                     </div>
 
                     <div class="text-center mt-6">
-                        <button onclick="navigateToSectionWithPrefill('sectionDefinicion')" class="btn-primary px-8 py-3 text-lg">Definir Piloto &raquo;</button>
+                        <button onclick="navigateToSectionWithPrefill('sectionAnalisis')" class="btn-primary px-8 py-3 text-lg">Analizar Proyectos &raquo;</button>
                     </div>
                 </div>
             </section>
 
-            <section id="sectionDefinicion" class="page-section hidden">
+            <section id="sectionAnalisis" class="page-section hidden">
+                <div id="analysisTabs" class="flex flex-wrap mb-4"></div>
                 <div id="definitionHeader" class="p-6 rounded-t-lg mb-0 flex justify-between items-center" style="background-color: #1E293B;">
                     <div>
                         <h2 id="definitionPilotNameHeader" class="text-2xl md:text-3xl font-bold px-4 py-2 rounded" style="color: #FFFFFF; background-color: #374151;">Definición del Piloto</h2>
@@ -258,6 +259,7 @@
                         </div>
                     </div>
                 </div>
+                <div id="summaryTabs" class="flex flex-wrap mt-4 mb-4"></div>
                 <div class="card bg-gray-900 p-6 rounded-b-lg rounded-t-none shadow-xl border-t-0" id="summaryCardContent" style="border-color: #334155;">
 
                     <div class="mb-8">
