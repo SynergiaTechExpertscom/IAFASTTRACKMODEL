@@ -151,11 +151,15 @@ def api_ai_search_projects(request):
         ai_data = {'projects': []}
 
     results = []
-    for pid in ai_data.get('projects', []):
+    for item in ai_data.get('projects', []):
+        pid = item.get('id') if isinstance(item, dict) else item
+        found = False
         for cat in catalog.get('categories', []):
             for sub in cat.get('subcategories', []):
                 for proj in sub.get('projects', []):
-                    if str(proj.get('id')) == str(pid):
+                    if str(proj.get('id')) == str(pid) or (
+                        isinstance(item, dict) and proj.get('projectName') == item.get('projectName')
+                    ):
                         results.append({
                             'id': proj.get('id'),
                             'projectName': proj.get('projectName'),
@@ -164,7 +168,21 @@ def api_ai_search_projects(request):
                             'categoryName': cat.get('categoryName'),
                             'subcategoryName': sub.get('subcategoryName'),
                         })
+                        found = True
                         break
+                if found:
+                    break
+            if found:
+                break
+        if not found and isinstance(item, dict):
+            results.append({
+                'id': item.get('id', ''),
+                'projectName': item.get('projectName') or item.get('name', ''),
+                'description': item.get('description', ''),
+                'technology': item.get('technology', ''),
+                'categoryName': item.get('categoryName', 'Sugeridos'),
+                'subcategoryName': item.get('subcategoryName', 'Otro'),
+            })
 
     other_data = None
     if not results:

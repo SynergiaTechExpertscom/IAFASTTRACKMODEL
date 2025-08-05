@@ -940,7 +940,7 @@ function getCategoryColors(categoryName) {
             }
 
             // Si hay resumen cargado, marca la categoría y subcategoría
-            if (selectedPilot.originalCategoryName) {
+            if (selectedPilot.originalCategoryName && currentFilter !== "Suggested") {
                 currentFilter = generateSafeId(selectedPilot.originalCategoryName);
             }
 
