@@ -79,14 +79,16 @@ def api_ai_search_projects(request):
     try:
         data = json.loads(request.body)
         prompt = data.get('prompt', '')
-    except Exception:
+    except Exception as e:
+        logger.exception("Error al leer el JSON de la solicitud: %s", e)
         return JsonResponse({'error': 'JSON invalido'}, status=400)
     if not prompt:
         return JsonResponse({'error': 'Prompt vacio'}, status=400)
     try:
         catalogo = ProyectoCatalog.objects.latest('version')
         catalog = catalogo.datos_catalogo
-    except ProyectoCatalog.DoesNotExist:
+    except ProyectoCatalog.DoesNotExist as e:
+        logger.exception("Catalogo de proyectos no disponible: %s", e)
         return JsonResponse({'error': 'Catalogo no disponible'}, status=500)
 
     project_names = []
@@ -125,7 +127,8 @@ def api_ai_search_projects(request):
         logger.info("Respuesta de OpenAI: %s", ai_resp)
         text = ai_resp['choices'][0]['message']['content']
         ai_data = json.loads(text)
-    except Exception:
+    except Exception as e:
+        logger.exception("Error al obtener proyectos desde OpenAI: %s", e)
         ai_data = {'projects': []}
 
     results = []
@@ -163,7 +166,8 @@ def api_ai_search_projects(request):
             logger.info("Respuesta de OpenAI (nuevo proyecto): %s", other_resp)
             other_text = other_resp['choices'][0]['message']['content']
             other_data = json.loads(other_text)
-        except Exception:
+        except Exception as e:
+            logger.exception("Error al proponer nuevo proyecto con OpenAI: %s", e)
             other_data = None
 
     return JsonResponse({'projects': results, 'otro': other_data})
