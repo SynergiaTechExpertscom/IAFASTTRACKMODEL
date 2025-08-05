@@ -1967,7 +1967,7 @@ function getCategoryColors(categoryName) {
                 if (response.ok) {
                     if (Array.isArray(data.projects)) {
                         data.projects.forEach(p => {
-                            if (!selectedPilots.some(sp => sp.solutionId === p.id)) {
+                            if (!selectedPilots.some(sp => String(sp.solutionId) === String(p.id))) {
                                 selectSolutionForPilot(p.id);
                             }
                         });

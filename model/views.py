@@ -91,11 +91,7 @@ def api_ai_search_projects(request):
         logger.exception("Catalogo de proyectos no disponible: %s", e)
         return JsonResponse({'error': 'Catalogo no disponible'}, status=500)
 
-    project_names = []
-    for cat in catalog.get('categories', []):
-        for sub in cat.get('subcategories', []):
-            for proj in sub.get('projects', []):
-                project_names.append(proj.get('projectName'))
+    catalog_json = json.dumps(catalog, ensure_ascii=False)
 
     config = OpenAIConfig.objects.first()
     api_base = config.endpoint if config else settings.OPENAI_ENDPOINT
@@ -135,10 +131,10 @@ def api_ai_search_projects(request):
 
     system_msg = 'Eres un asistente que recomienda proyectos del catalogo.'
     user_msg = (
-        'Lista de proyectos disponibles: ' + ', '.join(project_names) +
-        '. En base a la necesidad del usuario sugiere hasta tres nombres de proyectos del catalogo. '
-        'Responde solo con JSON {"projects": ["nombre1", "nombre2"]}. '
-        'Si no hay coincidencias deja la lista vacia.'
+        f"Catálogo de proyectos en formato JSON: {catalog_json}\n" +
+        'En base a la necesidad del usuario sugiere hasta tres IDs de proyectos del catálogo. '
+        'Responde solo con JSON {"projects": ["id1", "id2"]}. '
+        'Si no hay coincidencias deja la lista vacía.'
     )
     try:
         messages = [
@@ -155,11 +151,11 @@ def api_ai_search_projects(request):
         ai_data = {'projects': []}
 
     results = []
-    for pname in ai_data.get('projects', []):
+    for pid in ai_data.get('projects', []):
         for cat in catalog.get('categories', []):
             for sub in cat.get('subcategories', []):
                 for proj in sub.get('projects', []):
-                    if proj.get('projectName', '').lower() == pname.lower():
+                    if str(proj.get('id')) == str(pid):
                         results.append({
                             'id': proj.get('id'),
                             'projectName': proj.get('projectName'),
