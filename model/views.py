@@ -104,11 +104,34 @@ def api_ai_search_projects(request):
     api_type = config.api_type if config else settings.OPENAI_API_TYPE
     model_name = config.model_name if config else settings.OPENAI_MODEL
 
-    from openai import OpenAI, AzureOpenAI
-    if api_type == 'azure':
-        client = AzureOpenAI(api_key=api_key, api_version=api_version, azure_endpoint=api_base)
-    else:
-        client = OpenAI(api_key=api_key, base_url=api_base)
+    try:
+        from openai import OpenAI, AzureOpenAI
+
+        if api_type == 'azure':
+            client = AzureOpenAI(api_key=api_key, api_version=api_version, azure_endpoint=api_base)
+        else:
+            client = OpenAI(api_key=api_key, base_url=api_base)
+
+        def chat_complete(messages):
+            params = {'model': model_name, 'messages': messages}
+            return client.chat.completions.create(**params)
+
+    except ImportError:  # Fallback for older openai versions
+        import openai
+
+        openai.api_key = api_key
+        if api_type == 'azure':
+            openai.api_type = 'azure'
+            openai.api_base = api_base
+            openai.api_version = api_version
+
+            def chat_complete(messages):
+                return openai.ChatCompletion.create(engine=model_name, messages=messages)
+        else:
+            openai.api_base = api_base
+
+            def chat_complete(messages):
+                return openai.ChatCompletion.create(model=model_name, messages=messages)
 
     system_msg = 'Eres un asistente que recomienda proyectos del catalogo.'
     user_msg = (
@@ -123,11 +146,7 @@ def api_ai_search_projects(request):
             {'role': 'user', 'content': prompt + '\n' + user_msg},
         ]
         logger.info("Solicitando proyectos a OpenAI: %s", messages)
-        chat_params = {
-            'model': model_name,
-            'messages': messages,
-        }
-        ai_resp = client.chat.completions.create(**chat_params)
+        ai_resp = chat_complete(messages)
         logger.info("Respuesta de OpenAI: %s", ai_resp)
         text = ai_resp['choices'][0]['message']['content']
         ai_data = json.loads(text)
@@ -162,11 +181,7 @@ def api_ai_search_projects(request):
                 {'role': 'user', 'content': prompt},
             ]
             logger.info("Solicitando nuevo proyecto a OpenAI: %s", other_messages)
-            other_chat_params = {
-                'model': model_name,
-                'messages': other_messages,
-            }
-            other_resp = client.chat.completions.create(**other_chat_params)
+            other_resp = chat_complete(other_messages)
             logger.info("Respuesta de OpenAI (nuevo proyecto): %s", other_resp)
             other_text = other_resp['choices'][0]['message']['content']
             other_data = json.loads(other_text)
