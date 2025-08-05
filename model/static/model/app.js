@@ -962,7 +962,7 @@ function getCategoryColors(categoryName) {
             }
 
             // Si hay resumen cargado, marca la categoría y subcategoría
-            if (selectedPilot.originalCategoryName) {
+            if (selectedPilot.originalCategoryName && currentFilter !== "Suggested") {
                 currentFilter = generateSafeId(selectedPilot.originalCategoryName);
             }
 
@@ -2006,7 +2006,7 @@ function getCategoryColors(categoryName) {
                     body: JSON.stringify({ prompt })
                 });
                 const data = await response.json();
-                if (response.ok && Array.isArray(data.projects) && data.projects.length > 0) {
+                if (Array.isArray(data.projects) && data.projects.length > 0) {
                     clientData.colaboracion_propuesta = data.projects.map(p => p.projectName);
                     data.projects.forEach(p => {
                         suggestedProjectDetails[p.projectName] = {
