@@ -104,11 +104,11 @@ def api_ai_search_projects(request):
     api_type = config.api_type if config else settings.OPENAI_API_TYPE
     model_name = config.model_name if config else settings.OPENAI_MODEL
 
-    import openai
-    openai.api_base = api_base
-    openai.api_key = api_key
-    openai.api_version = api_version
-    openai.api_type = api_type
+    from openai import OpenAI, AzureOpenAI
+    if api_type == 'azure':
+        client = AzureOpenAI(api_key=api_key, api_version=api_version, azure_endpoint=api_base)
+    else:
+        client = OpenAI(api_key=api_key, base_url=api_base)
 
     system_msg = 'Eres un asistente que recomienda proyectos del catalogo.'
     user_msg = (
@@ -124,14 +124,10 @@ def api_ai_search_projects(request):
         ]
         logger.info("Solicitando proyectos a OpenAI: %s", messages)
         chat_params = {
+            'model': model_name,
             'messages': messages,
-            'temperature': 0.0,
         }
-        if api_type == 'azure':
-            chat_params['engine'] = model_name
-        else:
-            chat_params['model'] = model_name
-        ai_resp = openai.ChatCompletion.create(**chat_params)
+        ai_resp = client.chat.completions.create(**chat_params)
         logger.info("Respuesta de OpenAI: %s", ai_resp)
         text = ai_resp['choices'][0]['message']['content']
         ai_data = json.loads(text)
@@ -167,14 +163,10 @@ def api_ai_search_projects(request):
             ]
             logger.info("Solicitando nuevo proyecto a OpenAI: %s", other_messages)
             other_chat_params = {
+                'model': model_name,
                 'messages': other_messages,
-                'temperature': 0.3,
             }
-            if api_type == 'azure':
-                other_chat_params['engine'] = model_name
-            else:
-                other_chat_params['model'] = model_name
-            other_resp = openai.ChatCompletion.create(**other_chat_params)
+            other_resp = client.chat.completions.create(**other_chat_params)
             logger.info("Respuesta de OpenAI (nuevo proyecto): %s", other_resp)
             other_text = other_resp['choices'][0]['message']['content']
             other_data = json.loads(other_text)
