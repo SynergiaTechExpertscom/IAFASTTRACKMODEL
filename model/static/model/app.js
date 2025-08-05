@@ -27,8 +27,9 @@
             originalCategoryName: null,
             originalSubcategoryName: null,
             archivos_adjuntos: []
-        };
+        }; 
         let selectedPilot = { ...emptyPilotTemplate };
+        let suggestedProjectDetails = {};
         let csrfToken = null;
 
         let scoringGlobalChartInstance = null;
@@ -1114,10 +1115,22 @@ function getCategoryColors(categoryName) {
                             subcategoryName = projectDetails.subcategoryName;
                             projectUniqueId = project.id;
                         } else {
-                            project = { projectName: projectName, description: "", technology: "" };
-                            categoryName = "Sugeridos";
-                            subcategoryName = "Sin Categoría";
-                            projectUniqueId = `suggested_${idx}`;
+                            const custom = suggestedProjectDetails[projectName];
+                            if (custom) {
+                                project = {
+                                    projectName: custom.projectName,
+                                    description: custom.description,
+                                    technology: custom.technology
+                                };
+                                categoryName = custom.categoryName || 'Otros';
+                                subcategoryName = custom.subcategoryName || 'Otro';
+                                projectUniqueId = custom.id || `suggested_${idx}`;
+                            } else {
+                                project = { projectName: projectName, description: "", technology: "" };
+                                categoryName = "Sugeridos";
+                                subcategoryName = "Sin Categoría";
+                                projectUniqueId = `suggested_${idx}`;
+                            }
                         }
                         project.originalCategoryName = categoryName;
                         project.originalSubcategoryName = subcategoryName;
@@ -1979,6 +1992,10 @@ function getCategoryColors(categoryName) {
         async function handleIaSearch() {
             const prompt = document.getElementById('aiPromptInput').value.trim();
             if (!prompt) return;
+            const loader = document.getElementById('iaLoader');
+            if (loader) loader.classList.remove('hidden');
+            clientData.colaboracion_propuesta = [];
+            suggestedProjectDetails = {};
             try {
                 const response = await fetch('/api/buscar_proyectos_ia/', {
                     method: 'POST',
@@ -1989,55 +2006,61 @@ function getCategoryColors(categoryName) {
                     body: JSON.stringify({ prompt })
                 });
                 const data = await response.json();
-                if (response.ok) {
-                    if (Array.isArray(data.projects) && data.projects.length > 0) {
-                        data.projects.forEach(p => {
-                            if (!selectedPilots.some(sp => String(sp.solutionId) === String(p.id))) {
-                                const details = findSolutionByIdWithDetails(p.id);
-                                if (details) {
-                                    selectSolutionForPilot(p.id);
-                                } else {
-                                    addAiProjectDirect(p);
-                                }
-                            }
-                        });
-                    } else {
-                        let nuevo = data.otro;
-                        if (!nuevo) {
-                            try {
-                                const resp2 = await fetch('/api/buscar_proyectos_ia/', {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/json',
-                                        ...(csrfToken && { 'X-CSRFToken': csrfToken })
-                                    },
-                                    body: JSON.stringify({ prompt })
-                                });
-                                const data2 = await resp2.json();
-                                nuevo = data2.otro;
-                            } catch (e) {
-                                console.error('Error solicitando proyecto alternativo:', e);
-                            }
-                        }
-                        if (nuevo) {
-                            addAiProjectDirect({
-                                id: `custom_${selectedPilots.length}`,
-                                projectName: nuevo.name || 'Otro',
-                                description: nuevo.description || '',
-                                technology: nuevo.technology || '',
-                                categoryName: 'Otros',
-                                subcategoryName: 'Otro'
+                if (response.ok && Array.isArray(data.projects) && data.projects.length > 0) {
+                    clientData.colaboracion_propuesta = data.projects.map(p => p.projectName);
+                    data.projects.forEach(p => {
+                        suggestedProjectDetails[p.projectName] = {
+                            projectName: p.projectName,
+                            description: p.description || '',
+                            technology: p.technology || '',
+                            categoryName: p.categoryName || 'Otros',
+                            subcategoryName: p.subcategoryName || 'Otro',
+                            id: p.id
+                        };
+                    });
+                } else {
+                    let nuevo = data.otro;
+                    if (!nuevo) {
+                        try {
+                            const resp2 = await fetch('/api/buscar_proyectos_ia/', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    ...(csrfToken && { 'X-CSRFToken': csrfToken })
+                                },
+                                body: JSON.stringify({ prompt })
                             });
+                            const data2 = await resp2.json();
+                            nuevo = data2.otro;
+                        } catch (e) {
+                            console.error('Error solicitando proyecto alternativo:', e);
                         }
+                    }
+                    if (nuevo) {
+                        const name = nuevo.name || 'Otro';
+                        clientData.colaboracion_propuesta = [name];
+                        suggestedProjectDetails[name] = {
+                            projectName: name,
+                            description: nuevo.description || '',
+                            technology: nuevo.technology || '',
+                            categoryName: 'Otros',
+                            subcategoryName: 'Otro',
+                            id: `suggested_${Date.now()}`
+                        };
                     }
                 }
             } catch (err) {
                 console.error('Error buscando proyectos IA:', err);
             }
+            if (loader) loader.classList.add('hidden');
             document.getElementById('aiPromptInput').value = '';
+            currentFilter = 'Suggested';
+            setupMainFilters();
+            updateSubcategoryFilters();
+            renderProcessCatalog();
+            loadClientData();
             renderSelectedProjectsList();
             renderAnalysisTabs();
-            renderProcessCatalog();
         }
 
         function renderAnalysisTabs() {
