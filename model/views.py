@@ -100,11 +100,13 @@ def api_ai_search_projects(request):
     config = OpenAIConfig.objects.first()
     api_base = config.endpoint if config else settings.OPENAI_ENDPOINT
     api_key = config.api_key if config else settings.OPENAI_API_KEY
+    api_version = config.api_version if config else settings.OPENAI_API_VERSION
     model_name = config.model_name if config else settings.OPENAI_MODEL
 
     import openai
     openai.api_base = api_base
     openai.api_key = api_key
+    openai.api_version = api_version
 
     system_msg = 'Eres un asistente que recomienda proyectos del catalogo.'
     user_msg = (
