@@ -131,10 +131,10 @@ def api_ai_search_projects(request):
 
     system_msg = 'Eres un asistente que recomienda proyectos del catalogo.'
     user_msg = (
-        f"Cat√°logo de proyectos en formato JSON: {catalog_json}\n" +
-        'En base a la necesidad del usuario sugiere hasta tres IDs de proyectos del cat√°logo. '
+        f"Catalogo de proyectos en formato JSON: {catalog_json}\n" +
+        'En base a la necesidad del usuario sugiere IDs de proyectos del catalogo que estÈn relacionados con la necesidad. '
         'Responde solo con JSON {"projects": ["id1", "id2"]}. '
-        'Si no hay coincidencias deja la lista vac√≠a.'
+        'Si no hay coincidencias deja la lista vacÌa.'
     )
     try:
         messages = [
@@ -190,7 +190,7 @@ def api_ai_search_projects(request):
             other_messages = [
                 {
                     'role': 'system',
-                    'content': 'Prop√≥n un nuevo proyecto en JSON con campos name, description y technology basado en la necesidad.'
+                    'content': 'PropÛn un nuevo proyecto en JSON con campos name, description y technology basado en la necesidad.'
                 },
                 {'role': 'user', 'content': prompt},
             ]
