@@ -41,6 +41,7 @@ class OpenAIConfig(models.Model):
     endpoint = models.CharField(max_length=255)
     model_name = models.CharField(max_length=255)
     api_key = models.CharField(max_length=255)
+    api_type = models.CharField(max_length=50, blank=True, default="")
     api_version = models.CharField(max_length=50, blank=True, default="")
 
     def __str__(self):

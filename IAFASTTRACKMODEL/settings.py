@@ -26,6 +26,7 @@ OPENAI_ENDPOINT = os.getenv("OPENAI_ENDPOINT", "")
 OPENAI_MODEL = os.getenv("OPENAI_MODEL", "")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 OPENAI_API_VERSION = os.getenv("OPENAI_API_VERSION", "")
+OPENAI_API_TYPE = os.getenv("OPENAI_API_TYPE", "")
 
 # Configura logging básico si no hay configuración previa
 logging.basicConfig(level=logging.INFO)

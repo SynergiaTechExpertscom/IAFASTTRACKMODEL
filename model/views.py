@@ -101,12 +101,14 @@ def api_ai_search_projects(request):
     api_base = config.endpoint if config else settings.OPENAI_ENDPOINT
     api_key = config.api_key if config else settings.OPENAI_API_KEY
     api_version = config.api_version if config else settings.OPENAI_API_VERSION
+    api_type = config.api_type if config else settings.OPENAI_API_TYPE
     model_name = config.model_name if config else settings.OPENAI_MODEL
 
     import openai
     openai.api_base = api_base
     openai.api_key = api_key
     openai.api_version = api_version
+    openai.api_type = api_type
 
     system_msg = 'Eres un asistente que recomienda proyectos del catalogo.'
     user_msg = (
@@ -121,11 +123,15 @@ def api_ai_search_projects(request):
             {'role': 'user', 'content': prompt + '\n' + user_msg},
         ]
         logger.info("Solicitando proyectos a OpenAI: %s", messages)
-        ai_resp = openai.ChatCompletion.create(
-            model=model_name,
-            messages=messages,
-            temperature=0.0,
-        )
+        chat_params = {
+            'messages': messages,
+            'temperature': 0.0,
+        }
+        if api_type == 'azure':
+            chat_params['engine'] = model_name
+        else:
+            chat_params['model'] = model_name
+        ai_resp = openai.ChatCompletion.create(**chat_params)
         logger.info("Respuesta de OpenAI: %s", ai_resp)
         text = ai_resp['choices'][0]['message']['content']
         ai_data = json.loads(text)
@@ -160,11 +166,15 @@ def api_ai_search_projects(request):
                 {'role': 'user', 'content': prompt},
             ]
             logger.info("Solicitando nuevo proyecto a OpenAI: %s", other_messages)
-            other_resp = openai.ChatCompletion.create(
-                model=model_name,
-                messages=other_messages,
-                temperature=0.3,
-            )
+            other_chat_params = {
+                'messages': other_messages,
+                'temperature': 0.3,
+            }
+            if api_type == 'azure':
+                other_chat_params['engine'] = model_name
+            else:
+                other_chat_params['model'] = model_name
+            other_resp = openai.ChatCompletion.create(**other_chat_params)
             logger.info("Respuesta de OpenAI (nuevo proyecto): %s", other_resp)
             other_text = other_resp['choices'][0]['message']['content']
             other_data = json.loads(other_text)
