@@ -79,14 +79,16 @@ def api_ai_search_projects(request):
     try:
         data = json.loads(request.body)
         prompt = data.get('prompt', '')
-    except Exception:
+    except Exception as e:
+        logger.exception("Error al leer el JSON de la solicitud: %s", e)
         return JsonResponse({'error': 'JSON invalido'}, status=400)
     if not prompt:
         return JsonResponse({'error': 'Prompt vacio'}, status=400)
     try:
         catalogo = ProyectoCatalog.objects.latest('version')
         catalog = catalogo.datos_catalogo
-    except ProyectoCatalog.DoesNotExist:
+    except ProyectoCatalog.DoesNotExist as e:
+        logger.exception("Catalogo de proyectos no disponible: %s", e)
         return JsonResponse({'error': 'Catalogo no disponible'}, status=500)
 
     project_names = []
@@ -112,14 +114,21 @@ def api_ai_search_projects(request):
         'Si no hay coincidencias deja la lista vacia.'
     )
     try:
+        messages = [
+            {'role': 'system', 'content': system_msg},
+            {'role': 'user', 'content': prompt + '\n' + user_msg},
+        ]
+        logger.info("Solicitando proyectos a OpenAI: %s", messages)
         ai_resp = openai.ChatCompletion.create(
             model=model_name,
-            messages=[{'role': 'system', 'content': system_msg}, {'role': 'user', 'content': prompt + '\n' + user_msg}],
+            messages=messages,
             temperature=0.0,
         )
+        logger.info("Respuesta de OpenAI: %s", ai_resp)
         text = ai_resp['choices'][0]['message']['content']
         ai_data = json.loads(text)
-    except Exception:
+    except Exception as e:
+        logger.exception("Error al obtener proyectos desde OpenAI: %s", e)
         ai_data = {'projects': []}
 
     results = []
@@ -141,14 +150,24 @@ def api_ai_search_projects(request):
     other_data = None
     if not results:
         try:
+            other_messages = [
+                {
+                    'role': 'system',
+                    'content': 'Propón un nuevo proyecto en JSON con campos name, description y technology basado en la necesidad.'
+                },
+                {'role': 'user', 'content': prompt},
+            ]
+            logger.info("Solicitando nuevo proyecto a OpenAI: %s", other_messages)
             other_resp = openai.ChatCompletion.create(
                 model=model_name,
-                messages=[{'role': 'system', 'content': 'Propón un nuevo proyecto en JSON con campos name, description y technology basado en la necesidad.'}, {'role': 'user', 'content': prompt}],
+                messages=other_messages,
                 temperature=0.3,
             )
+            logger.info("Respuesta de OpenAI (nuevo proyecto): %s", other_resp)
             other_text = other_resp['choices'][0]['message']['content']
             other_data = json.loads(other_text)
-        except Exception:
+        except Exception as e:
+            logger.exception("Error al proponer nuevo proyecto con OpenAI: %s", e)
             other_data = None
 
     return JsonResponse({'projects': results, 'otro': other_data})
