@@ -1424,6 +1424,31 @@ function getCategoryColors(categoryName) {
             return null;
         }
 
+        function addAiProjectDirect(project) {
+            const newPilot = {
+                solutionId: project.id || `custom_${selectedPilots.length}`,
+                name: project.projectName || project.name || 'Otro',
+                description: project.description || '',
+                technology: project.technology || '',
+                valueProposition: project.valueProposition || '',
+                salesPitch: project.salesPitch || '',
+                kpis: project.kpis || [],
+                monthlyROI: project.monthlyROI || [],
+                currentProcessDescription: '',
+                attachedFileNames: [],
+                selectedProcessNameContent: project.projectName || project.name || '',
+                selectedProcessDescriptionContent: project.description || '',
+                selectedProcessTechnologyContent: project.technology ? project.technology.split(/[,;]/).map(t => t.trim()) : [],
+                originalProjectData: project,
+                originalCategoryName: project.categoryName || 'Otros',
+                originalSubcategoryName: project.subcategoryName || 'Otro',
+                archivos_adjuntos: []
+            };
+            selectedPilots.push(newPilot);
+            currentPilotIndex = selectedPilots.length - 1;
+            selectedPilot = newPilot;
+        }
+
 
         function findSolutionById(solutionId) {
             const details = findSolutionByIdWithDetails(solutionId);
@@ -1965,39 +1990,44 @@ function getCategoryColors(categoryName) {
                 });
                 const data = await response.json();
                 if (response.ok) {
-                    if (Array.isArray(data.projects)) {
+                    if (Array.isArray(data.projects) && data.projects.length > 0) {
                         data.projects.forEach(p => {
                             if (!selectedPilots.some(sp => String(sp.solutionId) === String(p.id))) {
-                                selectSolutionForPilot(p.id);
+                                const details = findSolutionByIdWithDetails(p.id);
+                                if (details) {
+                                    selectSolutionForPilot(p.id);
+                                } else {
+                                    addAiProjectDirect(p);
+                                }
                             }
                         });
-                    }
-                    if (!data.projects || data.projects.length === 0) {
-                        if (data.otro) {
-                            const newPilot = {
-                                solutionId: `custom_${selectedPilots.length}`,
-                                name: data.otro.name || 'Otro',
-                                description: data.otro.description || '',
-                                technology: data.otro.technology || '',
-                                valueProposition: '',
-                                salesPitch: '',
-                                kpis: [],
-                                monthlyROI: [],
-                                currentProcessDescription: '',
-                                attachedFileNames: [],
-                                selectedProcessNameContent: data.otro.name || '',
-                                selectedProcessDescriptionContent: data.otro.description || '',
-                                selectedProcessTechnologyContent: data.otro.technology ? data.otro.technology.split(/[,;]/).map(t => t.trim()) : [],
-                                originalProjectData: null,
-                                originalCategoryName: 'Otros',
-                                originalSubcategoryName: 'Otro',
-                                archivos_adjuntos: []
-                            };
-                            selectedPilots.push(newPilot);
-                            currentPilotIndex = selectedPilots.length - 1;
-                            selectedPilot = newPilot;
-                            renderSelectedProjectsList();
-                            renderAnalysisTabs();
+                    } else {
+                        let nuevo = data.otro;
+                        if (!nuevo) {
+                            try {
+                                const resp2 = await fetch('/api/buscar_proyectos_ia/', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        ...(csrfToken && { 'X-CSRFToken': csrfToken })
+                                    },
+                                    body: JSON.stringify({ prompt })
+                                });
+                                const data2 = await resp2.json();
+                                nuevo = data2.otro;
+                            } catch (e) {
+                                console.error('Error solicitando proyecto alternativo:', e);
+                            }
+                        }
+                        if (nuevo) {
+                            addAiProjectDirect({
+                                id: `custom_${selectedPilots.length}`,
+                                projectName: nuevo.name || 'Otro',
+                                description: nuevo.description || '',
+                                technology: nuevo.technology || '',
+                                categoryName: 'Otros',
+                                subcategoryName: 'Otro'
+                            });
                         }
                     }
                 }
@@ -2005,6 +2035,8 @@ function getCategoryColors(categoryName) {
                 console.error('Error buscando proyectos IA:', err);
             }
             document.getElementById('aiPromptInput').value = '';
+            renderSelectedProjectsList();
+            renderAnalysisTabs();
             renderProcessCatalog();
         }
 
@@ -2127,7 +2159,13 @@ function getCategoryColors(categoryName) {
             selectedPilots.forEach((p, idx) => {
                 const li = document.createElement('li');
                 li.className = 'selected-project-item';
-                li.innerHTML = `<span>${p.name || `Proyecto ${idx + 1}`}</span>`;
+                const infoBtn = document.createElement('button');
+                infoBtn.className = 'selected-project-link';
+                const cat = p.originalCategoryName || '';
+                const subcat = p.originalSubcategoryName || '';
+                infoBtn.textContent = `${p.name || `Proyecto ${idx + 1}`}${cat ? ' - ' + cat : ''}${subcat ? ' / ' + subcat : ''}`;
+                infoBtn.onclick = () => loadProjectIntoSelectionForm(idx);
+                li.appendChild(infoBtn);
                 const btn = document.createElement('button');
                 btn.className = 'remove-btn';
                 btn.textContent = 'Quitar';
@@ -2135,6 +2173,64 @@ function getCategoryColors(categoryName) {
                 li.appendChild(btn);
                 list.appendChild(li);
             });
+        }
+
+        function saveCurrentProcessSelection() {
+            if (!selectedPilot) return;
+            selectedPilot.selectedProcessNameContent = document.getElementById('selectedProcessName').value;
+            selectedPilot.selectedProcessDescriptionContent = document.getElementById('selectedProcessDescription').value;
+            selectedPilot.currentProcessDescription = document.getElementById('currentProcessDescription').value;
+            const techs = [];
+            document.querySelectorAll('#selectedProcessTechnologyCheckboxes input[type="checkbox"]:checked').forEach(cb => {
+                techs.push(cb.value);
+            });
+            selectedPilot.selectedProcessTechnologyContent = techs;
+            if (selectedPilot.selectedProcessNameContent) {
+                selectedPilot.name = selectedPilot.selectedProcessNameContent;
+            }
+        }
+
+        function loadProjectIntoSelectionForm(index) {
+            if (index < 0 || index >= selectedPilots.length) return;
+            saveCurrentProcessSelection();
+            currentPilotIndex = index;
+            selectedPilot = selectedPilots[index];
+            document.getElementById('selectedProcessName').value = selectedPilot.selectedProcessNameContent || '';
+            document.getElementById('selectedProcessDescription').value = selectedPilot.selectedProcessDescriptionContent || '';
+            document.getElementById('currentProcessDescription').value = selectedPilot.currentProcessDescription || '';
+            renderTechnologyCheckboxes();
+            const container = document.getElementById('selectedProcessTechnologyCheckboxes');
+            container.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+                cb.checked = selectedPilot.selectedProcessTechnologyContent.includes(cb.value);
+            });
+            document.getElementById('currentProcessFiles').value = '';
+            const fileDisplay = document.getElementById('fileListDisplay');
+            fileDisplay.innerHTML = '';
+            if (selectedPilot.archivos_adjuntos && selectedPilot.archivos_adjuntos.length > 0) {
+                const ul = document.createElement('ul');
+                ul.classList.add('list-disc', 'list-inside', 'pl-2');
+                selectedPilot.archivos_adjuntos.forEach(file => {
+                    const li = document.createElement('li');
+                    const a = document.createElement('a');
+                    a.href = file.url;
+                    a.textContent = file.nombre;
+                    a.target = '_blank';
+                    a.rel = 'noopener noreferrer';
+                    a.classList.add('text-blue-400', 'hover:underline');
+                    li.appendChild(a);
+                    ul.appendChild(li);
+                });
+                fileDisplay.appendChild(ul);
+            } else if (selectedPilot.attachedFileNames && selectedPilot.attachedFileNames.length > 0) {
+                const ul = document.createElement('ul');
+                ul.classList.add('list-disc', 'list-inside', 'pl-2');
+                selectedPilot.attachedFileNames.forEach(name => {
+                    const li = document.createElement('li');
+                    li.textContent = name + ' (pendiente de guardar)';
+                    ul.appendChild(li);
+                });
+                fileDisplay.appendChild(ul);
+            }
         }
 
         function removeSelectedProject(index) {
