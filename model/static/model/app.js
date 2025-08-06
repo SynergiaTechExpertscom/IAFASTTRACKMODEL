@@ -2271,11 +2271,18 @@ function normalizeString(text) {
 
         function removeSelectedProject(index) {
             if (index < 0 || index >= selectedPilots.length) return;
-            selectedPilots.splice(index, 1);
+            const removedPilot = selectedPilots.splice(index, 1)[0];
+
             if (currentPilotIndex >= selectedPilots.length) {
                 currentPilotIndex = selectedPilots.length - 1;
             }
+
             selectedPilot = selectedPilots[currentPilotIndex] || { ...emptyPilotTemplate };
+
+            if (selectedPilots.length === 0 || (removedPilot && removedPilot.solutionId === currentSelectedSolutionId)) {
+                currentSelectedSolutionId = selectedPilot.solutionId || null;
+            }
+
             renderProcessCatalog();
             renderSelectedProjectsList();
             renderAnalysisTabs();
