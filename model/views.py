@@ -135,9 +135,9 @@ def api_ai_search_projects(request):
 
     def extract_content(resp):
         try:
+            return resp.choices[0].message.content
+        except (AttributeError, TypeError, KeyError, IndexError):
             return resp['choices'][0]['message']['content']
-        except (TypeError, KeyError):
-            return resp.choices[0].message["content"]
 
     system_msg = 'Eres un asistente que recomienda proyectos del catalogo.'
     user_msg = (
