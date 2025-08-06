@@ -2020,7 +2020,8 @@ function getCategoryColors(categoryName) {
             }
             if (loader) loader.classList.add('hidden');
             document.getElementById('aiPromptInput').value = '';
-            currentFilter = 'All';
+            currentFilter = 'Suggested';
+            currentSubcategoryFilter = 'AllSubcategories';
             setupMainFilters();
             updateSubcategoryFilters();
             renderProcessCatalog();
