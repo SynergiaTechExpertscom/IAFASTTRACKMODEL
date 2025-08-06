@@ -1,5 +1,6 @@
-# encoding: iso-8859-1 
+# -*- coding: utf-8 -*-
 import logging
+import unicodedata
 from venv import logger
 from django.http import JsonResponse, HttpResponse
 from django.contrib.auth import authenticate, login as django_auth_login, logout as django_auth_logout
@@ -68,7 +69,10 @@ def api_get_project_catalog(request):
     #     return JsonResponse({'error': 'No autorizado'}, status=401)
     try:
         catalogo = ProyectoCatalog.objects.latest('version')
-        return JsonResponse(catalogo.datos_catalogo)
+        return JsonResponse(
+            catalogo.datos_catalogo,
+            json_dumps_params={'ensure_ascii': False}
+        )
     except ProyectoCatalog.DoesNotExist:
         return JsonResponse({'error': 'Catalogo de proyectos no encontrado'}, status=404)
 
@@ -150,15 +154,23 @@ def api_ai_search_projects(request):
         logger.exception("Error al obtener proyectos desde OpenAI: %s", e)
         ai_data = {'projects': []}
 
+    def normalize_text(text):
+        return unicodedata.normalize('NFD', text or '').encode('ascii', 'ignore').decode('utf-8').strip().lower()
+
     results = []
-    for item in ai_data.get('projects', []):
-        pid = item.get('id') if isinstance(item, dict) else item
+    for idx, item in enumerate(ai_data.get('projects', [])):
+        pid = item.get('id') if isinstance(item, dict) else None
+        pname = (
+            item.get('projectName') or item.get('name') if isinstance(item, dict) else item
+        )
         found = False
+        target = normalize_text(pname) if pname else None
         for cat in catalog.get('categories', []):
             for sub in cat.get('subcategories', []):
                 for proj in sub.get('projects', []):
-                    if str(proj.get('id')) == str(pid) or (
-                        isinstance(item, dict) and proj.get('projectName') == item.get('projectName')
+                    if (
+                        (pid and str(proj.get('id')) == str(pid))
+                        or (pname and normalize_text(proj.get('projectName')) == target)
                     ):
                         results.append({
                             'id': proj.get('id'),
@@ -174,14 +186,24 @@ def api_ai_search_projects(request):
                     break
             if found:
                 break
-        if not found and isinstance(item, dict):
+        if not found and pname:
+            desc = item.get('description', '') if isinstance(item, dict) else ''
+            tech = item.get('technology', '') if isinstance(item, dict) else ''
+            cat_name = (
+                item.get('categoryName', 'Otros')
+                if isinstance(item, dict) else 'Otros'
+            )
+            sub_name = (
+                item.get('subcategoryName', 'Otro')
+                if isinstance(item, dict) else 'Otro'
+            )
             results.append({
-                'id': item.get('id', ''),
-                'projectName': item.get('projectName') or item.get('name', ''),
-                'description': item.get('description', ''),
-                'technology': item.get('technology', ''),
-                'categoryName': item.get('categoryName', 'Sugeridos'),
-                'subcategoryName': item.get('subcategoryName', 'Otro'),
+                'id': pid or f'suggested_{idx}',
+                'projectName': pname,
+                'description': desc,
+                'technology': tech,
+                'categoryName': cat_name,
+                'subcategoryName': sub_name,
             })
 
     other_data = None
@@ -203,7 +225,10 @@ def api_ai_search_projects(request):
             logger.exception("Error al proponer nuevo proyecto con OpenAI: %s", e)
             other_data = None
 
-    return JsonResponse({'projects': results, 'otro': other_data})
+    return JsonResponse(
+        {'projects': results, 'otro': other_data},
+        json_dumps_params={'ensure_ascii': False}
+    )
 
 @csrf_exempt
 def api_save_summary(request, client_id):
