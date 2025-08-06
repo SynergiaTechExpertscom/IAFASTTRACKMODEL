@@ -1360,7 +1360,7 @@ function normalizeString(text) {
                 selectedPilots.splice(existingIndex, 1);
                 if (currentPilotIndex === existingIndex) {
                     currentPilotIndex = selectedPilots.length > 0 ? 0 : -1;
-                    selectedPilot = selectedPilots[currentPilotIndex] || selectedPilot;
+                    selectedPilot = selectedPilots[currentPilotIndex] || { ...emptyPilotTemplate };
                 }
                 currentSelectedSolutionId = null;
                 renderProcessCatalog();
