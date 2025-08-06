@@ -3,6 +3,7 @@
 
  $env:PRODUCTION = "true"
 
+//arrancar el entorno virtual
 python manage.py runserver
 
 
