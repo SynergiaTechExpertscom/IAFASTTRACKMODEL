@@ -301,6 +301,12 @@ function getCategoryColors(categoryName) {
                 const projectCatalogData = await catalogResponse.json();
                 catalogData = projectCatalogData;
 
+                if (Array.isArray(clientData.colaboracion_propuesta)) {
+                    clientData.colaboracion_propuesta = clientData.colaboracion_propuesta.filter(name => {
+                        return !!findProjectByNameAcrossAllCategories(name);
+                    });
+                }
+
                 // 2. Carga el resumen explícitamente desde la API
                 let resumen_json = null;
                 try {
@@ -1086,18 +1092,11 @@ function getCategoryColors(categoryName) {
                     const grouped = {};
                     clientData.colaboracion_propuesta.forEach((projectName, idx) => {
                         const projectDetails = findProjectByNameAcrossAllCategories(projectName);
-                        let project, categoryName, subcategoryName, projectUniqueId;
-                        if (projectDetails) {
-                            project = projectDetails.project;
-                            categoryName = projectDetails.categoryName;
-                            subcategoryName = projectDetails.subcategoryName;
-                            projectUniqueId = project.id;
-                        } else {
-                            project = { projectName: projectName, description: "", technology: "" };
-                            categoryName = "Sugeridos";
-                            subcategoryName = "Sin Categoría";
-                            projectUniqueId = `suggested_${idx}`;
-                        }
+                        if (!projectDetails) return;
+                        const project = projectDetails.project;
+                        const categoryName = projectDetails.categoryName;
+                        const subcategoryName = projectDetails.subcategoryName;
+                        const projectUniqueId = `${generateSafeId(categoryName)}_${generateSafeId(subcategoryName)}_${generateSafeId(project.projectName)}_${idx}`;
                         project.originalCategoryName = categoryName;
                         project.originalSubcategoryName = subcategoryName;
                         project.id = projectUniqueId;
@@ -1105,6 +1104,11 @@ function getCategoryColors(categoryName) {
                         if (!grouped[categoryName][subcategoryName]) grouped[categoryName][subcategoryName] = [];
                         grouped[categoryName][subcategoryName].push(project);
                     });
+
+                    if (Object.keys(grouped).length === 0) {
+                        catalogContainer.innerHTML += `<p class="text-center text-gray-400 py-4 md:col-span-2">No hay proyectos sugeridos en el catálogo.</p>`;
+                        return;
+                    }
 
                     Object.keys(grouped).forEach(catName => {
                         const categoryColors = getCategoryColors(catName);

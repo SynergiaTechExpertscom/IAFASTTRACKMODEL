@@ -310,6 +310,12 @@ function getCategoryColors(categoryName) {
                 const projectCatalogData = await catalogResponse.json();
                 catalogData = projectCatalogData;
 
+                if (Array.isArray(clientData.colaboracion_propuesta)) {
+                    clientData.colaboracion_propuesta = clientData.colaboracion_propuesta.filter(name => {
+                        return !!findProjectByNameAcrossAllCategories(name);
+                    });
+                }
+
                 // 2. Carga el resumen explícitamente desde la API
                 let resumen_json = null;
                 try {
@@ -1108,30 +1114,11 @@ function getCategoryColors(categoryName) {
                     const grouped = {};
                     clientData.colaboracion_propuesta.forEach((projectName, idx) => {
                         const projectDetails = findProjectByNameAcrossAllCategories(projectName);
-                        let project, categoryName, subcategoryName, projectUniqueId;
-                        if (projectDetails) {
-                            project = projectDetails.project;
-                            categoryName = projectDetails.categoryName;
-                            subcategoryName = projectDetails.subcategoryName;
-                            projectUniqueId = project.id;
-                        } else {
-                            const custom = suggestedProjectDetails[projectName];
-                            if (custom) {
-                                project = {
-                                    projectName: custom.projectName,
-                                    description: custom.description,
-                                    technology: custom.technology
-                                };
-                                categoryName = custom.categoryName || 'Otros';
-                                subcategoryName = custom.subcategoryName || 'Otro';
-                                projectUniqueId = custom.id || `suggested_${idx}`;
-                            } else {
-                                project = { projectName: projectName, description: "", technology: "" };
-                                categoryName = "Sugeridos";
-                                subcategoryName = "Sin Categoría";
-                                projectUniqueId = `suggested_${idx}`;
-                            }
-                        }
+                        if (!projectDetails) return;
+                        const project = projectDetails.project;
+                        const categoryName = projectDetails.categoryName;
+                        const subcategoryName = projectDetails.subcategoryName;
+                        const projectUniqueId = `${generateSafeId(categoryName)}_${generateSafeId(subcategoryName)}_${generateSafeId(project.projectName)}_${idx}`;
                         project.originalCategoryName = categoryName;
                         project.originalSubcategoryName = subcategoryName;
                         project.id = projectUniqueId;
@@ -1139,6 +1126,11 @@ function getCategoryColors(categoryName) {
                         if (!grouped[categoryName][subcategoryName]) grouped[categoryName][subcategoryName] = [];
                         grouped[categoryName][subcategoryName].push(project);
                     });
+
+                    if (Object.keys(grouped).length === 0) {
+                        catalogContainer.innerHTML += `<p class="text-center text-gray-400 py-4 md:col-span-2">No hay proyectos sugeridos en el catálogo.</p>`;
+                        return;
+                    }
 
                     Object.keys(grouped).forEach(catName => {
                         const categoryColors = getCategoryColors(catName);
@@ -2016,7 +2008,7 @@ function getCategoryColors(categoryName) {
                 });
                 const data = await response.json();
                 if (Array.isArray(data.projects) && data.projects.length > 0) {
-                    data.projects.forEach((p, idx) => {
+                    data.projects.forEach((p) => {
                         const match = findProjectByNameAcrossAllCategories(p.projectName);
                         if (match) {
                             const name = match.project.projectName;
@@ -2029,64 +2021,11 @@ function getCategoryColors(categoryName) {
                                 subcategoryName: match.subcategoryName,
                                 id: match.project.id
                             };
-                        } else {
-                            const name = p.projectName;
-                            clientData.colaboracion_propuesta.push(name);
-                            suggestedProjectDetails[name] = {
-                                projectName: name,
-                                description: p.description || '',
-                                technology: p.technology || '',
-                                categoryName: p.categoryName || 'Otros',
-                                subcategoryName: p.subcategoryName || 'Otro',
-                                id: `suggested_${idx}`
-                            };
                         }
                     });
-                } else {
-                    let nuevo = data.otro;
-                    if (!nuevo) {
-                        try {
-                            const resp2 = await fetch('/api/buscar_proyectos_ia/', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    ...(csrfToken && { 'X-CSRFToken': csrfToken })
-                                },
-                                body: JSON.stringify({ prompt })
-                            });
-                            const data2 = await resp2.json();
-                            nuevo = data2.otro;
-                        } catch (e) {
-                            console.error('Error solicitando proyecto alternativo:', e);
-                        }
-                    }
-                    if (nuevo) {
-                        const rawName = nuevo.name || 'Otro';
-                        const match = findProjectByNameAcrossAllCategories(rawName);
-                        if (match) {
-                            const name = match.project.projectName;
-                            clientData.colaboracion_propuesta = [name];
-                            suggestedProjectDetails[name] = {
-                                projectName: name,
-                                description: match.project.description || '',
-                                technology: match.project.technology || '',
-                                categoryName: match.categoryName,
-                                subcategoryName: match.subcategoryName,
-                                id: match.project.id
-                            };
-                        } else {
-                            const name = rawName;
-                            clientData.colaboracion_propuesta = [name];
-                            suggestedProjectDetails[name] = {
-                                projectName: name,
-                                description: nuevo.description || '',
-                                technology: nuevo.technology || '',
-                                categoryName: 'Otros',
-                                subcategoryName: 'Otro',
-                                id: 'suggested_0'
-                            };
-                        }
-                    }
+                }
+                if (clientData.colaboracion_propuesta.length === 0) {
+                    showGeneralMessage('No se encontraron proyectos sugeridos en el catálogo.', 'info');
                 }
             } catch (err) {
                 console.error('Error buscando proyectos IA:', err);
