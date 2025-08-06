@@ -665,6 +665,11 @@ function normalizeString(text) {
             }
 
             if (sectionId === 'sectionAnalisis') {
+                if (selectedPilots.length === 0) {
+                    showGeneralMessage('No hay proyectos seleccionados. Por favor elige uno en Oportunidades.', 'info');
+                    return;
+                }
+
                 renderAnalysisTabs();
                 // --- NUEVO BLOQUE PARA TÍTULO Y COLOR ---
                 const pilotName = selectedPilot.name || selectedPilot.selectedProcessNameContent || "Definición del Piloto";
@@ -757,6 +762,10 @@ function normalizeString(text) {
             }
 
             const newPilot = JSON.parse(JSON.stringify(selectedPilot));
+            const existingIndex = selectedPilots.findIndex(p => p.solutionId === selectedPilot.solutionId);
+            if (existingIndex !== -1) {
+                currentPilotIndex = existingIndex;
+            }
             if (currentPilotIndex === -1) {
                 selectedPilots.push(newPilot);
                 currentPilotIndex = selectedPilots.length - 1;
@@ -1362,10 +1371,17 @@ function normalizeString(text) {
             const existingIndex = selectedPilots.findIndex(p => p.solutionId === solutionId);
             if (existingIndex !== -1) {
                 selectedPilots.splice(existingIndex, 1);
-                if (currentPilotIndex === existingIndex) {
-                    currentPilotIndex = selectedPilots.length > 0 ? 0 : -1;
-                    selectedPilot = selectedPilots[currentPilotIndex] || selectedPilot;
+
+                if (selectedPilots.length === 0) {
+                    currentPilotIndex = -1;
+                    selectedPilot = { ...emptyPilotTemplate };
+                    currentSelectedSolutionId = null;
+                } else {
+                    currentPilotIndex = Math.min(currentPilotIndex, selectedPilots.length - 1);
+                    selectedPilot = selectedPilots[currentPilotIndex];
+                    currentSelectedSolutionId = selectedPilot.solutionId;
                 }
+
                 renderProcessCatalog();
                 renderSelectedProjectsList();
                 renderAnalysisTabs();
@@ -1395,6 +1411,7 @@ function normalizeString(text) {
             selectedPilots.push(newPilot);
             currentPilotIndex = selectedPilots.length - 1;
             selectedPilot = newPilot;
+            currentSelectedSolutionId = solutionId;
 
             renderProcessCatalog();
             renderSelectedProjectsList();
@@ -2266,10 +2283,17 @@ function normalizeString(text) {
         function removeSelectedProject(index) {
             if (index < 0 || index >= selectedPilots.length) return;
             selectedPilots.splice(index, 1);
-            if (currentPilotIndex >= selectedPilots.length) {
-                currentPilotIndex = selectedPilots.length - 1;
+
+            if (selectedPilots.length === 0) {
+                currentPilotIndex = -1;
+                selectedPilot = { ...emptyPilotTemplate };
+                currentSelectedSolutionId = null;
+            } else {
+                currentPilotIndex = Math.min(currentPilotIndex, selectedPilots.length - 1);
+                selectedPilot = selectedPilots[currentPilotIndex];
+                currentSelectedSolutionId = selectedPilot.solutionId;
             }
-            selectedPilot = selectedPilots[currentPilotIndex] || { ...emptyPilotTemplate };
+
             renderProcessCatalog();
             renderSelectedProjectsList();
             renderAnalysisTabs();
