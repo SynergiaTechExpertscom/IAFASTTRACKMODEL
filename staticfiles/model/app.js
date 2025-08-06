@@ -52,6 +52,12 @@ function getCategoryColors(categoryName) {
     return categoryColorStyles[categoryName] || categoryColorStyles["Default"];
 }
 
+function normalizeString(text) {
+    return text
+        ? text.toString().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase()
+        : '';
+}
+
         const icons = {
             default: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9.87891 7.51884C11.0505 6.49372 12.95 6.49372 14.1215 7.51884C15.2931 8.54397 15.2931 10.206 14.1215 11.2312C13.9176 11.4096 13.6917 11.5569 13.4513 11.6733C12.7056 12.0341 12.0002 12.6716 12.0002 13.5V14.25M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12ZM12 17.25H12.0075V17.2575H12V17.25Z" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
             automatizacion: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8.25 3V4.5M4.5 8.25H3M21 8.25H19.5M4.5 12H3M21 12H19.5M4.5 15.75H3M21 15.75H19.5M8.25 19.5V21M12 3V4.5M12 19.5V21M15.75 3V4.5M15.75 19.5V21M6.75 19.5H17.25C18.4926 19.5 19.5 18.4926 19.5 17.25V6.75C19.5 5.50736 18.4926 4.5 17.25 4.5H6.75C5.50736 4.5 4.5 5.50736 4.5 6.75V17.25C4.5 18.4926 5.50736 19.5 6.75 19.5ZM7.5 7.5H16.5V16.5H7.5V7.5Z" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
@@ -1314,12 +1320,6 @@ function getCategoryColors(categoryName) {
                 });
             }
             return maxIndex;
-        }
-
-        function normalizeString(text) {
-            return text
-                ? text.toString().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase()
-                : '';
         }
 
         function findProjectByNameAcrossAllCategories(projectName) {
