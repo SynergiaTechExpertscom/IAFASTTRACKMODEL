@@ -133,6 +133,12 @@ def api_ai_search_projects(request):
             def chat_complete(messages):
                 return openai.ChatCompletion.create(model=model_name, messages=messages)
 
+    def extract_content(resp):
+        try:
+            return resp['choices'][0]['message']['content']
+        except (TypeError, KeyError):
+            return resp.choices[0].message["content"]
+
     system_msg = 'Eres un asistente que recomienda proyectos del catalogo.'
     user_msg = (
         f"Catalogo de proyectos en formato JSON: {catalog_json}\n" +
@@ -148,7 +154,7 @@ def api_ai_search_projects(request):
         logger.info("Solicitando proyectos a OpenAI: %s", messages)
         ai_resp = chat_complete(messages)
         logger.info("Respuesta de OpenAI: %s", ai_resp)
-        text = ai_resp['choices'][0]['message']['content']
+        text = extract_content(ai_resp)
         ai_data = json.loads(text)
     except Exception as e:
         logger.exception("Error al obtener proyectos desde OpenAI: %s", e)
@@ -219,7 +225,7 @@ def api_ai_search_projects(request):
             logger.info("Solicitando nuevo proyecto a OpenAI: %s", other_messages)
             other_resp = chat_complete(other_messages)
             logger.info("Respuesta de OpenAI (nuevo proyecto): %s", other_resp)
-            other_text = other_resp['choices'][0]['message']['content']
+            other_text = extract_content(other_resp)
             other_data = json.loads(other_text)
         except Exception as e:
             logger.exception("Error al proponer nuevo proyecto con OpenAI: %s", e)
