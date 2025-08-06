@@ -668,6 +668,7 @@ function normalizeString(text) {
                     });
                     fileDisplay.appendChild(ul);
                 }
+                toggleProyectoSection();
             }
 
             if (sectionId === 'sectionAnalisis') {
@@ -747,7 +748,20 @@ function normalizeString(text) {
                 // For now, let's keep originalProjectData if a catalog item was selected,
                 // and the prefill logic in navigateTo('sectionAnalisis') will handle it.
             }
+            const isOtrosOtro = currentFilter === generateSafeId('Otros') && currentSubcategoryFilter === generateSafeId('Otro');
+            if (isOtrosOtro) {
+                selectedPilot.originalCategoryName = 'Otros';
+                selectedPilot.originalSubcategoryName = 'Otro';
+                if (!selectedPilot.solutionId) {
+                    selectedPilot.solutionId = `custom_${Date.now()}`;
+                }
+            }
 
+            const hasProject = selectedPilot.solutionId || selectedPilot.selectedProcessNameContent || (selectedPilot.originalProjectData && selectedPilot.originalProjectData.projectName);
+            if (!hasProject) {
+                showGeneralMessage('Por favor selecciona un proyecto del catálogo o define uno en la sección Proyecto.', 'error');
+                return;
+            }
 
             const newPilot = JSON.parse(JSON.stringify(selectedPilot));
             if (currentPilotIndex === -1) {
@@ -1298,6 +1312,7 @@ function normalizeString(text) {
                 }
                 catalogContainer.innerHTML = `<p class="text-center text-gray-400 py-4 md:col-span-2">${message}</p>`;
             }
+            toggleProyectoSection();
         }
 
 
@@ -2165,6 +2180,13 @@ function normalizeString(text) {
             });
         }
 
+        function toggleProyectoSection() {
+            const section = document.getElementById('customProjectSection');
+            if (!section) return;
+            const isOtrosOtro = currentFilter === generateSafeId('Otros') && currentSubcategoryFilter === generateSafeId('Otro');
+            section.classList.toggle('hidden', !isOtrosOtro);
+        }
+
         function saveCurrentProcessSelection() {
             if (!selectedPilot) return;
             selectedPilot.selectedProcessNameContent = document.getElementById('selectedProcessName').value;
@@ -2178,6 +2200,30 @@ function normalizeString(text) {
             if (selectedPilot.selectedProcessNameContent) {
                 selectedPilot.name = selectedPilot.selectedProcessNameContent;
             }
+        }
+
+        function addCustomProject() {
+            saveCurrentProcessSelection();
+            selectedPilot.originalCategoryName = 'Otros';
+            selectedPilot.originalSubcategoryName = 'Otro';
+            if (!selectedPilot.selectedProcessNameContent) {
+                showGeneralMessage('Por favor indica un nombre para el proyecto.', 'error');
+                return;
+            }
+            if (!selectedPilot.solutionId) {
+                selectedPilot.solutionId = `custom_${Date.now()}`;
+            }
+            const newPilot = JSON.parse(JSON.stringify(selectedPilot));
+            if (currentPilotIndex === -1) {
+                selectedPilots.push(newPilot);
+                currentPilotIndex = selectedPilots.length - 1;
+            } else {
+                selectedPilots[currentPilotIndex] = newPilot;
+            }
+            selectedPilot = newPilot;
+            renderSelectedProjectsList();
+            renderAnalysisTabs();
+            toggleProyectoSection();
         }
 
         function loadProjectIntoSelectionForm(index) {
@@ -2221,6 +2267,7 @@ function normalizeString(text) {
                 });
                 fileDisplay.appendChild(ul);
             }
+            toggleProyectoSection();
         }
 
         function removeSelectedProject(index) {
