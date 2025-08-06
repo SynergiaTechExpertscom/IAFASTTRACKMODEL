@@ -110,30 +110,30 @@ WSGI_APPLICATION = 'IAFASTTRACKMODEL.wsgi.application'
 # Detect environment: use 'PRODUCTION' env var or DEBUG flag
 if os.environ.get('PRODUCTION', '').lower() == 'true' or not DEBUG:
     logging.info("Running in production mode")  
-    # DATABASES = {
-    #     'default': {
-    #         'ENGINE': 'django.db.backends.mysql',
-    #         'HOST': f"/cloudsql/{os.getenv('DB_CONNECTION_NAME')}",
-    #         'NAME': os.getenv('DB_NAME'),
-    #         'USER': os.getenv('DB_USER'),
-    #         'PASSWORD': os.getenv('DB_PASSWORD'),
-    #     }
-    # }
-    # db_info = DATABASES['default']
-    # conn_str = f"ENGINE={db_info['ENGINE']}; NAME={db_info['NAME']}; USER={db_info['USER']}; HOST={db_info['HOST']}"
-
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
-            'HOST': f"35.195.92.90",
-            'PORT': '3306',
-            'NAME': 'aifasttrackmodel',
-            'USER': 'aifasttrackmodel',
-            'PASSWORD': 'Choflas_3',
+            'HOST': f"/cloudsql/{os.getenv('DB_CONNECTION_NAME')}",
+            'NAME': os.getenv('DB_NAME'),
+            'USER': os.getenv('DB_USER'),
+            'PASSWORD': os.getenv('DB_PASSWORD'),
         }
     }
     db_info = DATABASES['default']
-    conn_str = f"ENGINE={db_info['ENGINE']}; NAME={db_info['NAME']}; USER={db_info['USER']}; HOST={db_info['HOST']}; PORT={db_info['PORT']}"
+    conn_str = f"ENGINE={db_info['ENGINE']}; NAME={db_info['NAME']}; USER={db_info['USER']}; HOST={db_info['HOST']}"
+
+    # DATABASES = {
+    #     'default': {
+    #         'ENGINE': 'django.db.backends.mysql',
+    #         'HOST': f"35.195.92.90",
+    #         'PORT': '3306',
+    #         'NAME': 'aifasttrackmodel',
+    #         'USER': 'aifasttrackmodel',
+    #         'PASSWORD': 'Choflas_3',
+    #     }
+    # }
+    # db_info = DATABASES['default']
+    # conn_str = f"ENGINE={db_info['ENGINE']}; NAME={db_info['NAME']}; USER={db_info['USER']}; HOST={db_info['HOST']}; PORT={db_info['PORT']}"
 else:
     logging.info("Running in development mode") 
     DATABASES = {
