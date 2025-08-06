@@ -388,6 +388,7 @@ function normalizeString(text) {
         /* ✅ FLAG nuevo para evitar recursión */
         let isGeneratingSummary = false;
 
+        
         function applySavedSummaryData(savedSummaryRaw) {
             if (!savedSummaryRaw) return;
 
@@ -401,86 +402,75 @@ function normalizeString(text) {
                 }
             }
 
-            // Normaliza tecnologías
-            let techArray = [];
-            if (savedSummary.solucion_tecnologias) {
-                if (Array.isArray(savedSummary.solucion_tecnologias)) {
-                    techArray = savedSummary.solucion_tecnologias.map(t => t.trim()).filter(Boolean);
-                } else {
-                    techArray = savedSummary.solucion_tecnologias.split(/[,;]/).map(t => t.trim()).filter(Boolean);
-                }
-            }
+            selectedPilots = [];
+            currentPilotIndex = -1;
+            selectedPilot = { ...emptyPilotTemplate };
 
-            // Oportunidades
-            selectedPilot.selectedProcessNameContent = savedSummary.nombre_piloto || "";
-            selectedPilot.selectedProcessDescriptionContent = savedSummary.solucion_descripcion || "";
-            selectedPilot.selectedProcessTechnologyContent = [...techArray];
-            selectedPilot.currentProcessDescription = savedSummary.problema_actual_descripcion || "";
+            const proyectos = Array.isArray(savedSummary.proyectos)
+                ? savedSummary.proyectos
+                : (savedSummary.nombre_piloto ? [savedSummary] : []);
 
-            // Definición Piloto
-            selectedPilot.name = savedSummary.nombre_piloto || "";
-            selectedPilot.description = savedSummary.solucion_descripcion || "";
-            selectedPilot.technology = techArray.join(", ");
-            selectedPilot.valueProposition = savedSummary.propuesta_valor || "";
-            selectedPilot.salesPitch = savedSummary.pitch_ventas || "";
-
-            // KPIs
-            selectedPilot.kpis = Array.isArray(savedSummary.kpis)
-                ? savedSummary.kpis.map((k, i) => ({
-                    id: `kpi-${i}`,
-                    name: k.nombre || "",
-                    currentValue: k.valor_actual || "",
-                    targetValue: k.valor_objetivo || "",
-                    impactValue: k.impacto_esperado || ""
-                }))
-                : [];
-
-            // ROI
-            selectedPilot.monthlyROI = Array.isArray(savedSummary.roi_indicativo)
-                ? savedSummary.roi_indicativo.map((r, i) => ({
-                    id: `roi-${i}`,
-                    name: r.nombre || "",
-                    value: r.valor || ""
-                }))
-                : [];
-
-            // Archivos adjuntos
-            selectedPilot.archivos_adjuntos = Array.isArray(savedSummary.archivos_adjuntos)
-                ? savedSummary.archivos_adjuntos.map(f => ({
-                    nombre: f.nombre,
-                    url: f.url
-                }))
-                : [];
-            selectedPilot.attachedFileNames = selectedPilot.archivos_adjuntos.map(f => f.nombre);
-
-            // Categoría y subcategoría
-            selectedPilot.originalCategoryName = savedSummary.categoria_piloto || null;
-            selectedPilot.originalSubcategoryName = savedSummary.subcategoria_piloto || null;
-
-
-            // Al cargar un resumen, marca el proyecto correspondiente como seleccionado en el catálogo
-            if (selectedPilot.name && selectedPilot.originalCategoryName && selectedPilot.originalSubcategoryName) {
-                // Busca el proyecto en el catálogo
-                if (catalogData && catalogData.categories) {
-                    for (const category of catalogData.categories) {
-                        if (category.categoryName === selectedPilot.originalCategoryName) {
-                            for (const subcategory of category.subcategories) {
-                                if (subcategory.subcategoryName === selectedPilot.originalSubcategoryName) {
-                                    const foundProject = subcategory.projects.find(
-                                        proj => proj.projectName === selectedPilot.name
-                                    );
-                                    if (foundProject && foundProject.id) {
-                                        currentSelectedSolutionId = foundProject.id;
-                                        return;
-                                    }
-                                }
-                            }
-                        }
+            proyectos.forEach((proj, idx) => {
+                let techArray = [];
+                if (proj.solucion_tecnologias) {
+                    if (Array.isArray(proj.solucion_tecnologias)) {
+                        techArray = proj.solucion_tecnologias.map(t => t.trim()).filter(Boolean);
+                    } else {
+                        techArray = proj.solucion_tecnologias.split(/[,;]/).map(t => t.trim()).filter(Boolean);
                     }
                 }
-            }
 
-            console.log(selectedPilot);
+                const newPilot = {
+                    solutionId: null,
+                    name: proj.nombre_piloto || "",
+                    description: proj.solucion_descripcion || "",
+                    technology: techArray.join(", "),
+                    valueProposition: proj.propuesta_valor || "",
+                    salesPitch: proj.pitch_ventas || "",
+                    kpis: Array.isArray(proj.kpis)
+                        ? proj.kpis.map((k, i) => ({
+                            id: `kpi-${idx}-${i}`,
+                            name: k.nombre || "",
+                            currentValue: k.valor_actual || "",
+                            targetValue: k.valor_objetivo || "",
+                            impactValue: k.impacto_esperado || ""
+                        }))
+                        : [],
+                    monthlyROI: Array.isArray(proj.roi_indicativo)
+                        ? proj.roi_indicativo.map((r, i) => ({
+                            id: `roi-${idx}-${i}`,
+                            name: r.nombre || "",
+                            value: r.valor || ""
+                        }))
+                        : [],
+                    currentProcessDescription: proj.problema_actual_descripcion || "",
+                    attachedFileNames: Array.isArray(proj.archivos_adjuntos) ? proj.archivos_adjuntos.map(f => f.nombre) : [],
+                    selectedProcessNameContent: proj.nombre_piloto || "",
+                    selectedProcessDescriptionContent: proj.solucion_descripcion || "",
+                    selectedProcessTechnologyContent: [...techArray],
+                    originalProjectData: null,
+                    originalCategoryName: proj.categoria_piloto || null,
+                    originalSubcategoryName: proj.subcategoria_piloto || null,
+                    archivos_adjuntos: Array.isArray(proj.archivos_adjuntos)
+                        ? proj.archivos_adjuntos.map(f => ({ nombre: f.nombre, url: f.url }))
+                        : []
+                };
+
+                const found = findProjectByNameAcrossAllCategories(proj.nombre_piloto || "");
+                if (found && found.project) {
+                    newPilot.solutionId = found.project.id;
+                    newPilot.originalProjectData = found.project;
+                } else {
+                    newPilot.solutionId = `custom_${idx}`;
+                }
+
+                selectedPilots.push(newPilot);
+            });
+
+            if (selectedPilots.length > 0) {
+                currentPilotIndex = 0;
+                selectedPilot = selectedPilots[0];
+            }
         }
 
 
@@ -580,6 +570,9 @@ function normalizeString(text) {
             setupMainFilters();
             updateSubcategoryFilters();
             renderProcessCatalog();
+            renderSelectedProjectsList();
+            renderAnalysisTabs();
+            renderSummaryTabs();
             navigateTo('sectionCliente', document.getElementById('navCliente'));
         }
 

@@ -61,7 +61,7 @@ def api_get_client_resume(request, client_id):
     # if not request.user.is_authenticated or not request.user.is_staff:
     #     return JsonResponse({'error': 'No autorizado'}, status=401)
     cliente = get_object_or_404(Cliente, id=client_id)
-    return JsonResponse(cliente.resumen_json)
+    return JsonResponse(cliente.resumen_json or {}, safe=False)
 
 @csrf_exempt  # Para desarrollo. En producción, el frontend debe enviar el token CSRF.
 def api_get_project_catalog(request):
