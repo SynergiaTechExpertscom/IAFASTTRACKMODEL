@@ -302,9 +302,11 @@ function getCategoryColors(categoryName) {
                 catalogData = projectCatalogData;
 
                 if (Array.isArray(clientData.colaboracion_propuesta)) {
-                    clientData.colaboracion_propuesta = clientData.colaboracion_propuesta.filter(name => {
-                        return !!findProjectByNameAcrossAllCategories(name);
-                    });
+                    clientData.colaboracion_propuesta = clientData.colaboracion_propuesta
+                        .map(item => typeof item === 'string' ? { projectName: item } : item)
+                        .filter(item => {
+                            return !!findProjectByNameAcrossAllCategories(item.projectName);
+                        });
                 }
 
                 // 2. Carga el resumen explícitamente desde la API
@@ -791,8 +793,9 @@ function getCategoryColors(categoryName) {
             colaboracionList.innerHTML = '';
             if (clientData.colaboracion_propuesta && clientData.colaboracion_propuesta.length > 0) {
                 clientData.colaboracion_propuesta.forEach(prop => {
+                    const name = prop.projectName || prop;
                     const li = document.createElement('li');
-                    li.textContent = prop;
+                    li.textContent = name;
                     colaboracionList.appendChild(li);
                 });
             } else {
@@ -1090,16 +1093,14 @@ function getCategoryColors(categoryName) {
             if (currentFilter === "Suggested") {
                 if (clientData.colaboracion_propuesta && clientData.colaboracion_propuesta.length > 0) {
                     const grouped = {};
-                    clientData.colaboracion_propuesta.forEach((projectName, idx) => {
-                        const projectDetails = findProjectByNameAcrossAllCategories(projectName);
-                        if (!projectDetails) return;
-                        const project = projectDetails.project;
-                        const categoryName = projectDetails.categoryName;
-                        const subcategoryName = projectDetails.subcategoryName;
+                    clientData.colaboracion_propuesta.forEach((proj, idx) => {
+                        const categoryName = proj.categoryName || 'Otros';
+                        const subcategoryName = proj.subcategoryName || 'Otro';
+                        const project = { ...proj };
                         const projectUniqueId = `${generateSafeId(categoryName)}_${generateSafeId(subcategoryName)}_${generateSafeId(project.projectName)}_${idx}`;
                         project.originalCategoryName = categoryName;
                         project.originalSubcategoryName = subcategoryName;
-                        project.id = projectUniqueId;
+                        project.id = project.id || projectUniqueId;
                         if (!grouped[categoryName]) grouped[categoryName] = {};
                         if (!grouped[categoryName][subcategoryName]) grouped[categoryName][subcategoryName] = [];
                         grouped[categoryName][subcategoryName].push(project);
@@ -1219,7 +1220,7 @@ function getCategoryColors(categoryName) {
                                     solutionDiv.dataset.solutionId = project.id;
                                     solutionDiv.style.borderColor = categoryColors.border;
 
-                                    const isSuggestedByData = clientData.colaboracion_propuesta && clientData.colaboracion_propuesta.includes(project.projectName);
+                                    const isSuggestedByData = clientData.colaboracion_propuesta && clientData.colaboracion_propuesta.some(p => normalizeString(p.projectName || p) === normalizeString(project.projectName));
                                     if (isSuggestedByData) {
                                         solutionDiv.classList.add('suggested-highlight');
                                     }
@@ -1397,28 +1398,22 @@ function getCategoryColors(categoryName) {
                 }
             }
 
-            // 2. Buscar en los sugeridos (IDs tipo suggested_XX)
-            if (typeof solutionId === "string" && solutionId.startsWith("suggested_")) {
-                const idx = parseInt(solutionId.replace("suggested_", ""), 10);
-                if (
-                    clientData &&
-                    Array.isArray(clientData.colaboracion_propuesta) &&
-                    idx >= 0 &&
-                    idx < clientData.colaboracion_propuesta.length
-                ) {
-                    const projectName = clientData.colaboracion_propuesta[idx];
-                    if (projectName) {
-                        return {
-                            project: {
-                                id: solutionId,
-                                projectName: projectName,
-                                description: "",
-                                technology: ""
-                            },
-                            categoryName: "Sugeridos",
-                            subcategoryName: ""
-                        };
-                    }
+            // 2. Buscar en los sugeridos almacenados
+            if (typeof solutionId === "string") {
+                const proj = Array.isArray(clientData.colaboracion_propuesta)
+                    ? clientData.colaboracion_propuesta.find(p => p.id === solutionId)
+                    : null;
+                if (proj) {
+                    return {
+                        project: {
+                            id: proj.id || solutionId,
+                            projectName: proj.projectName,
+                            description: proj.description || "",
+                            technology: proj.technology || ""
+                        },
+                        categoryName: proj.categoryName || "Sugeridos",
+                        subcategoryName: proj.subcategoryName || ""
+                    };
                 }
             }
 
