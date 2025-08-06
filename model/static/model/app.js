@@ -1324,11 +1324,20 @@ function getCategoryColors(categoryName) {
             return maxIndex;
         }
 
+        function normalizeString(text) {
+            return text
+                ? text.toString().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase()
+                : '';
+        }
+
         function findProjectByNameAcrossAllCategories(projectName) {
             if (!catalogData || !catalogData.categories) return null;
+            const target = normalizeString(projectName);
             for (const category of catalogData.categories) {
                 for (const subcategory of category.subcategories) {
-                    const foundProject = subcategory.projects.find(proj => proj.projectName === projectName);
+                    const foundProject = subcategory.projects.find(
+                        proj => normalizeString(proj.projectName) === target
+                    );
                     if (foundProject) {
                         return {
                             project: foundProject,
@@ -2007,16 +2016,31 @@ function getCategoryColors(categoryName) {
                 });
                 const data = await response.json();
                 if (Array.isArray(data.projects) && data.projects.length > 0) {
-                    clientData.colaboracion_propuesta = data.projects.map(p => p.projectName);
-                    data.projects.forEach(p => {
-                        suggestedProjectDetails[p.projectName] = {
-                            projectName: p.projectName,
-                            description: p.description || '',
-                            technology: p.technology || '',
-                            categoryName: p.categoryName || 'Otros',
-                            subcategoryName: p.subcategoryName || 'Otro',
-                            id: p.id
-                        };
+                    data.projects.forEach((p, idx) => {
+                        const match = findProjectByNameAcrossAllCategories(p.projectName);
+                        if (match) {
+                            const name = match.project.projectName;
+                            clientData.colaboracion_propuesta.push(name);
+                            suggestedProjectDetails[name] = {
+                                projectName: name,
+                                description: match.project.description || '',
+                                technology: match.project.technology || '',
+                                categoryName: match.categoryName,
+                                subcategoryName: match.subcategoryName,
+                                id: match.project.id
+                            };
+                        } else {
+                            const name = p.projectName;
+                            clientData.colaboracion_propuesta.push(name);
+                            suggestedProjectDetails[name] = {
+                                projectName: name,
+                                description: p.description || '',
+                                technology: p.technology || '',
+                                categoryName: p.categoryName || 'Otros',
+                                subcategoryName: p.subcategoryName || 'Otro',
+                                id: `suggested_${idx}`
+                            };
+                        }
                     });
                 } else {
                     let nuevo = data.otro;
@@ -2037,16 +2061,31 @@ function getCategoryColors(categoryName) {
                         }
                     }
                     if (nuevo) {
-                        const name = nuevo.name || 'Otro';
-                        clientData.colaboracion_propuesta = [name];
-                        suggestedProjectDetails[name] = {
-                            projectName: name,
-                            description: nuevo.description || '',
-                            technology: nuevo.technology || '',
-                            categoryName: 'Otros',
-                            subcategoryName: 'Otro',
-                            id: `suggested_${Date.now()}`
-                        };
+                        const rawName = nuevo.name || 'Otro';
+                        const match = findProjectByNameAcrossAllCategories(rawName);
+                        if (match) {
+                            const name = match.project.projectName;
+                            clientData.colaboracion_propuesta = [name];
+                            suggestedProjectDetails[name] = {
+                                projectName: name,
+                                description: match.project.description || '',
+                                technology: match.project.technology || '',
+                                categoryName: match.categoryName,
+                                subcategoryName: match.subcategoryName,
+                                id: match.project.id
+                            };
+                        } else {
+                            const name = rawName;
+                            clientData.colaboracion_propuesta = [name];
+                            suggestedProjectDetails[name] = {
+                                projectName: name,
+                                description: nuevo.description || '',
+                                technology: nuevo.technology || '',
+                                categoryName: 'Otros',
+                                subcategoryName: 'Otro',
+                                id: 'suggested_0'
+                            };
+                        }
                     }
                 }
             } catch (err) {
