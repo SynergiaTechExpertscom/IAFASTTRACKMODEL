@@ -757,6 +757,10 @@ function normalizeString(text) {
             }
 
             const newPilot = JSON.parse(JSON.stringify(selectedPilot));
+            const existingIndex = selectedPilots.findIndex(p => p.solutionId === selectedPilot.solutionId);
+            if (existingIndex !== -1) {
+                currentPilotIndex = existingIndex;
+            }
             if (currentPilotIndex === -1) {
                 selectedPilots.push(newPilot);
                 currentPilotIndex = selectedPilots.length - 1;
@@ -1366,6 +1370,7 @@ function normalizeString(text) {
                     currentPilotIndex = selectedPilots.length > 0 ? 0 : -1;
                     selectedPilot = selectedPilots[currentPilotIndex] || selectedPilot;
                 }
+                currentSelectedSolutionId = null;
                 renderProcessCatalog();
                 renderSelectedProjectsList();
                 renderAnalysisTabs();
@@ -1395,6 +1400,7 @@ function normalizeString(text) {
             selectedPilots.push(newPilot);
             currentPilotIndex = selectedPilots.length - 1;
             selectedPilot = newPilot;
+            currentSelectedSolutionId = solutionId;
 
             renderProcessCatalog();
             renderSelectedProjectsList();
