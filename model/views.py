@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
 import unicodedata
+from difflib import SequenceMatcher
 from venv import logger
 from django.http import JsonResponse, HttpResponse
 from django.contrib.auth import authenticate, login as django_auth_login, logout as django_auth_logout
@@ -185,6 +186,9 @@ def api_ai_search_projects(request):
     def normalize_text(text):
         return re.sub(r'\W+', '', unicodedata.normalize('NFD', text or '').encode('ascii', 'ignore').decode('utf-8').lower())
 
+    def is_close_match(a, b):
+        return a == b or SequenceMatcher(None, a, b).ratio() > 0.8
+
     results = []
     for idx, item in enumerate(ai_data.get('projects', [])):
         logger.debug("Procesando item %s: %s", idx, item)
@@ -203,9 +207,12 @@ def api_ai_search_projects(request):
         for cat in catalog.get('categories', []):
             for sub in cat.get('subcategories', []):
                 for proj in sub.get('projects', []):
+                    proj_name_norm = normalize_text(proj.get('projectName'))
                     if (
                         pid and str(proj.get('id')) == str(pid)
-                    ) or (pname and normalize_text(proj.get('projectName')) == target):
+                    ) or (
+                        target and proj_name_norm and is_close_match(proj_name_norm, target)
+                    ):
                         results.append({
                             'id': proj.get('id'),
                             'projectName': proj.get('projectName'),
@@ -226,15 +233,42 @@ def api_ai_search_projects(request):
 
     new_proj = ai_data.get('new_project')
     if not results and new_proj:
-        logger.debug("Agregando nuevo proyecto sugerido: %s", new_proj)
-        results.append({
-            'id': new_proj.get('id') or 'suggested_0',
-            'projectName': new_proj.get('projectName') or new_proj.get('name'),
-            'description': new_proj.get('description', ''),
-            'technology': new_proj.get('technology', ''),
-            'categoryName': 'Otros',
-            'subcategoryName': 'Otro',
-        })
+        logger.debug("Evaluando nuevo proyecto sugerido: %s", new_proj)
+        potential = new_proj.get('projectName') or new_proj.get('name')
+        target_new = normalize_text(potential) if potential else None
+        matched = None
+        if target_new:
+            for cat in catalog.get('categories', []):
+                for sub in cat.get('subcategories', []):
+                    for proj in sub.get('projects', []):
+                        proj_name_norm = normalize_text(proj.get('projectName'))
+                        if proj_name_norm and is_close_match(proj_name_norm, target_new):
+                            matched = {
+                                'id': proj.get('id'),
+                                'projectName': proj.get('projectName'),
+                                'description': proj.get('description'),
+                                'technology': proj.get('technology'),
+                                'categoryName': cat.get('categoryName'),
+                                'subcategoryName': sub.get('subcategoryName'),
+                            }
+                            logger.debug("Nuevo proyecto coincidió con catálogo: %s", matched)
+                            break
+                    if matched:
+                        break
+                if matched:
+                    break
+        if matched:
+            results.append(matched)
+        else:
+            logger.debug("Agregando nuevo proyecto sin coincidencias: %s", new_proj)
+            results.append({
+                'id': new_proj.get('id') or 'suggested_0',
+                'projectName': new_proj.get('projectName') or new_proj.get('name'),
+                'description': new_proj.get('description', ''),
+                'technology': new_proj.get('technology', ''),
+                'categoryName': 'Otros',
+                'subcategoryName': 'Otro',
+            })
 
     logger.info("Resultados finales: %s", results)
 
