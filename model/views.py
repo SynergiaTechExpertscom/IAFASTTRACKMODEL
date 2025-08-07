@@ -165,10 +165,23 @@ def api_ai_search_projects(request):
 
     results = []
     for idx, item in enumerate(ai_data.get('projects', [])):
-        pid = item.get('id') if isinstance(item, dict) else None
-        pname = (
-            item.get('projectName') or item.get('name') if isinstance(item, dict) else item
-        )
+        pid = None
+        pname = None
+        desc = ''
+        tech = ''
+        cat_name = 'Otros'
+        sub_name = 'Otro'
+
+        if isinstance(item, dict):
+            pid = item.get('id')
+            pname = item.get('projectName') or item.get('name')
+            desc = item.get('description', '')
+            tech = item.get('technology', '')
+            cat_name = item.get('categoryName', 'Otros')
+            sub_name = item.get('subcategoryName', 'Otro')
+        else:
+            pid = str(item)
+
         found = False
         target = normalize_text(pname) if pname else None
         for cat in catalog.get('categories', []):
@@ -193,16 +206,6 @@ def api_ai_search_projects(request):
             if found:
                 break
         if not found and pname:
-            desc = item.get('description', '') if isinstance(item, dict) else ''
-            tech = item.get('technology', '') if isinstance(item, dict) else ''
-            cat_name = (
-                item.get('categoryName', 'Otros')
-                if isinstance(item, dict) else 'Otros'
-            )
-            sub_name = (
-                item.get('subcategoryName', 'Otro')
-                if isinstance(item, dict) else 'Otro'
-            )
             results.append({
                 'id': pid or f'suggested_{idx}',
                 'projectName': pname,
