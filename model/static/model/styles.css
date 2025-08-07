@@ -48,10 +48,14 @@
         }
 
 
-        .nav-menu {
-            border-bottom: 2px solid #4839CD;
-            padding-bottom: 0.5rem;
-        }
+.nav-menu {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0;
+    border-bottom: 2px solid #4839CD;
+    padding-bottom: 0.5rem;
+}
 
         .nav-button {
             background-color: transparent;
@@ -804,6 +808,40 @@
 @media (min-width: 640px) {
     #generalUserMessage {
         max-width: 384px;
+    }
+}
+
+@media (max-width: 640px) {
+    #mainNav,
+    #analysisTabs {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+    }
+
+    #mainNav::-webkit-scrollbar,
+    #analysisTabs::-webkit-scrollbar {
+        display: none;
+    }
+
+    .nav-button,
+    .tab-button {
+        flex: 0 0 auto;
+        white-space: nowrap;
+    }
+
+    .subcategory-filter-card-container {
+        display: flex;
+        overflow-x: auto;
+        gap: 0.5rem;
+    }
+
+    .subcategory-filter-card-container::-webkit-scrollbar {
+        display: none;
+    }
+
+    .subcategory-filter-card {
+        flex: 0 0 auto;
+        white-space: nowrap;
     }
 }
 
