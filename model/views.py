@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# Standard library logging for consistent merge behavior
 import logging
 import unicodedata
 from difflib import SequenceMatcher
