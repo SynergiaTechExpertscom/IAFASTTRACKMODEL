@@ -228,6 +228,10 @@ def api_ai_search_projects(request):
                             'projectName': proj.get('projectName'),
                             'description': proj.get('description'),
                             'technology': proj.get('technology'),
+                            'kpis': proj.get('kpis', []),
+                            'valueProposition': proj.get('valueProposition'),
+                            'salesPitch': proj.get('salesPitch'),
+                            'monthlyROI': proj.get('monthlyROI', []),
                             'categoryName': cat.get('categoryName'),
                             'subcategoryName': sub.get('subcategoryName'),
                         })
@@ -244,6 +248,10 @@ def api_ai_search_projects(request):
                 'projectName': pname,
                 'description': desc,
                 'technology': tech,
+                'kpis': item.get('kpis', []) if isinstance(item, dict) else [],
+                'valueProposition': item.get('valueProposition', '') if isinstance(item, dict) else '',
+                'salesPitch': item.get('salesPitch', '') if isinstance(item, dict) else '',
+                'monthlyROI': item.get('monthlyROI', []) if isinstance(item, dict) else [],
                 'categoryName': cat_name,
                 'subcategoryName': sub_name,
             })
