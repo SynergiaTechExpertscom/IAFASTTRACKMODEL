@@ -2,7 +2,6 @@
 import logging
 import unicodedata
 from difflib import SequenceMatcher
-from venv import logger
 from django.http import JsonResponse, HttpResponse
 from django.contrib.auth import authenticate, login as django_auth_login, logout as django_auth_logout
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
@@ -16,6 +15,8 @@ from .models import Cliente, ProyectoCatalog, ClienteFile, OpenAIConfig
 import base64
 import os
 from django.conf import settings
+
+logger = logging.getLogger(__name__)
 
 @ensure_csrf_cookie  # Para que Django envíe el cookie CSRF en la primera petición GET si es necesario
 def main_app_view(request):
