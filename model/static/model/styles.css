@@ -297,12 +297,16 @@
                 flex-shrink: 0;
             }
 
-            .subcategory-filter-card span {
-                flex-grow: 1;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis; /* color set by JS */
-            }
+        .subcategory-filter-card span {
+            flex-grow: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis; /* color set by JS */
+        }
+
+        .subcategory-filter-select {
+            display: none;
+        }
 
         .solution-card {
             background-color: rgba(255, 255, 255, 0.05);
@@ -812,36 +816,41 @@
 }
 
 @media (max-width: 640px) {
-    #mainNav,
-    #analysisTabs {
-        overflow-x: auto;
-        flex-wrap: nowrap;
+    html {
+        font-size: 14px;
     }
 
-    #mainNav::-webkit-scrollbar,
-    #analysisTabs::-webkit-scrollbar {
-        display: none;
+    #mainNav,
+    #analysisTabs {
+        overflow-x: visible;
+        flex-wrap: wrap;
     }
 
     .nav-button,
     .tab-button {
-        flex: 0 0 auto;
-        white-space: nowrap;
+        flex: 1 0 100%;
+        white-space: normal;
+        width: 100%;
+        text-align: center;
+        margin-right: 0;
+    }
+
+    .objetivo-filter-card {
+        min-height: 90px;
+        padding: 0.75rem;
+    }
+
+    .objetivo-filter-card svg {
+        width: 1.5em;
+        height: 1.5em;
     }
 
     .subcategory-filter-card-container {
-        display: flex;
-        overflow-x: auto;
-        gap: 0.5rem;
-    }
-
-    .subcategory-filter-card-container::-webkit-scrollbar {
         display: none;
     }
 
-    .subcategory-filter-card {
-        flex: 0 0 auto;
-        white-space: nowrap;
+    .subcategory-filter-select {
+        display: block;
     }
 }
 

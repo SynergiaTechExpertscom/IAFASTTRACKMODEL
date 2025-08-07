@@ -1027,8 +1027,10 @@ function normalizeString(text) {
         }
         function updateSubcategoryFilters() {
             const cardContainer = document.getElementById('subcategoryFilterCardContainer');
+            const selectEl = document.getElementById('subcategoryFilterSelect');
             const sectionContainer = document.getElementById('subcategoryFilterSection');
             cardContainer.innerHTML = '';
+            selectEl.innerHTML = '';
 
             if (currentFilter === "All" || currentFilter === "Suggested" || !catalogData || !catalogData.categories) {
                 sectionContainer.classList.add('hidden');
@@ -1045,6 +1047,11 @@ function normalizeString(text) {
 
 
             if (selectedCategory && selectedCategory.subcategories && selectedCategory.subcategories.length > 0) {
+                const allOption = document.createElement('option');
+                allOption.value = "AllSubcategories";
+                allOption.textContent = "Todos los Casos de Uso";
+                selectEl.appendChild(allOption);
+
                 const allCard = document.createElement('div');
                 allCard.classList.add('subcategory-filter-card');
                 allCard.dataset.subcategoryId = "AllSubcategories";
@@ -1063,6 +1070,11 @@ function normalizeString(text) {
 
                 selectedCategory.subcategories.forEach(sub => {
                     const subId = generateSafeId(sub.subcategoryName);
+                    const option = document.createElement('option');
+                    option.value = subId;
+                    option.textContent = sub.subcategoryName;
+                    selectEl.appendChild(option);
+
                     const card = document.createElement('div');
                     card.classList.add('subcategory-filter-card');
                     card.dataset.subcategoryId = subId;
@@ -1083,10 +1095,16 @@ function normalizeString(text) {
                     currentSubcategoryFilter = generateSafeId(selectedPilot.originalSubcategoryName);
                 }
 
-
                 const activeCardToSet = cardContainer.querySelector(`.subcategory-filter-card[data-subcategory-id="${currentSubcategoryFilter}"]`) || cardContainer.querySelector('[data-subcategory-id="AllSubcategories"]');
                 if (activeCardToSet) setActiveSubcategoryCard(activeCardToSet);
 
+                selectEl.value = currentSubcategoryFilter;
+                selectEl.onchange = () => {
+                    currentSubcategoryFilter = selectEl.value;
+                    const card = document.querySelector(`.subcategory-filter-card[data-subcategory-id="${currentSubcategoryFilter}"]`);
+                    if (card) setActiveSubcategoryCard(card);
+                    renderProcessCatalog();
+                };
             } else {
                 const noSubcategoriesMsg = document.createElement('p');
                 noSubcategoriesMsg.textContent = "No hay casos de uso específicos para este objetivo.";
@@ -1110,6 +1128,10 @@ function normalizeString(text) {
                 activeCardElement.style.backgroundColor = categoryColors.bg; // Darker for active
                 activeCardElement.style.borderColor = categoryColors.iconFill;
                 activeCardElement.querySelector('span').style.color = categoryColors.text; // Ensure text remains readable
+            }
+            const selectEl = document.getElementById('subcategoryFilterSelect');
+            if (selectEl && activeCardElement) {
+                selectEl.value = activeCardElement.dataset.subcategoryId;
             }
         }
 

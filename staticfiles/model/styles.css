@@ -300,6 +300,10 @@
                 text-overflow: ellipsis; /* color set by JS */
             }
 
+        .subcategory-filter-select {
+            display: none;
+        }
+
         .solution-card {
             background-color: rgba(255, 255, 255, 0.05);
             border: 1px solid #4839CD;
@@ -804,6 +808,45 @@
 @media (min-width: 640px) {
     #generalUserMessage {
         max-width: 384px;
+    }
+}
+
+@media (max-width: 640px) {
+    html {
+        font-size: 14px;
+    }
+
+    #mainNav,
+    #analysisTabs {
+        overflow-x: visible;
+        flex-wrap: wrap;
+    }
+
+    .nav-button,
+    .tab-button {
+        flex: 1 0 100%;
+        white-space: normal;
+        width: 100%;
+        text-align: center;
+        margin-right: 0;
+    }
+
+    .objetivo-filter-card {
+        min-height: 90px;
+        padding: 0.75rem;
+    }
+
+    .objetivo-filter-card svg {
+        width: 1.5em;
+        height: 1.5em;
+    }
+
+    .subcategory-filter-card-container {
+        display: none;
+    }
+
+    .subcategory-filter-select {
+        display: block;
     }
 }
 
