@@ -95,7 +95,22 @@ def api_ai_search_projects(request):
         logger.exception("Catalogo de proyectos no disponible: %s", e)
         return JsonResponse({'error': 'Catalogo no disponible'}, status=500)
 
-    catalog_json = json.dumps(catalog, ensure_ascii=False)
+    def catalog_for_ai(cat):
+        light = {"categories": []}
+        for c in cat.get("categories", []):
+            light_cat = {"categoryName": c.get("categoryName"), "subcategories": []}
+            for s in c.get("subcategories", []):
+                light_sub = {"subcategoryName": s.get("subcategoryName"), "projects": []}
+                for p in s.get("projects", []):
+                    light_sub["projects"].append({
+                        "projectName": p.get("projectName"),
+                        "description": p.get("description", ""),
+                    })
+                light_cat["subcategories"].append(light_sub)
+            light["categories"].append(light_cat)
+        return light
+
+    catalog_json = json.dumps(catalog_for_ai(catalog), ensure_ascii=False)
 
     config = OpenAIConfig.objects.first()
     api_base = config.endpoint if config else settings.OPENAI_ENDPOINT
@@ -141,10 +156,13 @@ def api_ai_search_projects(request):
 
     system_msg = 'Eres un asistente que recomienda proyectos del catalogo.'
     user_msg = (
-        f"Catalogo de proyectos en formato JSON: {catalog_json}\n" +
-        'En base a la necesidad del usuario sugiere IDs de proyectos del catalogo que est?n relacionados con la necesidad. '
-        'Responde solo con JSON {"projects": ["id1", "id2"]}. '
-        'Si no hay coincidencias deja la lista vac?a.'
+        f"Catalogo de proyectos en formato JSON: {catalog_json}\n"
+        'Devuelve los projectName de los proyectos del catalogo que se ajusten a la necesidad del usuario. '
+        'Responde solo con JSON {"projects": ["nombre1", "nombre2"], '
+        '"new_project": {"projectName": "...", "description": "...", "technology": "..."}}. '
+        'Si encuentras proyectos del catalogo, la propiedad new_project debe omitirse o ser null. '
+        'Si no hay coincidencias, projects debe ser una lista vacia y new_project debe incluir un nuevo proyecto '
+        'con categoryName "Otros" y subcategoryName "Otro".'
     )
     try:
         messages = [
@@ -155,29 +173,39 @@ def api_ai_search_projects(request):
         ai_resp = chat_complete(messages)
         logger.info("Respuesta de OpenAI: %s", ai_resp)
         text = extract_content(ai_resp)
+        logger.debug("Contenido textual de OpenAI: %s", text)
         ai_data = json.loads(text)
+        logger.info("JSON de OpenAI parseado: %s", ai_data)
     except Exception as e:
         logger.exception("Error al obtener proyectos desde OpenAI: %s", e)
-        ai_data = {'projects': []}
+        ai_data = {'projects': [], 'new_project': None}
+
+    import re
 
     def normalize_text(text):
-        return unicodedata.normalize('NFD', text or '').encode('ascii', 'ignore').decode('utf-8').strip().lower()
+        return re.sub(r'\W+', '', unicodedata.normalize('NFD', text or '').encode('ascii', 'ignore').decode('utf-8').lower())
 
     results = []
     for idx, item in enumerate(ai_data.get('projects', [])):
-        pid = item.get('id') if isinstance(item, dict) else None
-        pname = (
-            item.get('projectName') or item.get('name') if isinstance(item, dict) else item
-        )
+        logger.debug("Procesando item %s: %s", idx, item)
+        pid = None
+        pname = None
+
+        if isinstance(item, dict):
+            pid = item.get('id')
+            pname = item.get('projectName') or item.get('name') or pid
+        else:
+            pname = str(item)
+
         found = False
         target = normalize_text(pname) if pname else None
+        logger.debug("Buscando coincidencias para pid=%s pname=%s", pid, pname)
         for cat in catalog.get('categories', []):
             for sub in cat.get('subcategories', []):
                 for proj in sub.get('projects', []):
                     if (
-                        (pid and str(proj.get('id')) == str(pid))
-                        or (pname and normalize_text(proj.get('projectName')) == target)
-                    ):
+                        pid and str(proj.get('id')) == str(pid)
+                    ) or (pname and normalize_text(proj.get('projectName')) == target):
                         results.append({
                             'id': proj.get('id'),
                             'projectName': proj.get('projectName'),
@@ -186,55 +214,31 @@ def api_ai_search_projects(request):
                             'categoryName': cat.get('categoryName'),
                             'subcategoryName': sub.get('subcategoryName'),
                         })
+                        logger.debug("Match encontrado: %s", results[-1])
                         found = True
                         break
                 if found:
                     break
             if found:
                 break
-        if not found and pname:
-            desc = item.get('description', '') if isinstance(item, dict) else ''
-            tech = item.get('technology', '') if isinstance(item, dict) else ''
-            cat_name = (
-                item.get('categoryName', 'Otros')
-                if isinstance(item, dict) else 'Otros'
-            )
-            sub_name = (
-                item.get('subcategoryName', 'Otro')
-                if isinstance(item, dict) else 'Otro'
-            )
-            results.append({
-                'id': pid or f'suggested_{idx}',
-                'projectName': pname,
-                'description': desc,
-                'technology': tech,
-                'categoryName': cat_name,
-                'subcategoryName': sub_name,
-            })
+        if not found:
+            logger.debug("Sin coincidencias para item %s", item)
 
-    other_data = None
-    if not results:
-        try:
-            other_messages = [
-                {
-                    'role': 'system',
-                    'content': 'Prop?n un nuevo proyecto en JSON con campos name, description y technology basado en la necesidad.'
-                },
-                {'role': 'user', 'content': prompt},
-            ]
-            logger.info("Solicitando nuevo proyecto a OpenAI: %s", other_messages)
-            other_resp = chat_complete(other_messages)
-            logger.info("Respuesta de OpenAI (nuevo proyecto): %s", other_resp)
-            other_text = extract_content(other_resp)
-            other_data = json.loads(other_text)
-        except Exception as e:
-            logger.exception("Error al proponer nuevo proyecto con OpenAI: %s", e)
-            other_data = None
+    new_proj = ai_data.get('new_project')
+    if not results and new_proj:
+        logger.debug("Agregando nuevo proyecto sugerido: %s", new_proj)
+        results.append({
+            'id': new_proj.get('id') or 'suggested_0',
+            'projectName': new_proj.get('projectName') or new_proj.get('name'),
+            'description': new_proj.get('description', ''),
+            'technology': new_proj.get('technology', ''),
+            'categoryName': 'Otros',
+            'subcategoryName': 'Otro',
+        })
 
-    return JsonResponse(
-        {'projects': results, 'otro': other_data},
-        json_dumps_params={'ensure_ascii': False}
-    )
+    logger.info("Resultados finales: %s", results)
+
+    return JsonResponse({'projects': results}, json_dumps_params={'ensure_ascii': False})
 
 @csrf_exempt
 def api_save_summary(request, client_id):
