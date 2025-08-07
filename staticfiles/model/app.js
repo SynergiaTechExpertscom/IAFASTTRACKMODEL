@@ -2208,9 +2208,9 @@ function normalizeString(text) {
             }
         }
 
-        function loadProjectIntoSelectionForm(index) {
+        function loadProjectIntoSelectionForm(index, skipSave = false) {
             if (index < 0 || index >= selectedPilots.length) return;
-            saveCurrentProcessSelection();
+            if (!skipSave) saveCurrentProcessSelection();
             currentPilotIndex = index;
             selectedPilot = selectedPilots[index];
             document.getElementById('selectedProcessName').value = selectedPilot.selectedProcessNameContent || '';
@@ -2259,7 +2259,17 @@ function normalizeString(text) {
                 currentPilotIndex = selectedPilots.length - 1;
             }
 
-            selectedPilot = selectedPilots[currentPilotIndex] || { ...emptyPilotTemplate };
+            if (selectedPilots.length > 0) {
+                loadProjectIntoSelectionForm(currentPilotIndex, true);
+            } else {
+                selectedPilot = { ...emptyPilotTemplate };
+                document.getElementById('selectedProcessName').value = '';
+                document.getElementById('selectedProcessDescription').value = '';
+                document.getElementById('currentProcessDescription').value = '';
+                renderTechnologyCheckboxes();
+                document.getElementById('currentProcessFiles').value = '';
+                document.getElementById('fileListDisplay').innerHTML = '';
+            }
 
             if (selectedPilots.length === 0 || (removedPilot && removedPilot.solutionId === currentSelectedSolutionId)) {
                 currentSelectedSolutionId = selectedPilot.solutionId || null;
