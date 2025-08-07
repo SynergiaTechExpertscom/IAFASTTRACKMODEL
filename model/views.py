@@ -95,7 +95,30 @@ def api_ai_search_projects(request):
         logger.exception("Catalogo de proyectos no disponible: %s", e)
         return JsonResponse({'error': 'Catalogo no disponible'}, status=500)
 
-    catalog_json = json.dumps(catalog, ensure_ascii=False)
+    # Construir un catálogo reducido para la IA con solo nombre y descripción
+    minimal_catalog = {
+        'categories': [
+            {
+                'categoryName': cat.get('categoryName'),
+                'subcategories': [
+                    {
+                        'subcategoryName': sub.get('subcategoryName'),
+                        'projects': [
+                            {
+                                'projectName': proj.get('projectName'),
+                                'description': proj.get('description', ''),
+                            }
+                            for proj in sub.get('projects', [])
+                        ],
+                    }
+                    for sub in cat.get('subcategories', [])
+                ],
+            }
+            for cat in catalog.get('categories', [])
+        ]
+    }
+
+    catalog_json = json.dumps(minimal_catalog, ensure_ascii=False)
 
     config = OpenAIConfig.objects.first()
     api_base = config.endpoint if config else settings.OPENAI_ENDPOINT
@@ -142,9 +165,11 @@ def api_ai_search_projects(request):
     system_msg = 'Eres un asistente que recomienda proyectos del catalogo.'
     user_msg = (
         f"Catalogo de proyectos en formato JSON: {catalog_json}\n" +
-        'En base a la necesidad del usuario sugiere IDs de proyectos del catalogo que est?n relacionados con la necesidad. '
-        'Responde solo con JSON {"projects": ["id1", "id2"]}. '
-        'Si no hay coincidencias deja la lista vac?a.'
+        'En base a la necesidad del usuario responde con JSON del formato '
+        '{"projects": [{"projectName": "nombre", "description": "descripcion"}, ...]}. '
+        'Utiliza los nombres exactamente como aparecen en el catalogo. '
+        'Si ningun proyecto coincide, devuelve un unico proyecto nuevo con '
+        '{"projectName": "Otros-Otro", "description": "descripcion"}.'
     )
     try:
         messages = [
@@ -155,7 +180,9 @@ def api_ai_search_projects(request):
         ai_resp = chat_complete(messages)
         logger.info("Respuesta de OpenAI: %s", ai_resp)
         text = extract_content(ai_resp)
+        logger.info("Texto plano de respuesta de OpenAI: %s", text)
         ai_data = json.loads(text)
+        logger.info("Datos interpretados de OpenAI: %s", ai_data)
     except Exception as e:
         logger.exception("Error al obtener proyectos desde OpenAI: %s", e)
         ai_data = {'projects': []}
@@ -165,6 +192,7 @@ def api_ai_search_projects(request):
 
     results = []
     for idx, item in enumerate(ai_data.get('projects', [])):
+        logger.info("Procesando item de IA %s: %s", idx, item)
         pid = None
         pname = None
         desc = ''
@@ -179,9 +207,12 @@ def api_ai_search_projects(request):
             tech = item.get('technology', '')
             cat_name = item.get('categoryName', 'Otros')
             sub_name = item.get('subcategoryName', 'Otro')
+        elif isinstance(item, str):
+            pname = item
         else:
             pid = str(item)
 
+        logger.info("Item interpretado - pid: %s, pname: %s", pid, pname)
         found = False
         target = normalize_text(pname) if pname else None
         for cat in catalog.get('categories', []):
@@ -191,6 +222,7 @@ def api_ai_search_projects(request):
                         (pid and str(proj.get('id')) == str(pid))
                         or (pname and normalize_text(proj.get('projectName')) == target)
                     ):
+                        logger.info("Match encontrado en catálogo: %s", proj.get('projectName'))
                         results.append({
                             'id': proj.get('id'),
                             'projectName': proj.get('projectName'),
@@ -206,6 +238,7 @@ def api_ai_search_projects(request):
             if found:
                 break
         if not found and pname:
+            logger.info("No se encontró coincidencia en el catálogo para: %s", pname)
             results.append({
                 'id': pid or f'suggested_{idx}',
                 'projectName': pname,
@@ -215,27 +248,9 @@ def api_ai_search_projects(request):
                 'subcategoryName': sub_name,
             })
 
-    other_data = None
-    if not results:
-        try:
-            other_messages = [
-                {
-                    'role': 'system',
-                    'content': 'Prop?n un nuevo proyecto en JSON con campos name, description y technology basado en la necesidad.'
-                },
-                {'role': 'user', 'content': prompt},
-            ]
-            logger.info("Solicitando nuevo proyecto a OpenAI: %s", other_messages)
-            other_resp = chat_complete(other_messages)
-            logger.info("Respuesta de OpenAI (nuevo proyecto): %s", other_resp)
-            other_text = extract_content(other_resp)
-            other_data = json.loads(other_text)
-        except Exception as e:
-            logger.exception("Error al proponer nuevo proyecto con OpenAI: %s", e)
-            other_data = None
-
+    logger.info("Proyectos finales a devolver: %s", results)
     return JsonResponse(
-        {'projects': results, 'otro': other_data},
+        {'projects': results},
         json_dumps_params={'ensure_ascii': False}
     )
 
