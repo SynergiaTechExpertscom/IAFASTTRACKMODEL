@@ -201,75 +201,71 @@ def api_ai_search_projects(request):
     results = []
     for idx, item in enumerate(ai_data.get('projects', [])):
         logger.info("Procesando item de IA %s: %s", idx, item)
-            pid = None
-            pname = None
-            desc = ''
-            tech = ''
-            cat_name = 'Otros'
-            sub_name = 'Otro'
-            kpis = []
-            value_proposition = ''
-            sales_pitch = ''
-            monthly_roi = []
-
-            if isinstance(item, dict):
-                pid = item.get('id')
-                pname = item.get('projectName') or item.get('name')
-                desc = item.get('description', '')
-                tech = item.get('technology', '')
-                cat_name = item.get('categoryName', 'Otros')
-                sub_name = item.get('subcategoryName', 'Otro')
-                kpis = item.get('kpis', [])
-                value_proposition = item.get('valueProposition', '')
-                sales_pitch = item.get('salesPitch', '')
-                monthly_roi = item.get('monthlyROI', [])
-            elif isinstance(item, str):
-                pname = item
-            else:
-                pid = str(item)        
-                logger.info("Item interpretado - pid: %s, pname: %s", pid, pname)
-        found = False
-        target = normalize_text(pname) if pname else None
-        for cat in catalog.get('categories', []):
-            for sub in cat.get('subcategories', []):
-                for proj in sub.get('projects', []):
-                    if (
-                        (pid and str(proj.get('id')) == str(pid))
-                        or (pname and normalize_text(proj.get('projectName')) == target)
-                    ):
-                        logger.info("Match encontrado en catálogo: %s", proj.get('projectName'))
-                        results.append({
-                            'id': proj.get('id'),
-                            'projectName': proj.get('projectName'),
-                            'description': proj.get('description'),
-                            'technology': proj.get('technology'),
-                            'kpis': proj.get('kpis', []),
-                            'valueProposition': proj.get('valueProposition'),
-                            'salesPitch': proj.get('salesPitch'),
-                            'monthlyROI': proj.get('monthlyROI', []),
-                            'categoryName': cat.get('categoryName'),
-                            'subcategoryName': sub.get('subcategoryName'),
-                        })
-                        found = True
+        logger.info("Procesando item de IA %s: %s", idx, item)
+        
+        # Si el item es un diccionario, usamos directamente todos sus campos
+        if isinstance(item, dict):
+            results.append({
+                'id': item.get('id', f'suggested_{idx}'),
+                'projectName': item.get('projectName') or item.get('name', ''),
+                'description': item.get('description', ''),
+                'technology': item.get('technology', ''),
+                'kpis': item.get('kpis', []),
+                'valueProposition': item.get('valueProposition', ''),
+                'salesPitch': item.get('salesPitch', ''),
+                'monthlyROI': item.get('monthlyROI', []),
+                'categoryName': item.get('categoryName', 'Otros'),
+                'subcategoryName': item.get('subcategoryName', 'Otro')
+            })
+            continue
+            
+        # Si no es un diccionario, procesamos como antes
+        pid = str(item) if not isinstance(item, str) else None
+        pname = item if isinstance(item, str) else None
+        # Solo si no es un diccionario buscamos en el catálogo
+        if pid or pname:
+            found = False
+            target = normalize_text(pname) if pname else None
+            for cat in catalog.get('categories', []):
+                for sub in cat.get('subcategories', []):
+                    for proj in sub.get('projects', []):
+                        if (
+                            (pid and str(proj.get('id')) == str(pid))
+                            or (pname and normalize_text(proj.get('projectName')) == target)
+                        ):
+                            logger.info("Match encontrado en catálogo: %s", proj.get('projectName'))
+                            results.append({
+                                'id': proj.get('id'),
+                                'projectName': proj.get('projectName'),
+                                'description': proj.get('description'),
+                                'technology': proj.get('technology'),
+                                'kpis': proj.get('kpis', []),
+                                'valueProposition': proj.get('valueProposition'),
+                                'salesPitch': proj.get('salesPitch'),
+                                'monthlyROI': proj.get('monthlyROI', []),
+                                'categoryName': cat.get('categoryName'),
+                                'subcategoryName': sub.get('subcategoryName'),
+                            })
+                            found = True
+                            break
+                    if found:
                         break
                 if found:
                     break
-            if found:
-                break
-        if not found and pname:
-            logger.info("No se encontró coincidencia en el catálogo para: %s", pname)
-            results.append({
-                'id': pid or f'suggested_{idx}',
-                'projectName': pname,
-                'description': desc,
-                'technology': tech,
-                'kpis': kpis,
-                'valueProposition': value_proposition,
-                'salesPitch': sales_pitch,
-                'monthlyROI': monthly_roi,
-                'categoryName': cat_name,
-                'subcategoryName': sub_name,
-            })
+            if not found:
+                logger.info("No se encontró coincidencia en el catálogo para: %s", pname or pid)
+                results.append({
+                    'id': f'suggested_{idx}',
+                    'projectName': pname or str(pid),
+                    'description': '',
+                    'technology': '',
+                    'kpis': [],
+                    'valueProposition': '',
+                    'salesPitch': '',
+                    'monthlyROI': [],
+                    'categoryName': 'Otros',
+                    'subcategoryName': 'Otro',
+                })
 
     logger.info("Proyectos finales a devolver: %s", results)
     return JsonResponse(
