@@ -166,10 +166,18 @@ def api_ai_search_projects(request):
     user_msg = (
         f"Catalogo de proyectos en formato JSON: {catalog_json}\n" +
         'En base a la necesidad del usuario responde con JSON del formato '
-        '{"projects": [{"projectName": "nombre", "description": "descripcion"}, ...]}. '
+        '{"projects": [{"projectName": "nombre", "description": "descripcion", "technology": "tecnologias", ' +
+        '"kpis": ["kpi1", "kpi2"], "valueProposition": "propuesta de valor", ' +
+        '"salesPitch": "pitch comercial", "monthlyROI": ["ROI mes 1", "ROI mes 2", "ROI mes 3"]}, ...]}. '
         'Utiliza los nombres exactamente como aparecen en el catalogo. '
-        'Si ningun proyecto coincide, devuelve un unico proyecto nuevo con '
-        '{"projectName": "Otros-Otro", "description": "descripcion"}.'
+        'Si ningun proyecto coincide, analiza detalladamente la necesidad del usuario y crea un proyecto personalizado '
+        'bajo la categoria "Otros-Otro" incluyendo: '
+        '1) Una descripción detallada de la solución propuesta, '
+        '2) Las tecnologías específicas recomendadas, '
+        '3) KPIs medibles y relevantes para el caso, '
+        '4) Una propuesta de valor clara y diferenciada, '
+        '5) Un pitch comercial persuasivo, '
+        '6) Una proyección realista del ROI mensual para los primeros 3 meses.'
     )
     try:
         messages = [
@@ -193,26 +201,33 @@ def api_ai_search_projects(request):
     results = []
     for idx, item in enumerate(ai_data.get('projects', [])):
         logger.info("Procesando item de IA %s: %s", idx, item)
-        pid = None
-        pname = None
-        desc = ''
-        tech = ''
-        cat_name = 'Otros'
-        sub_name = 'Otro'
+            pid = None
+            pname = None
+            desc = ''
+            tech = ''
+            cat_name = 'Otros'
+            sub_name = 'Otro'
+            kpis = []
+            value_proposition = ''
+            sales_pitch = ''
+            monthly_roi = []
 
-        if isinstance(item, dict):
-            pid = item.get('id')
-            pname = item.get('projectName') or item.get('name')
-            desc = item.get('description', '')
-            tech = item.get('technology', '')
-            cat_name = item.get('categoryName', 'Otros')
-            sub_name = item.get('subcategoryName', 'Otro')
-        elif isinstance(item, str):
-            pname = item
-        else:
-            pid = str(item)
-
-        logger.info("Item interpretado - pid: %s, pname: %s", pid, pname)
+            if isinstance(item, dict):
+                pid = item.get('id')
+                pname = item.get('projectName') or item.get('name')
+                desc = item.get('description', '')
+                tech = item.get('technology', '')
+                cat_name = item.get('categoryName', 'Otros')
+                sub_name = item.get('subcategoryName', 'Otro')
+                kpis = item.get('kpis', [])
+                value_proposition = item.get('valueProposition', '')
+                sales_pitch = item.get('salesPitch', '')
+                monthly_roi = item.get('monthlyROI', [])
+            elif isinstance(item, str):
+                pname = item
+            else:
+                pid = str(item)        
+                logger.info("Item interpretado - pid: %s, pname: %s", pid, pname)
         found = False
         target = normalize_text(pname) if pname else None
         for cat in catalog.get('categories', []):
@@ -248,10 +263,10 @@ def api_ai_search_projects(request):
                 'projectName': pname,
                 'description': desc,
                 'technology': tech,
-                'kpis': item.get('kpis', []) if isinstance(item, dict) else [],
-                'valueProposition': item.get('valueProposition', '') if isinstance(item, dict) else '',
-                'salesPitch': item.get('salesPitch', '') if isinstance(item, dict) else '',
-                'monthlyROI': item.get('monthlyROI', []) if isinstance(item, dict) else [],
+                'kpis': kpis,
+                'valueProposition': value_proposition,
+                'salesPitch': sales_pitch,
+                'monthlyROI': monthly_roi,
                 'categoryName': cat_name,
                 'subcategoryName': sub_name,
             })
