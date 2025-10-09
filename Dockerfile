@@ -31,15 +31,18 @@ RUN pip install --no-cache-dir -r /app/requirements.txt
 
 # Copy project
 COPY . /app/
+# Copy entrypoint and set executable bit as root (avoid permission errors)
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
-# Create a non-root user
+# Copy project
+COPY . /app/
+
+# Create a non-root user and take ownership of the app dir, then switch to that user
 RUN adduser --disabled-password --gecos "" appuser && chown -R appuser /app
 USER appuser
 
 RUN mkdir -p /app/staticfiles /app/media
-
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
 
 EXPOSE 8000
 
