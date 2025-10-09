@@ -29,13 +29,10 @@ COPY requirements.txt /app/requirements.txt
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r /app/requirements.txt
 
-# Copy project
-COPY . /app/
 # Copy entrypoint and set executable bit as root (avoid permission errors)
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+COPY --chown=root:root --chmod=0755 entrypoint.sh /entrypoint.sh
 
-# Copy project
+# Copy project (single copy)
 COPY . /app/
 
 # Create a non-root user and take ownership of the app dir, then switch to that user
