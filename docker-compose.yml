@@ -1,0 +1,36 @@
+version: '3.8'
+services:
+  web:
+    build: .
+    image: iafasttrackmodel:latest
+    restart: unless-stopped
+    environment:
+      - PRODUCTION=true
+      - DJANGO_SETTINGS_MODULE=IAFASTTRACKMODEL.settings
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_NAME=iafasttrack
+      - DB_USER=iauser
+      - DB_PASSWORD=iapassword
+    ports:
+      - "8000:8000"
+    volumes:
+      - staticfiles:/app/staticfiles
+      - media:/app/media
+    depends_on:
+      - db
+
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: iafasttrack
+      MYSQL_USER: iauser
+      MYSQL_PASSWORD: iapassword
+    volumes:
+      - dbdata:/var/lib/mysql
+
+volumes:
+  dbdata:
+  staticfiles:
+  media:

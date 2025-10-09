@@ -1,0 +1,112 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: iafasttrack
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: iafasttrack-db-secret
+  namespace: iafasttrack
+type: Opaque
+data:
+  # echo -n 'iauser' | base64
+  DB_USER: aWF1c2Vy
+  # echo -n 'iapassword' | base64
+  DB_PASSWORD: aWFwYXNzd29yZA==
+  # echo -n 'iafasttrack' | base64
+  DB_NAME: aWFmYXN0dHJhY2s=
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: iafasttrack-web
+  namespace: iafasttrack
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: iafasttrack-web
+  template:
+    metadata:
+      labels:
+        app: iafasttrack-web
+    spec:
+      containers:
+        - name: web
+          image: iafasttrackmodel:latest
+          ports:
+            - containerPort: 8000
+          env:
+            - name: PRODUCTION
+              value: "true"
+            - name: DB_HOST
+              value: iafasttrack-db
+            - name: DB_PORT
+              value: "3306"
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: iafasttrack-db-secret
+                  key: DB_USER
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: iafasttrack-db-secret
+                  key: DB_PASSWORD
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: iafasttrack-db-secret
+                  key: DB_NAME
+          readinessProbe:
+            httpGet:
+              path: /healthz/
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz/
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 20
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: iafasttrack-web-svc
+  namespace: iafasttrack
+spec:
+  selector:
+    app: iafasttrack-web
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8000
+  type: ClusterIP
+
+---
+# Optional Ingress (requires ingress controller)
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: iafasttrack-ingress
+  namespace: iafasttrack
+  annotations:
+    kubernetes.io/ingress.class: nginx
+spec:
+  rules:
+    - host: iafasttrack.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: iafasttrack-web-svc
+                port:
+                  number: 80
