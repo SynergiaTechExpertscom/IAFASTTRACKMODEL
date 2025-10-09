@@ -28,17 +28,18 @@ COPY requirements.txt /app/requirements.txt
 
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r /app/requirements.txt
+# Create a non-root user early so we can copy files owned by that user
+RUN adduser --disabled-password --gecos "" appuser
 
-# Copy entrypoint and set executable bit as root (avoid permission errors)
-COPY --chown=root:root --chmod=0755 entrypoint.sh /entrypoint.sh
+# Copy entrypoint and make it owned by appuser, with executable bit
+COPY --chown=appuser:appuser --chmod=0755 entrypoint.sh /entrypoint.sh
 
-# Copy project (single copy)
-COPY . /app/
+# Copy project files and set ownership to appuser to avoid permission issues
+COPY --chown=appuser:appuser . /app/
 
-# Create a non-root user and take ownership of the app dir, then switch to that user
-RUN adduser --disabled-password --gecos "" appuser && chown -R appuser /app
 USER appuser
 
+# Ensure runtime directories exist (owned by appuser)
 RUN mkdir -p /app/staticfiles /app/media
 
 EXPOSE 8000
