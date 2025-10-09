@@ -1,4 +1,4 @@
-FROM python:3.9-slim
+FROM python:3.9-bullseye
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
@@ -18,9 +18,9 @@ RUN apt-get update \
          libcairo2 \
          libcairo2-dev \
          pkg-config \
-         libpangocairo-1.0-0 \
-         libpango-1.0-0 \
-         libpango-dev \
+        libpangocairo-1.0-0 \
+        libpango-1.0-0 \
+        libpango1.0-dev \
          libjpeg-dev \
          zlib1g-dev \
          git \
