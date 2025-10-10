@@ -19,7 +19,11 @@ jobs:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
       - name: Configure SSH authentication
+=======
+      - name: Add remote host to known_hosts
+>>>>>>> Stashed changes
 =======
       - name: Add remote host to known_hosts
 >>>>>>> Stashed changes
@@ -27,6 +31,7 @@ jobs:
           SSH_HOST: ${{ secrets.SSH_HOST }}
           SSH_PORT: ${{ secrets.SSH_PORT }}
         run: |
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
           set -e
           mkdir -p ~/.ssh
@@ -41,6 +46,9 @@ jobs:
           echo "SSH_EFFECTIVE_PORT=$PORT" >> "$GITHUB_ENV"
 =======
           PORT=${SSH_PORT:-22}
+=======
+          PORT=${SSH_PORT:-22}
+>>>>>>> Stashed changes
           mkdir -p ~/.ssh
           ssh-keyscan -t ed25519,rsa,ecdsa -p "$PORT" -H "$SSH_HOST" >> ~/.ssh/known_hosts
 
@@ -53,6 +61,9 @@ jobs:
         run: |
           PORT=${SSH_PORT:-22}
           ssh -p "$PORT" "$SSH_USER@$SSH_HOST" "mkdir -p '$DEPLOY_PATH'"
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 
       - name: Copy repository to remote server (rsync)
