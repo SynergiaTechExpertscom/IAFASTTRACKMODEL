@@ -65,4 +65,3 @@ jobs:
 # - SSH_PRIVATE_KEY: private key (PEM) for SSH_USER (no passphrase recommended for CI)
 # - SSH_PORT: optional, default 22
 # - DEPLOY_PATH: remote path where the repo will be copied (e.g. /opt/IAFASTTRACKMODEL)
-
