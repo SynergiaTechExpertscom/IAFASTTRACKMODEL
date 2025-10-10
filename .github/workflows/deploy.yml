@@ -1,4 +1,4 @@
-name: Deploy to remote VM via SSH
+name: 🚀 Deploy to remote VM via SSH (Docker Compose v2)
 
 on:
   push:
@@ -10,62 +10,30 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1️⃣ Descargar el repositorio
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Start ssh-agent and add key
-        uses: webfactory/ssh-agent@v0.8.1
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-      - name: Configure SSH authentication
-=======
-      - name: Add remote host to known_hosts
->>>>>>> Stashed changes
-=======
-      - name: Add remote host to known_hosts
->>>>>>> Stashed changes
+      # 2️⃣ Escribir clave SSH y configurar known_hosts
+      - name: Write SSH key & known_hosts
         env:
           SSH_HOST: ${{ secrets.SSH_HOST }}
           SSH_PORT: ${{ secrets.SSH_PORT }}
         run: |
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
           set -e
           mkdir -p ~/.ssh
-          PORT=${SSH_PORT:-22}
-          if [ -z "$SSH_PRIVATE_KEY" ]; then
-            echo "SSH_PRIVATE_KEY secret must be configured for certificate-based authentication." >&2
-            exit 1
-          fi
-          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
+          cat > ~/.ssh/deploy_key << 'EOF'
+${{ secrets.SSH_PRIVATE_KEY }}
+EOF
+          sed -i 's/\r$//' ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -p "$PORT" -H "$SSH_HOST" >> ~/.ssh/known_hosts
-          echo "SSH_EFFECTIVE_PORT=$PORT" >> "$GITHUB_ENV"
-=======
-          PORT=${SSH_PORT:-22}
-=======
-          PORT=${SSH_PORT:-22}
->>>>>>> Stashed changes
-          mkdir -p ~/.ssh
-          ssh-keyscan -t ed25519,rsa,ecdsa -p "$PORT" -H "$SSH_HOST" >> ~/.ssh/known_hosts
+          # Validar que la clave es correcta
+          ssh-keygen -y -f ~/.ssh/deploy_key > /dev/null
+          # Agregar host remoto a known_hosts
+          ssh-keyscan -t rsa,ecdsa,ed25519 -p "${SSH_PORT:-22}" -H "${SSH_HOST}" >> ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
 
-      - name: Ensure remote path exists
-        env:
-          SSH_USER: ${{ secrets.SSH_USER }}
-          SSH_HOST: ${{ secrets.SSH_HOST }}
-          SSH_PORT: ${{ secrets.SSH_PORT }}
-          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
-        run: |
-          PORT=${SSH_PORT:-22}
-          ssh -p "$PORT" "$SSH_USER@$SSH_HOST" "mkdir -p '$DEPLOY_PATH'"
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
-
+      # 3️⃣ Copiar el código al servidor con rsync
       - name: Copy repository to remote server (rsync)
         env:
           SSH_USER: ${{ secrets.SSH_USER }}
@@ -75,10 +43,11 @@ jobs:
         run: |
           set -e
           PORT=${SSH_PORT:-22}
-          echo "Copying files to $SSH_USER@$SSH_HOST:$DEPLOY_PATH (port $PORT)"
-          rsync -avz --delete -e "ssh -o StrictHostKeyChecking=yes -p $PORT" ./ "$SSH_USER@$SSH_HOST:$DEPLOY_PATH"
+          echo "📦 Copying files to $SSH_USER@$SSH_HOST:$DEPLOY_PATH (port $PORT)"
+          rsync -avz --delete -e "ssh -o StrictHostKeyChecking=yes -i ~/.ssh/deploy_key -p $PORT" ./ "$SSH_USER@$SSH_HOST:$DEPLOY_PATH"
 
-      - name: Run remote docker compose deploy via ssh
+      # 4️⃣ Desplegar en remoto con Docker Compose v2
+      - name: Deploy remotely with Docker Compose
         env:
           SSH_USER: ${{ secrets.SSH_USER }}
           SSH_HOST: ${{ secrets.SSH_HOST }}
@@ -86,18 +55,19 @@ jobs:
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
         run: |
           set -e
-          PORT=${SSH_PORT:-22}
-          echo "Deploying on remote host $SSH_HOST"
-          ssh -p "$PORT" "$SSH_USER@$SSH_HOST" "\
+          PORT=${SSH_EFFECTIVE_PORT:-${SSH_PORT:-22}}
+          echo "🚀 Deploying on remote host $SSH_HOST"
+          ssh -i ~/.ssh/deploy_key -p "$PORT" "$SSH_USER@$SSH_HOST" "\
             set -e; \
             cd '$DEPLOY_PATH'; \
-            docker --version || (echo 'Docker not found' && exit 1); \
-            docker compose version || (echo 'docker compose plugin not found' && exit 1); \
+            docker --version; \
+            docker compose version || (apt-get update -y && apt-get install -y docker-compose-plugin); \
             docker compose down || true; \
             docker compose pull || true; \
             docker compose up -d --build; \
             docker compose logs --tail=200 web || true \
           "
 
+      # 5️⃣ Confirmación
       - name: Finished
-        run: echo "Deployment finished"
+        run: echo "✅ Deployment finished successfully"
