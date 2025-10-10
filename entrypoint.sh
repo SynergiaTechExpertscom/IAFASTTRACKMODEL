@@ -38,5 +38,12 @@ python manage.py collectstatic --noinput
 
 # Lanzar Gunicorn (modo producción)
 echo "🔥 Iniciando Gunicorn..."
-exec gunicorn IAFASTTRACKMODEL.wsgi:application --bind 0.0.0.0:8000 --workers 3
+exec gunicorn IAFASTTRACKMODEL.wsgi:application \
+  --bind 0.0.0.0:8000 \
+  --workers "${GUNICORN_WORKERS:-1}" \
+  --timeout "${GUNICORN_TIMEOUT:-60}" \
+  --access-logfile - \
+  --error-logfile - \
+  --log-level "${GUNICORN_LOG_LEVEL:-info}"
+
 
