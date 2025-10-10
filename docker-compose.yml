@@ -26,6 +26,11 @@ services:
       MYSQL_DATABASE: iafasttrack
       MYSQL_USER: iauser
       MYSQL_PASSWORD: iapassword
+      # Allow root connections from any host (use with caution) so remote clients can connect
+      MYSQL_ROOT_HOST: '%'
+    # Expose MySQL port to the host so it can be reached from outside the VM
+    ports:
+      - "3306:3306"
     volumes:
       - dbdata:/var/lib/mysql
 
