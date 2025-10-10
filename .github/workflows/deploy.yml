@@ -1,38 +1,60 @@
-name: Deploy to GAE
+name: Deploy to remote VM via SSH
 
 on:
   push:
     branches:
-      - master    # ← ahora se activa al hacer push en 'master'
+      - master
 
 jobs:
-  deploy:
+  deploy-to-vm:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Authenticate with GCP
-        uses: google-github-actions/auth@v2
-        with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
-
-      - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
-
-      - name: Deploy to App Engine
-        uses: google-github-actions/deploy-appengine@v2
-        with:
-          project_id: ${{ secrets.GCP_PROJECT }}
-          deliverables: app.yaml
-
-      - name: Smoke test deployment
+      - name: Prepare SSH deploy variables
+        id: prepare
         run: |
-          URL=$(gcloud app describe \
-            --project=${{ secrets.GCP_PROJECT }} \
-            --format="value(defaultHostname)")
-          curl -fs "https://$URL" && echo " Deployed!"
+          echo "DEPLOY_PATH=${{ secrets.DEPLOY_PATH }}" >> $GITHUB_OUTPUT
+
+      - name: Copy repository to remote server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          source: "./"
+          target: ${{ secrets.DEPLOY_PATH }}
+
+      - name: Run remote docker-compose deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            set -e
+            echo "Deploying to ${{ secrets.SSH_HOST }}:${{ secrets.DEPLOY_PATH }}"
+            cd "${{ secrets.DEPLOY_PATH }}"
+            # Ensure docker and docker-compose are available
+            docker --version || (echo "Docker not found on remote host" && exit 1)
+            docker-compose --version || (echo "docker-compose not found on remote host" && exit 1)
+            # Stop any running stack, build and start
+            docker-compose down || true
+            docker-compose pull || true
+            docker-compose up -d --build
+            # Show last logs from web service
+            docker-compose logs --tail=200 web || true
+
+      - name: Finished
+        run: echo "Deployment finished"
+
+# Secrets required by this workflow (add them in repository Settings > Secrets):
+# - SSH_HOST: public IP or hostname of your VM
+# - SSH_USER: SSH username
+# - SSH_PRIVATE_KEY: private key (PEM) for SSH_USER (no passphrase recommended for CI)
+# - SSH_PORT: optional, default 22
+# - DEPLOY_PATH: remote path where the repo will be copied (e.g. /opt/IAFASTTRACKMODEL)
