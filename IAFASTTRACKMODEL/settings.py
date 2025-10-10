@@ -51,7 +51,7 @@ SECRET_KEY = '4cfeccdb-b04b-4b34-9255-d6f2e681c463'
 DEBUG = True
 
 #ALLOWED_HOSTS = ['https://ia-fast-track-hggfakg6fch5h2bd.francecentral-01.azurewebsites.net', 'ia-fast-track-hggfakg6fch5h2bd.francecentral-01.azurewebsites.net', '127.0.0.1', 'localhost']
-ALLOWED_HOSTS = ['.appspot.com', 'ai.synergiatechexperts.com', '127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['217.154.184.34', 'ai.synergiatechexperts.com', '127.0.0.1', 'localhost']
 
 CSRF_TRUSTED_ORIGINS = [
     "https://ia-fast-track-hggfakg6fch5h2bd.francecentral-01.azurewebsites.net",
