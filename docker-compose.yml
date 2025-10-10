@@ -1,38 +1,46 @@
 services:
+  db:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword          # cámbialo si quieres
+      MYSQL_DATABASE: iafasttrack
+      MYSQL_USER: iauser
+      MYSQL_PASSWORD: iapassword                 # debe coincidir con DB_PASSWORD de web
+      MYSQL_ROOT_HOST: '%'                       # (opcional) permite conexiones root externas
+    # ⚠️ Exponer 3306 al exterior no es necesario salvo que quieras acceso remoto
+    # Si no lo necesitas, comenta la línea de ports de abajo por seguridad:
+    ports:
+      - "3306:3306"
+    volumes:
+      - dbdata:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$${MYSQL_ROOT_PASSWORD} --silent"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
   web:
     build: .
     image: iafasttrackmodel:latest
     restart: unless-stopped
     environment:
-      - PRODUCTION=true
-      - DJANGO_SETTINGS_MODULE=IAFASTTRACKMODEL.settings
-      - DB_HOST=db
-      - DB_PORT=3306
-      - DB_NAME=iafasttrack
-      - DB_USER=iauser
-      - DB_PASSWORD=iapassword
+      PRODUCTION: "true"
+      DJANGO_SETTINGS_MODULE: IAFastTrackModel.settings  # usa el módulo real de tu proyecto
+      DB_HOST: db
+      DB_PORT: "3306"
+      DB_NAME: iafasttrack
+      DB_USER: iauser
+      DB_PASSWORD: iapassword
+      # IMPORTANTE: no definas INSTANCE_CONNECTION_NAME ni vars de Cloud SQL aquí
     ports:
       - "8000:8000"
     volumes:
       - staticfiles:/app/staticfiles
       - media:/app/media
     depends_on:
-      - db
-
-  db:
-    image: mysql:8.0
-    environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: iafasttrack
-      MYSQL_USER: iauser
-      MYSQL_PASSWORD: iapassword
-      # Allow root connections from any host (use with caution) so remote clients can connect
-      MYSQL_ROOT_HOST: '%'
-    # Expose MySQL port to the host so it can be reached from outside the VM
-    ports:
-      - "3306:3306"
-    volumes:
-      - dbdata:/var/lib/mysql
+      db:
+        condition: service_healthy
 
 volumes:
   dbdata:
