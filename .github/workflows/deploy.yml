@@ -18,7 +18,7 @@ jobs:
         run: |
           echo "DEPLOY_PATH=${{ secrets.DEPLOY_PATH }}" >> $GITHUB_OUTPUT
 
-      - name: Setup SSH key on runner
+      - name: Configure SSH authentication
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           SSH_HOST: ${{ secrets.SSH_HOST }}
@@ -26,11 +26,15 @@ jobs:
         run: |
           set -e
           mkdir -p ~/.ssh
-          echo "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
-          chmod 600 ~/.ssh/deploy_key
-          # Add remote host to known_hosts (use provided port or 22)
           PORT=${SSH_PORT:-22}
-          ssh-keyscan -p $PORT -H "$SSH_HOST" >> ~/.ssh/known_hosts
+          if [ -z "$SSH_PRIVATE_KEY" ]; then
+            echo "SSH_PRIVATE_KEY secret must be configured for certificate-based authentication." >&2
+            exit 1
+          fi
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -p "$PORT" -H "$SSH_HOST" >> ~/.ssh/known_hosts
+          echo "SSH_EFFECTIVE_PORT=$PORT" >> "$GITHUB_ENV"
 
       - name: Copy repository to remote server (rsync)
         env:
@@ -40,9 +44,9 @@ jobs:
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
         run: |
           set -e
-          PORT=${SSH_PORT:-22}
+          PORT=${SSH_EFFECTIVE_PORT:-22}
           echo "Copying files to $SSH_USER@$SSH_HOST:$DEPLOY_PATH (port $PORT)"
-          rsync -avz --delete -e "ssh -o StrictHostKeyChecking=yes -i ~/.ssh/deploy_key -p $PORT" ./ $SSH_USER@$SSH_HOST:$DEPLOY_PATH
+          rsync -avz --delete -e "ssh -o StrictHostKeyChecking=yes -i ~/.ssh/deploy_key -p $PORT" ./ "$SSH_USER@$SSH_HOST:$DEPLOY_PATH"
 
       - name: Run remote docker-compose deploy via ssh
         env:
@@ -52,9 +56,9 @@ jobs:
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
         run: |
           set -e
-          PORT=${SSH_PORT:-22}
+          PORT=${SSH_EFFECTIVE_PORT:-22}
           echo "Deploying on remote host $SSH_HOST"
-          ssh -i ~/.ssh/deploy_key -p $PORT $SSH_USER@$SSH_HOST "set -e; cd $DEPLOY_PATH; docker --version || (echo 'Docker not found' && exit 1); docker-compose --version || (echo 'docker-compose not found' && exit 1); docker-compose down || true; docker-compose pull || true; docker-compose up -d --build; docker-compose logs --tail=200 web || true"
+          ssh -i ~/.ssh/deploy_key -p "$PORT" "$SSH_USER@$SSH_HOST" "set -e; cd $DEPLOY_PATH; docker --version || (echo 'Docker not found' && exit 1); docker-compose --version || (echo 'docker-compose not found' && exit 1); docker-compose down || true; docker-compose pull || true; docker-compose up -d --build; docker-compose logs --tail=200 web || true"
 
       - name: Finished
         run: echo "Deployment finished"
