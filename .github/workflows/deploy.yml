@@ -23,8 +23,8 @@ jobs:
           set -e
           mkdir -p ~/.ssh
           cat > ~/.ssh/deploy_key << 'EOF'
-${{ secrets.SSH_PRIVATE_KEY }}
-EOF
+          ${{ secrets.SSH_PRIVATE_KEY }}
+          EOF
           sed -i 's/\r$//' ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
           # Validar que la clave es correcta
