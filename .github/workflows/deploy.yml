@@ -13,17 +13,21 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Prepare SSH deploy variables
-        id: prepare
-        run: |
-          echo "DEPLOY_PATH=${{ secrets.DEPLOY_PATH }}" >> $GITHUB_OUTPUT
+      - name: Start ssh-agent and add key
+        uses: webfactory/ssh-agent@v0.8.1
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
+<<<<<<< Updated upstream
       - name: Configure SSH authentication
+=======
+      - name: Add remote host to known_hosts
+>>>>>>> Stashed changes
         env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           SSH_HOST: ${{ secrets.SSH_HOST }}
           SSH_PORT: ${{ secrets.SSH_PORT }}
         run: |
+<<<<<<< Updated upstream
           set -e
           mkdir -p ~/.ssh
           PORT=${SSH_PORT:-22}
@@ -35,6 +39,21 @@ jobs:
           chmod 600 ~/.ssh/deploy_key
           ssh-keyscan -p "$PORT" -H "$SSH_HOST" >> ~/.ssh/known_hosts
           echo "SSH_EFFECTIVE_PORT=$PORT" >> "$GITHUB_ENV"
+=======
+          PORT=${SSH_PORT:-22}
+          mkdir -p ~/.ssh
+          ssh-keyscan -t ed25519,rsa,ecdsa -p "$PORT" -H "$SSH_HOST" >> ~/.ssh/known_hosts
+
+      - name: Ensure remote path exists
+        env:
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_PORT: ${{ secrets.SSH_PORT }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+        run: |
+          PORT=${SSH_PORT:-22}
+          ssh -p "$PORT" "$SSH_USER@$SSH_HOST" "mkdir -p '$DEPLOY_PATH'"
+>>>>>>> Stashed changes
 
       - name: Copy repository to remote server (rsync)
         env:
@@ -44,11 +63,11 @@ jobs:
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
         run: |
           set -e
-          PORT=${SSH_EFFECTIVE_PORT:-22}
+          PORT=${SSH_PORT:-22}
           echo "Copying files to $SSH_USER@$SSH_HOST:$DEPLOY_PATH (port $PORT)"
-          rsync -avz --delete -e "ssh -o StrictHostKeyChecking=yes -i ~/.ssh/deploy_key -p $PORT" ./ "$SSH_USER@$SSH_HOST:$DEPLOY_PATH"
+          rsync -avz --delete -e "ssh -o StrictHostKeyChecking=yes -p $PORT" ./ "$SSH_USER@$SSH_HOST:$DEPLOY_PATH"
 
-      - name: Run remote docker-compose deploy via ssh
+      - name: Run remote docker compose deploy via ssh
         env:
           SSH_USER: ${{ secrets.SSH_USER }}
           SSH_HOST: ${{ secrets.SSH_HOST }}
@@ -56,16 +75,18 @@ jobs:
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
         run: |
           set -e
-          PORT=${SSH_EFFECTIVE_PORT:-22}
+          PORT=${SSH_PORT:-22}
           echo "Deploying on remote host $SSH_HOST"
-          ssh -i ~/.ssh/deploy_key -p "$PORT" "$SSH_USER@$SSH_HOST" "set -e; cd $DEPLOY_PATH; docker --version || (echo 'Docker not found' && exit 1); docker-compose --version || (echo 'docker-compose not found' && exit 1); docker-compose down || true; docker-compose pull || true; docker-compose up -d --build; docker-compose logs --tail=200 web || true"
+          ssh -p "$PORT" "$SSH_USER@$SSH_HOST" "\
+            set -e; \
+            cd '$DEPLOY_PATH'; \
+            docker --version || (echo 'Docker not found' && exit 1); \
+            docker compose version || (echo 'docker compose plugin not found' && exit 1); \
+            docker compose down || true; \
+            docker compose pull || true; \
+            docker compose up -d --build; \
+            docker compose logs --tail=200 web || true \
+          "
 
       - name: Finished
         run: echo "Deployment finished"
-
-# Secrets required by this workflow (add them in repository Settings > Secrets):
-# - SSH_HOST: public IP or hostname of your VM
-# - SSH_USER: SSH username
-# - SSH_PRIVATE_KEY: private key (PEM) for SSH_USER (no passphrase recommended for CI)
-# - SSH_PORT: optional, default 22
-# - DEPLOY_PATH: remote path where the repo will be copied (e.g. /opt/IAFASTTRACKMODEL)
