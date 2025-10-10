@@ -1,30 +1,42 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 
+echo "=============================================="
+echo "🚀 Iniciando contenedor de Django (IAFASTTRACK)"
+echo "=============================================="
+
 if [ "$PRODUCTION" = "true" ]; then
-  echo "Running in production mode"
+  echo "Modo: Producción"
+else
+  echo "Modo: Desarrollo"
 fi
 
-# Wait for DB to be available (optional: simple loop, can be improved)
+# Esperar a la base de datos MySQL
 if [ -n "$DB_HOST" ]; then
-  echo "Waiting for database $DB_HOST:$DB_PORT..."
+  echo "⏳ Esperando a la base de datos ($DB_HOST:$DB_PORT)..."
   retries=0
-  until nc -z "$DB_HOST" ${DB_PORT:-3306} >/dev/null 2>&1; do
+  until nc -z "$DB_HOST" "${DB_PORT:-3306}" >/dev/null 2>&1; do
     retries=$((retries+1))
-    echo "Waiting for DB... ($retries)"
+    echo "   ➜ Intento $retries..."
     if [ $retries -gt 30 ]; then
-      echo "Database did not become available in time" >&2
+      echo "❌ La base de datos no respondió a tiempo" >&2
       exit 1
     fi
     sleep 2
   done
+  echo "✅ Base de datos disponible."
 fi
 
-echo "Applying database migrations"
-python manage.py makemigrations || true
+# Migraciones automáticas
+echo "📦 Aplicando migraciones..."
+python manage.py makemigrations --noinput || true
 python manage.py migrate --noinput
 
-echo "Collecting static files"
+# Archivos estáticos
+echo "📁 Recopilando archivos estáticos..."
 python manage.py collectstatic --noinput
 
-exec "$@"
+# Lanzar Gunicorn (modo producción)
+echo "🔥 Iniciando Gunicorn..."
+exec gunicorn IAFASTTRACKMODEL.wsgi:application --bind 0.0.0.0:8000 --workers 3
+
