@@ -26,7 +26,7 @@ services:
     restart: unless-stopped
     environment:
       PRODUCTION: "true"
-      DJANGO_SETTINGS_MODULE: IAFastTrackModel.settings  # usa el módulo real de tu proyecto
+      DJANGO_SETTINGS_MODULE: IAFASTTRACKMODEL.settings  # usa el módulo real de tu proyecto
       DB_HOST: db
       DB_PORT: "3306"
       DB_NAME: iafasttrack
