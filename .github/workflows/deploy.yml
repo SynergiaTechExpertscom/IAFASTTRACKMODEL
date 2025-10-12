@@ -57,48 +57,56 @@ jobs:
           set -e
           PORT=${SSH_EFFECTIVE_PORT:-${SSH_PORT:-22}}
           echo "🚀 Deploying on remote host $SSH_HOST"
-          ssh -i ~/.ssh/deploy_key -p "$PORT" "$SSH_USER@$SSH_HOST" "\
-            set -e; \
-            cd '$DEPLOY_PATH'; \
-            docker --version; \
-            COMPOSE_CMD=''; \
-            if docker compose version >/dev/null 2>&1; then \
-              COMPOSE_CMD='docker compose'; \
-            elif command -v docker-compose >/dev/null 2>&1; then \
-              COMPOSE_CMD='docker-compose'; \
-            else \
-              apt-get update -y; \
-              apt-get install -y ca-certificates curl gnupg; \
-              install -m 0755 -d /etc/apt/keyrings; \
-              curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg; \
-              chmod a+r /etc/apt/keyrings/docker.gpg; \
-              if [ ! -f /etc/apt/sources.list.d/docker.list ]; then \
-                . /etc/os-release; \
-                echo "deb [arch=\$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \$VERSION_CODENAME stable" > /etc/apt/sources.list.d/docker.list; \
-              fi; \
-              apt-get update -y; \
-              apt-get install -y docker-compose-plugin; \
-              if docker compose version >/dev/null 2>&1; then \
-                COMPOSE_CMD='docker compose'; \
-              elif command -v docker-compose >/dev/null 2>&1; then \
-                COMPOSE_CMD='docker-compose'; \
-              fi; \
-            fi; \
-            if [ -z "\$COMPOSE_CMD" ]; then \
-              echo 'Docker Compose is not available even after installation attempts.' >&2; \
-              exit 1; \
-            fi; \
-            echo "Using \$COMPOSE_CMD"; \
-            if [ "\$COMPOSE_CMD" = 'docker compose' ]; then \
-              docker compose version; \
-            else \
-              docker-compose --version; \
-            fi; \
-            \$COMPOSE_CMD down || true; \
-            \$COMPOSE_CMD pull || true; \
-            \$COMPOSE_CMD up -d --build; \
-            \$COMPOSE_CMD logs --tail=200 web || true \
-          "
+          ssh -i ~/.ssh/deploy_key -p "$PORT" "$SSH_USER@$SSH_HOST" "DEPLOY_PATH='$DEPLOY_PATH' bash -s" <<'REMOTE_SCRIPT'
+          set -e
+          cd "$DEPLOY_PATH"
+          docker --version
+
+          COMPOSE_CMD=""
+          if docker compose version >/dev/null 2>&1; then
+            COMPOSE_CMD="docker compose"
+          elif command -v docker-compose >/dev/null 2>&1; then
+            COMPOSE_CMD="docker-compose"
+          else
+            apt-get update -y
+            apt-get install -y ca-certificates curl gnupg
+            install -m 0755 -d /etc/apt/keyrings
+            if [ ! -f /etc/apt/keyrings/docker.gpg ]; then
+              curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+              chmod a+r /etc/apt/keyrings/docker.gpg
+            fi
+            if [ ! -f /etc/apt/sources.list.d/docker.list ]; then
+              . /etc/os-release
+              echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $VERSION_CODENAME stable" > /etc/apt/sources.list.d/docker.list
+            fi
+            apt-get update -y
+            if ! apt-get install -y docker-compose-plugin; then
+              apt-get install -y docker-compose
+            fi
+            if docker compose version >/dev/null 2>&1; then
+              COMPOSE_CMD="docker compose"
+            elif command -v docker-compose >/dev/null 2>&1; then
+              COMPOSE_CMD="docker-compose"
+            fi
+          fi
+
+          if [ -z "$COMPOSE_CMD" ]; then
+            echo "Docker Compose is not available even after installation attempts." >&2
+            exit 1
+          fi
+
+          if [ "$COMPOSE_CMD" = "docker compose" ]; then
+            compose() { docker compose "$@"; }
+          else
+            compose() { docker-compose "$@"; }
+          fi
+
+          compose version
+          compose down || true
+          compose pull || true
+          compose up -d --build
+          compose logs --tail=200 web || true
+REMOTE_SCRIPT
 
       # 5️⃣ Confirmación
       - name: Finished
