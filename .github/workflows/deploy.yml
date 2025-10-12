@@ -102,7 +102,7 @@ jobs:
           compose pull || true
           compose up -d --build
           compose logs --tail=200 web || true
-REMOTE_SCRIPT
+          REMOTE_SCRIPT
 
       # 5️⃣ Confirmación
       - name: Finished
