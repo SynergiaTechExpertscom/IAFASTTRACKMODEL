@@ -34,7 +34,8 @@ RUN pip install --no-cache-dir -r /app/requirements.txt
 RUN adduser --disabled-password --gecos "" appuser
 
 # Copy entrypoint and make it owned by appuser, with executable bit
-COPY --chown=appuser:appuser --chmod=0755 entrypoint.sh /entrypoint.sh
+COPY --chown=appuser:appuser entrypoint.sh /entrypoint.sh
+RUN chmod 0755 /entrypoint.sh
 
 # Copy project files and set ownership to appuser to avoid permission issues
 COPY --chown=appuser:appuser . /app/
