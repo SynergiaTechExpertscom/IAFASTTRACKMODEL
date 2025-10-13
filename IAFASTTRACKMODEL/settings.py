@@ -55,6 +55,7 @@ ALLOWED_HOSTS = ['217.154.184.34', 'ai.synergiatechexperts.com', '127.0.0.1', 'l
 
 CSRF_TRUSTED_ORIGINS = [
     "https://ia-fast-track-hggfakg6fch5h2bd.francecentral-01.azurewebsites.net",
+    "https://ai.synergiatechexperts.com",
 ]
 
 # Application references
