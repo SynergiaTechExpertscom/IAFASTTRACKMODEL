@@ -1,4 +1,4 @@
-name: 🚀 Deploy to remote VM via SSH (Docker Compose v2)
+name: Deploy to remote VM via SSH (Docker Compose v2)
 
 on:
   push:
@@ -10,11 +10,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Descargar el repositorio
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2️⃣ Escribir clave SSH y configurar known_hosts
       - name: Write SSH key & known_hosts
         env:
           SSH_HOST: ${{ secrets.SSH_HOST }}
@@ -22,18 +20,15 @@ jobs:
         run: |
           set -e
           mkdir -p ~/.ssh
-          cat > ~/.ssh/deploy_key << 'EOF'
+          cat > ~/.ssh/deploy_key <<'EOF'
           ${{ secrets.SSH_PRIVATE_KEY }}
           EOF
           sed -i 's/\r$//' ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          # Validar que la clave es correcta
           ssh-keygen -y -f ~/.ssh/deploy_key > /dev/null
-          # Agregar host remoto a known_hosts
           ssh-keyscan -t rsa,ecdsa,ed25519 -p "${SSH_PORT:-22}" -H "${SSH_HOST}" >> ~/.ssh/known_hosts
           chmod 644 ~/.ssh/known_hosts
 
-      # 3️⃣ Copiar el código al servidor con rsync
       - name: Copy repository to remote server (rsync)
         env:
           SSH_USER: ${{ secrets.SSH_USER }}
@@ -43,10 +38,9 @@ jobs:
         run: |
           set -e
           PORT=${SSH_PORT:-22}
-          echo "📦 Copying files to $SSH_USER@$SSH_HOST:$DEPLOY_PATH (port $PORT)"
+          echo "Copying files to $SSH_USER@$SSH_HOST:$DEPLOY_PATH (port $PORT)"
           rsync -avz --delete -e "ssh -o StrictHostKeyChecking=yes -i ~/.ssh/deploy_key -p $PORT" ./ "$SSH_USER@$SSH_HOST:$DEPLOY_PATH"
 
-      # 4️⃣ Desplegar en remoto con Docker Compose v2
       - name: Deploy remotely with Docker Compose
         env:
           SSH_USER: ${{ secrets.SSH_USER }}
@@ -56,7 +50,7 @@ jobs:
         run: |
           set -e
           PORT=${SSH_EFFECTIVE_PORT:-${SSH_PORT:-22}}
-          echo "🚀 Deploying on remote host $SSH_HOST"
+          echo "Deploying on remote host $SSH_HOST"
           ssh -i ~/.ssh/deploy_key -p "$PORT" "$SSH_USER@$SSH_HOST" "DEPLOY_PATH='$DEPLOY_PATH' bash -s" <<'REMOTE_SCRIPT'
           set -e
           cd "$DEPLOY_PATH"
@@ -104,6 +98,5 @@ jobs:
           compose logs --tail=200 web || true
           REMOTE_SCRIPT
 
-      # 5️⃣ Confirmación
       - name: Finished
-        run: echo "✅ Deployment finished successfully"
+        run: echo "Deployment finished successfully"
