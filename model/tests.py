@@ -212,6 +212,22 @@ class ClientDiagnosticoApiTests(TestCase):
         self.assertEqual(len(propuestas), 1)
         self.assertEqual(propuestas[0]['projectName'], 'Proyecto Coincidente')
 
+    def test_catalog_json_string_is_parsed(self):
+        ProyectoCatalog.objects.create(
+            datos_catalogo=json.dumps(self.catalog),
+            version=2,
+        )
+
+        url = reverse('model:api_get_client_diagnostico', args=[self.cliente.id])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        data = response.json()
+        propuestas = data.get('colaboracion_propuesta')
+        self.assertEqual(len(propuestas), 2)
+        matched = propuestas[0]
+        self.assertEqual(matched['id'], 7)
+
 
 class ProjectCatalogApiTests(TestCase):
     def test_fallback_catalog_is_served_when_database_is_empty(self):
@@ -225,6 +241,17 @@ class ProjectCatalogApiTests(TestCase):
         first_category = data['categories'][0]
         self.assertIn('subcategories', first_category)
         self.assertTrue(first_category['subcategories'], 'El catálogo de fallback debe incluir subcategorías con proyectos')
+
+    def test_catalog_json_string_is_returned_as_dict(self):
+        ProyectoCatalog.objects.create(
+            datos_catalogo=json.dumps({'categories': []}),
+            version=1,
+        )
+        response = self.client.get(reverse('model:api_get_project_catalog'))
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertIsInstance(data, dict)
+        self.assertIn('categories', data)
 
     def test_staticfiles_finder_can_locate_catalog(self):
         catalog_path = finders.find('proyectos.json')

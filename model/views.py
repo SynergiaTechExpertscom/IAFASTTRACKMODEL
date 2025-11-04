@@ -20,6 +20,41 @@ from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
+
+def _ensure_dict_from_json(raw_value, *, default=None, context=''):
+    """
+    Accepts dict or JSON string and returns a dict.
+    Returns `default` (or ``{}``) when data is missing or invalid.
+    """
+    if isinstance(raw_value, dict):
+        return raw_value
+
+    if isinstance(raw_value, str):
+        try:
+            parsed = json.loads(raw_value)
+        except json.JSONDecodeError:
+            logger.warning("JSON invalido en %s: %s", context or 'payload', raw_value[:200])
+            return default if default is not None else {}
+        if isinstance(parsed, dict):
+            return parsed
+        logger.warning(
+            "JSON en %s no es un objeto: tipo %s",
+            context or 'payload',
+            type(parsed).__name__,
+        )
+        return default if default is not None else {}
+
+    if raw_value is None:
+        return default if default is not None else {}
+
+    logger.warning(
+        "Valor inesperado para %s (tipo %s); se usa valor por defecto",
+        context or 'payload',
+        type(raw_value).__name__,
+    )
+    return default if default is not None else {}
+
+
 @ensure_csrf_cookie  # Para que Django envíe el cookie CSRF en la primera petición GET si es necesario
 def main_app_view(request):
     """
@@ -136,26 +171,15 @@ def api_get_client_diagnostico(request, client_id):
     #     return JsonResponse({'error': 'No autorizado'}, status=401)
     cliente = get_object_or_404(Cliente, id=client_id)
     raw_diagnostico = cliente.diagnostico_json
-    diagnostico = deepcopy(raw_diagnostico) if isinstance(raw_diagnostico, (dict, list)) else raw_diagnostico
-
-    if isinstance(diagnostico, str):
-        try:
-            diagnostico = json.loads(diagnostico)
-        except json.JSONDecodeError:
-            logger.warning("Diagnostico JSON almacenado como cadena invalida para cliente %s", cliente.id)
-            diagnostico = {}
-
-    if not isinstance(diagnostico, dict):
-        logger.warning(
-            "Diagnostico JSON con tipo inesperado (%s) para cliente %s; se usa objeto vacio",
-            type(diagnostico).__name__,
-            cliente.id,
-        )
-        diagnostico = {}
+    diagnostico = deepcopy(raw_diagnostico) if isinstance(raw_diagnostico, dict) else raw_diagnostico
+    diagnostico = _ensure_dict_from_json(diagnostico, context=f'diagnostico cliente {cliente.id}')
 
     try:
         catalogo = ProyectoCatalog.objects.latest('version')
-        catalog_data = catalogo.datos_catalogo
+        catalog_data = _ensure_dict_from_json(
+            catalogo.datos_catalogo,
+            context=f'catalogo proyectos v{catalogo.version}',
+        )
     except ProyectoCatalog.DoesNotExist:
         catalog_data = None
 
@@ -215,6 +239,10 @@ def api_get_project_catalog(request):
     #     return JsonResponse({'error': 'No autorizado'}, status=401)
     try:
         catalogo = ProyectoCatalog.objects.latest('version')
+        datos_catalogo = _ensure_dict_from_json(
+            catalogo.datos_catalogo,
+            context=f'catalogo proyectos v{catalogo.version}',
+        )
     except ProyectoCatalog.DoesNotExist:
         fallback_catalog = _load_fallback_catalog_data()
         if fallback_catalog is not None:
@@ -223,7 +251,7 @@ def api_get_project_catalog(request):
         return JsonResponse({'error': 'Catalogo de proyectos no encontrado'}, status=404)
 
     return JsonResponse(
-        catalogo.datos_catalogo,
+        datos_catalogo,
         json_dumps_params={'ensure_ascii': False}
     )
 
