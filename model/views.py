@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import logging
 import unicodedata
+from copy import deepcopy
 from venv import logger
 from django.http import JsonResponse, HttpResponse
 from django.contrib.auth import authenticate, login as django_auth_login, logout as django_auth_logout
@@ -49,12 +50,100 @@ def api_get_clients(request):
     data = [{"id": cliente.id, "name": cliente.nombre_cliente} for cliente in clientes]
     return JsonResponse(data, safe=False)
 
+def normalize_text(value):
+    if not value:
+        return ""
+    return unicodedata.normalize('NFD', value).encode('ascii', 'ignore').decode('utf-8').strip().lower()
+
+
+def find_project_in_catalog_by_name(catalog, project_name):
+    if not catalog or not project_name:
+        return None
+
+    target = normalize_text(project_name)
+    for category in catalog.get('categories', []):
+        for subcategory in category.get('subcategories', []):
+            for project in subcategory.get('projects', []):
+                if normalize_text(project.get('projectName')) == target:
+                    return {
+                        'project': project,
+                        'categoryName': category.get('categoryName'),
+                        'subcategoryName': subcategory.get('subcategoryName'),
+                    }
+    return None
+
+
+def enrich_colaboracion_propuesta(propuestas, catalog):
+    if not isinstance(propuestas, list):
+        return []
+
+    enriched = []
+    for index, propuesta in enumerate(propuestas):
+        if isinstance(propuesta, str):
+            base = {'projectName': propuesta}
+        elif isinstance(propuesta, dict):
+            base = propuesta.copy()
+            if 'projectName' not in base and base.get('name'):
+                base['projectName'] = base['name']
+        else:
+            continue
+
+        project_name = base.get('projectName')
+        if not project_name:
+            continue
+
+        match = find_project_in_catalog_by_name(catalog, project_name)
+        if match:
+            project = match['project']
+            enriched.append({
+                'id': project.get('id'),
+                'projectName': project.get('projectName'),
+                'description': project.get('description', ''),
+                'technology': project.get('technology', ''),
+                'kpis': project.get('kpis', []),
+                'valueProposition': project.get('valueProposition', ''),
+                'salesPitch': project.get('salesPitch', ''),
+                'monthlyROI': project.get('monthlyROI', []),
+                'categoryName': match.get('categoryName', 'Otros'),
+                'subcategoryName': match.get('subcategoryName', 'Otro'),
+                'source': base.get('source', 'catalog'),
+            })
+            continue
+
+        enriched.append({
+            'id': base.get('id') or f'suggested_{index}',
+            'projectName': project_name,
+            'description': base.get('description', ''),
+            'technology': base.get('technology', ''),
+            'kpis': base.get('kpis', []),
+            'valueProposition': base.get('valueProposition', ''),
+            'salesPitch': base.get('salesPitch', ''),
+            'monthlyROI': base.get('monthlyROI', []),
+            'categoryName': base.get('categoryName', 'Otros'),
+            'subcategoryName': base.get('subcategoryName', 'Otro'),
+            'source': base.get('source', 'custom'),
+        })
+
+    return enriched
+
+
 @csrf_exempt  # Para desarrollo. En producción, el frontend debe enviar el token CSRF.
 def api_get_client_diagnostico(request, client_id):
     # if not request.user.is_authenticated or not request.user.is_staff:
     #     return JsonResponse({'error': 'No autorizado'}, status=401)
     cliente = get_object_or_404(Cliente, id=client_id)
-    return JsonResponse(cliente.diagnostico_json)
+    diagnostico = deepcopy(cliente.diagnostico_json or {})
+
+    try:
+        catalogo = ProyectoCatalog.objects.latest('version')
+        catalog_data = catalogo.datos_catalogo
+    except ProyectoCatalog.DoesNotExist:
+        catalog_data = None
+
+    propuestas = diagnostico.get('colaboracion_propuesta')
+    diagnostico['colaboracion_propuesta'] = enrich_colaboracion_propuesta(propuestas, catalog_data)
+
+    return JsonResponse(diagnostico)
 
 @csrf_exempt  # Para desarrollo. En producción, el frontend debe enviar el token CSRF.
 def api_get_client_resume(request, client_id):
@@ -194,9 +283,6 @@ def api_ai_search_projects(request):
     except Exception as e:
         logger.exception("Error al obtener proyectos desde OpenAI: %s", e)
         ai_data = {'projects': []}
-
-    def normalize_text(text):
-        return unicodedata.normalize('NFD', text or '').encode('ascii', 'ignore').decode('utf-8').strip().lower()
 
     results = []
     for idx, item in enumerate(ai_data.get('projects', [])):

@@ -317,10 +317,45 @@ function normalizeString(text) {
 
                 if (Array.isArray(clientData.colaboracion_propuesta)) {
                     clientData.colaboracion_propuesta = clientData.colaboracion_propuesta
-                        .map(item => typeof item === 'string' ? { projectName: item } : item)
-                        .filter(item => {
-                            return !!findProjectByNameAcrossAllCategories(item.projectName);
-                        });
+                        .map((item, index) => {
+                            const base = typeof item === 'string' ? { projectName: item } : { ...(item || {}) };
+                            const projectName = base.projectName || base.name;
+                            if (!projectName) {
+                                return null;
+                            }
+
+                            const match = findProjectByNameAcrossAllCategories(projectName);
+                            if (match && match.project) {
+                                return {
+                                    id: match.project.id,
+                                    projectName: match.project.projectName,
+                                    description: match.project.description || '',
+                                    technology: match.project.technology || '',
+                                    kpis: match.project.kpis || [],
+                                    valueProposition: match.project.valueProposition || '',
+                                    salesPitch: match.project.salesPitch || '',
+                                    monthlyROI: match.project.monthlyROI || [],
+                                    categoryName: match.categoryName,
+                                    subcategoryName: match.subcategoryName,
+                                    source: base.source || 'catalog'
+                                };
+                            }
+
+                            return {
+                                id: base.id || `suggested_custom_${index}`,
+                                projectName,
+                                description: base.description || '',
+                                technology: base.technology || '',
+                                kpis: base.kpis || [],
+                                valueProposition: base.valueProposition || '',
+                                salesPitch: base.salesPitch || '',
+                                monthlyROI: base.monthlyROI || [],
+                                categoryName: base.categoryName || 'Otros',
+                                subcategoryName: base.subcategoryName || 'Otro',
+                                source: base.source || 'custom'
+                            };
+                        })
+                        .filter(Boolean);
                 }
 
                 // 2. Carga el resumen explícitamente desde la API

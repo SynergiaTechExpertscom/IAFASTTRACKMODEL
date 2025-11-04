@@ -107,3 +107,84 @@ class AiSearchProjectsTests(TestCase):
         self.assertEqual(project['monthlyROI'][0]['name'], 'ROI1')
         self.assertEqual(project['monthlyROI'][0]['value'], '1000')
 
+
+class ClientDiagnosticoApiTests(TestCase):
+    def setUp(self):
+        self.catalog = {
+            'categories': [
+                {
+                    'categoryName': 'Cat',
+                    'subcategories': [
+                        {
+                            'subcategoryName': 'Sub',
+                            'projects': [
+                                {
+                                    'id': 7,
+                                    'projectName': 'Proyecto Coincidente',
+                                    'description': 'Descripción desde catálogo',
+                                    'technology': 'IA',
+                                    'kpis': [{'name': 'KPI', 'value': '10'}],
+                                    'valueProposition': 'Valor catálogo',
+                                    'salesPitch': 'Pitch catálogo',
+                                    'monthlyROI': [{'name': 'ROI', 'value': '100'}],
+                                }
+                            ],
+                        }
+                    ],
+                }
+            ]
+        }
+        ProyectoCatalog.objects.create(datos_catalogo=self.catalog, version=1)
+        self.cliente = Cliente.objects.create(
+            nombre_cliente="Cliente Discovery",
+            diagnostico_json={
+                'colaboracion_propuesta': [
+                    'Proyecto Coincidente',
+                    {
+                        'projectName': 'Proyecto Desconocido',
+                        'description': 'Generado desde discovery',
+                        'technology': 'LLM',
+                        'valueProposition': 'Valor discovery',
+                        'salesPitch': 'Pitch discovery',
+                        'kpis': [{'name': 'KPI custom', 'value': '5'}],
+                        'monthlyROI': [{'name': 'ROI custom', 'value': '50'}],
+                    },
+                ]
+            }
+        )
+
+    def test_api_enriches_colaboracion_propuesta(self):
+        url = reverse('model:api_get_client_diagnostico', args=[self.cliente.id])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        data = response.json()
+        propuestas = data.get('colaboracion_propuesta')
+        self.assertEqual(len(propuestas), 2)
+
+        matched = propuestas[0]
+        self.assertEqual(matched['projectName'], 'Proyecto Coincidente')
+        self.assertEqual(matched['id'], 7)
+        self.assertEqual(matched['categoryName'], 'Cat')
+        self.assertEqual(matched['subcategoryName'], 'Sub')
+        self.assertEqual(matched['source'], 'catalog')
+        self.assertEqual(matched['description'], 'Descripción desde catálogo')
+        self.assertEqual(matched['technology'], 'IA')
+        self.assertEqual(matched['valueProposition'], 'Valor catálogo')
+        self.assertEqual(matched['salesPitch'], 'Pitch catálogo')
+        self.assertEqual(matched['kpis'][0]['name'], 'KPI')
+        self.assertEqual(matched['monthlyROI'][0]['value'], '100')
+
+        custom = propuestas[1]
+        self.assertEqual(custom['projectName'], 'Proyecto Desconocido')
+        self.assertTrue(custom['id'].startswith('suggested_'))
+        self.assertEqual(custom['categoryName'], 'Otros')
+        self.assertEqual(custom['subcategoryName'], 'Otro')
+        self.assertEqual(custom['source'], 'custom')
+        self.assertEqual(custom['description'], 'Generado desde discovery')
+        self.assertEqual(custom['technology'], 'LLM')
+        self.assertEqual(custom['valueProposition'], 'Valor discovery')
+        self.assertEqual(custom['salesPitch'], 'Pitch discovery')
+        self.assertEqual(custom['kpis'][0]['name'], 'KPI custom')
+        self.assertEqual(custom['monthlyROI'][0]['value'], '50')
+
