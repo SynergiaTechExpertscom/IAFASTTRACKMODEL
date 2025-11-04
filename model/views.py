@@ -135,7 +135,23 @@ def api_get_client_diagnostico(request, client_id):
     # if not request.user.is_authenticated or not request.user.is_staff:
     #     return JsonResponse({'error': 'No autorizado'}, status=401)
     cliente = get_object_or_404(Cliente, id=client_id)
-    diagnostico = deepcopy(cliente.diagnostico_json or {})
+    raw_diagnostico = cliente.diagnostico_json
+    diagnostico = deepcopy(raw_diagnostico) if isinstance(raw_diagnostico, (dict, list)) else raw_diagnostico
+
+    if isinstance(diagnostico, str):
+        try:
+            diagnostico = json.loads(diagnostico)
+        except json.JSONDecodeError:
+            logger.warning("Diagnostico JSON almacenado como cadena invalida para cliente %s", cliente.id)
+            diagnostico = {}
+
+    if not isinstance(diagnostico, dict):
+        logger.warning(
+            "Diagnostico JSON con tipo inesperado (%s) para cliente %s; se usa objeto vacio",
+            type(diagnostico).__name__,
+            cliente.id,
+        )
+        diagnostico = {}
 
     try:
         catalogo = ProyectoCatalog.objects.latest('version')

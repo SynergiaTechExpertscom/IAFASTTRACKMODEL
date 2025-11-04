@@ -191,6 +191,27 @@ class ClientDiagnosticoApiTests(TestCase):
         self.assertEqual(custom['kpis'][0]['name'], 'KPI custom')
         self.assertEqual(custom['monthlyROI'][0]['value'], '50')
 
+    def test_legacy_string_diagnostico_is_normalised(self):
+        legacy_payload = json.dumps({
+            'colaboracion_propuesta': [
+                'Proyecto Coincidente',
+            ]
+        })
+        legacy_client = Cliente.objects.create(
+            nombre_cliente="Cliente Legacy",
+            diagnostico_json=legacy_payload,
+        )
+
+        url = reverse('model:api_get_client_diagnostico', args=[legacy_client.id])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        data = response.json()
+        propuestas = data.get('colaboracion_propuesta')
+        self.assertIsInstance(propuestas, list)
+        self.assertEqual(len(propuestas), 1)
+        self.assertEqual(propuestas[0]['projectName'], 'Proyecto Coincidente')
+
 
 class ProjectCatalogApiTests(TestCase):
     def test_fallback_catalog_is_served_when_database_is_empty(self):
