@@ -2,6 +2,7 @@
 import logging
 import unicodedata
 from copy import deepcopy
+from pathlib import Path
 from venv import logger
 from django.http import JsonResponse, HttpResponse
 from django.contrib.auth import authenticate, login as django_auth_login, logout as django_auth_logout
@@ -152,18 +153,47 @@ def api_get_client_resume(request, client_id):
     cliente = get_object_or_404(Cliente, id=client_id)
     return JsonResponse(cliente.resumen_json or {}, safe=False)
 
+def _load_fallback_catalog_data():
+    """Carga un catálogo de proyectos de un archivo estático si está disponible."""
+
+    fallback_locations = [
+        Path(settings.BASE_DIR) / 'static' / 'proyectos.json',
+        Path(settings.BASE_DIR) / 'model' / 'static' / 'model' / 'proyectos.json',
+    ]
+
+    for location in fallback_locations:
+        if not location.exists():
+            continue
+
+        try:
+            with location.open(encoding='utf-8') as file_pointer:
+                data = json.load(file_pointer)
+                logger.info("Catálogo de proyectos cargado desde fallback estático: %s", location)
+                return data
+        except json.JSONDecodeError as exc:
+            logger.exception("No se pudo interpretar el catálogo de fallback %s: %s", location, exc)
+            continue
+
+    return None
+
+
 @csrf_exempt  # Para desarrollo. En producción, el frontend debe enviar el token CSRF.
 def api_get_project_catalog(request):
     # if not request.user.is_authenticated or not request.user.is_staff:
     #     return JsonResponse({'error': 'No autorizado'}, status=401)
     try:
         catalogo = ProyectoCatalog.objects.latest('version')
-        return JsonResponse(
-            catalogo.datos_catalogo,
-            json_dumps_params={'ensure_ascii': False}
-        )
     except ProyectoCatalog.DoesNotExist:
+        fallback_catalog = _load_fallback_catalog_data()
+        if fallback_catalog is not None:
+            return JsonResponse(fallback_catalog, json_dumps_params={'ensure_ascii': False})
+
         return JsonResponse({'error': 'Catalogo de proyectos no encontrado'}, status=404)
+
+    return JsonResponse(
+        catalogo.datos_catalogo,
+        json_dumps_params={'ensure_ascii': False}
+    )
 
 @csrf_exempt
 def api_ai_search_projects(request):

@@ -1,0 +1,76 @@
+{
+  "version": "demo-fallback-2024-01",
+  "categories": [
+    {
+      "categoryName": "Operaciones Inteligentes",
+      "subcategories": [
+        {
+          "subcategoryName": "Automatización de Procesos",
+          "projects": [
+            {
+              "id": "ops_auto_cobranzas",
+              "projectName": "Automatización Inteligente de Cobranzas",
+              "description": "Digitaliza y prioriza la gestión de cuentas por cobrar usando agentes cognitivos para acelerar el flujo de caja.",
+              "technology": "RPA, LLM, Integración ERP",
+              "kpis": [
+                {"name": "Reducción de días de cobranza", "value": "-25%"},
+                {"name": "Tareas automatizadas", "value": "+70%"}
+              ],
+              "valueProposition": "Reduce la morosidad y libera al equipo financiero de tareas repetitivas con un asistente que gestiona recordatorios y negociaciones iniciales.",
+              "salesPitch": "Active un flujo de cobros 24/7 que conversa con sus clientes, prioriza montos críticos y registra acuerdos en su ERP sin intervención manual.",
+              "monthlyROI": [
+                {"name": "Mes 1", "value": "$5.000"},
+                {"name": "Mes 2", "value": "$8.500"},
+                {"name": "Mes 3", "value": "$12.000"}
+              ]
+            },
+            {
+              "id": "ops_auto_logistica",
+              "projectName": "Planificador Predictivo de Logística",
+              "description": "Predice la demanda y asigna rutas óptimas para disminuir tiempos de entrega y costos de transporte.",
+              "technology": "Machine Learning, Optimización, Integración IoT",
+              "kpis": [
+                {"name": "Costo de transporte", "value": "-18%"},
+                {"name": "Cumplimiento de OTIF", "value": "+12%"}
+              ],
+              "valueProposition": "Mantenga inventarios ajustados y rutas eficientes con un planificador que reacciona en minutos ante cambios en la demanda.",
+              "salesPitch": "Coordine flotas y almacenes con recomendaciones automáticas y alertas predictivas que evitan urgencias logísticas.",
+              "monthlyROI": [
+                {"name": "Mes 1", "value": "$4.000"},
+                {"name": "Mes 2", "value": "$6.300"},
+                {"name": "Mes 3", "value": "$9.750"}
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "categoryName": "Experiencia de Cliente",
+      "subcategories": [
+        {
+          "subcategoryName": "Canales Inteligentes",
+          "projects": [
+            {
+              "id": "cx_asistente_multicanal",
+              "projectName": "Asistente Multicanal con IA",
+              "description": "Resuelve preguntas frecuentes, deriva casos complejos y aprende del feedback de clientes en cada interacción.",
+              "technology": "LLM, NLP, Integraciones CRM",
+              "kpis": [
+                {"name": "Resolución en primer contacto", "value": "+35%"},
+                {"name": "Satisfacción NPS", "value": "+15 pts"}
+              ],
+              "valueProposition": "Entregue respuestas consistentes en minutos, disponible en web, WhatsApp y correo con trazabilidad completa.",
+              "salesPitch": "Mejore la experiencia de sus clientes y reduzca costos operativos con un agente que comprende el contexto y propone la mejor acción siguiente.",
+              "monthlyROI": [
+                {"name": "Mes 1", "value": "$3.500"},
+                {"name": "Mes 2", "value": "$5.200"},
+                {"name": "Mes 3", "value": "$7.800"}
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -191,6 +191,20 @@ class ClientDiagnosticoApiTests(TestCase):
         self.assertEqual(custom['monthlyROI'][0]['value'], '50')
 
 
+class ProjectCatalogApiTests(TestCase):
+    def test_fallback_catalog_is_served_when_database_is_empty(self):
+        response = self.client.get(reverse('model:api_get_project_catalog'))
+
+        self.assertEqual(response.status_code, 200)
+
+        data = response.json()
+        self.assertIn('categories', data)
+        self.assertTrue(data['categories'], 'El catálogo de fallback debe contener categorías')
+        first_category = data['categories'][0]
+        self.assertIn('subcategories', first_category)
+        self.assertTrue(first_category['subcategories'], 'El catálogo de fallback debe incluir subcategorías con proyectos')
+
+
 class SuggestedSelectionJsTests(TestCase):
     def test_suggested_projects_assign_ids_for_selection(self):
         script = textwrap.dedent(
