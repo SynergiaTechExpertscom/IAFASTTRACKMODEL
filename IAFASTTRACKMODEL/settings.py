@@ -35,8 +35,8 @@ logging.basicConfig(level=logging.INFO)
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # destino para collectstatic
 
-# Si tienes archivos estáticos personalizados, descomenta y ajusta la siguiente línea:
-# STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+# Directorios adicionales de archivos estáticos (además de los de cada app)
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

@@ -3,7 +3,6 @@ import logging
 import unicodedata
 from copy import deepcopy
 from pathlib import Path
-from venv import logger
 from django.http import JsonResponse, HttpResponse
 from django.contrib.auth import authenticate, login as django_auth_login, logout as django_auth_logout
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
@@ -12,11 +11,14 @@ from django.utils.decorators import method_decorator
 from django.template.loader import render_to_string
 import json
 import io
+from django.contrib.staticfiles import finders
 from xhtml2pdf import pisa
 from .models import Cliente, ProyectoCatalog, ClienteFile, OpenAIConfig
 import base64
 import os
 from django.conf import settings
+
+logger = logging.getLogger(__name__)
 
 @ensure_csrf_cookie  # Para que Django envíe el cookie CSRF en la primera petición GET si es necesario
 def main_app_view(request):
@@ -156,24 +158,38 @@ def api_get_client_resume(request, client_id):
 def _load_fallback_catalog_data():
     """Carga un catálogo de proyectos de un archivo estático si está disponible."""
 
-    fallback_locations = [
+    fallback_locations = []
+
+    staticfile_location = finders.find('proyectos.json')
+    if staticfile_location:
+        if isinstance(staticfile_location, (list, tuple)):
+            fallback_locations.extend(staticfile_location)
+        else:
+            fallback_locations.append(staticfile_location)
+
+    fallback_locations.extend([
         Path(settings.BASE_DIR) / 'static' / 'proyectos.json',
         Path(settings.BASE_DIR) / 'model' / 'static' / 'model' / 'proyectos.json',
-    ]
+    ])
+
+    seen_locations = set()
 
     for location in fallback_locations:
-        if not location.exists():
+        path = Path(location)
+        if path in seen_locations or not path.exists():
             continue
+        seen_locations.add(path)
 
         try:
-            with location.open(encoding='utf-8') as file_pointer:
+            with path.open(encoding='utf-8') as file_pointer:
                 data = json.load(file_pointer)
-                logger.info("Catálogo de proyectos cargado desde fallback estático: %s", location)
+                logger.info("Catálogo de proyectos cargado desde fallback estático: %s", path)
                 return data
         except json.JSONDecodeError as exc:
-            logger.exception("No se pudo interpretar el catálogo de fallback %s: %s", location, exc)
+            logger.exception("No se pudo interpretar el catálogo de fallback %s: %s", path, exc)
             continue
 
+    logger.error("No se encontró ningún catálogo de proyectos de fallback disponible")
     return None
 
 

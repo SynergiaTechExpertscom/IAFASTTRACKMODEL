@@ -7,6 +7,7 @@ from unittest.mock import MagicMock, patch
 
 from django.test import TestCase
 from django.urls import reverse
+from django.contrib.staticfiles import finders
 
 from pypdf import PdfReader
 
@@ -203,6 +204,19 @@ class ProjectCatalogApiTests(TestCase):
         first_category = data['categories'][0]
         self.assertIn('subcategories', first_category)
         self.assertTrue(first_category['subcategories'], 'El catálogo de fallback debe incluir subcategorías con proyectos')
+
+    def test_staticfiles_finder_can_locate_catalog(self):
+        catalog_path = finders.find('proyectos.json')
+        self.assertIsNotNone(catalog_path, 'El archivo proyectos.json debe estar disponible como recurso estático')
+
+        if isinstance(catalog_path, (list, tuple)):
+            catalog_path = catalog_path[0]
+
+        with open(catalog_path, encoding='utf-8') as catalog_file:
+            data = json.load(catalog_file)
+
+        self.assertIn('categories', data)
+        self.assertGreater(len(data['categories']), 0)
 
 
 class SuggestedSelectionJsTests(TestCase):
