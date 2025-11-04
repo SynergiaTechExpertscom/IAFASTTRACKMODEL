@@ -56,3 +56,16 @@ Notes and production considerations
 - Replace placeholder secrets with Kubernetes Secrets or an external secret manager.
 - Ensure STATIC_ROOT is correctly set and that a web server (nginx) serves `/staticfiles` directly for performance.
 - Use a production-ready WSGI (gunicorn is included) with proper process management and logging.
+- When deploying with MySQL, create `/root/IAFASTTRACKMODEL/mysql-conf/my.cnf` on the target host to tune buffer sizes:
+
+  ```bash
+  sudo mkdir -p /root/IAFASTTRACKMODEL/mysql-conf
+  sudo tee /root/IAFASTTRACKMODEL/mysql-conf/my.cnf >/dev/null <<'EOF'
+  [mysqld]
+  sort_buffer_size = 4M
+  join_buffer_size = 4M
+  read_rnd_buffer_size = 4M
+  tmp_table_size = 128M
+  max_heap_table_size = 128M
+  EOF
+  ```
