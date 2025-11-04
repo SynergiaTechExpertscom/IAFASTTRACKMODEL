@@ -12,6 +12,8 @@ from django.template.loader import render_to_string
 import json
 import io
 from django.contrib.staticfiles import finders
+from django.db import OperationalError
+from django.db.models import Max
 from xhtml2pdf import pisa
 from .models import Cliente, ProyectoCatalog, ClienteFile, OpenAIConfig
 import base64
@@ -53,6 +55,27 @@ def _ensure_dict_from_json(raw_value, *, default=None, context=''):
         type(raw_value).__name__,
     )
     return default if default is not None else {}
+
+
+def _fetch_latest_catalog():
+    """
+    Retrieves the latest ProyectoCatalog instance using aggregation to avoid
+    large ORDER BY operations that can overflow MySQL sort buffers.
+    """
+    try:
+        latest_version = ProyectoCatalog.objects.aggregate(version_max=Max('version'))['version_max']
+    except OperationalError as exc:
+        logger.exception("Error al calcular la versión del catálogo de proyectos: %s", exc)
+        return None
+
+    if latest_version is None:
+        return None
+
+    try:
+        return ProyectoCatalog.objects.get(version=latest_version)
+    except (ProyectoCatalog.DoesNotExist, OperationalError) as exc:
+        logger.exception("No se pudo recuperar el catálogo de proyectos v%s: %s", latest_version, exc)
+        return None
 
 
 @ensure_csrf_cookie  # Para que Django envíe el cookie CSRF en la primera petición GET si es necesario
@@ -174,13 +197,13 @@ def api_get_client_diagnostico(request, client_id):
     diagnostico = deepcopy(raw_diagnostico) if isinstance(raw_diagnostico, dict) else raw_diagnostico
     diagnostico = _ensure_dict_from_json(diagnostico, context=f'diagnostico cliente {cliente.id}')
 
-    try:
-        catalogo = ProyectoCatalog.objects.latest('version')
+    catalogo = _fetch_latest_catalog()
+    if catalogo:
         catalog_data = _ensure_dict_from_json(
             catalogo.datos_catalogo,
             context=f'catalogo proyectos v{catalogo.version}',
         )
-    except ProyectoCatalog.DoesNotExist:
+    else:
         catalog_data = None
 
     propuestas = diagnostico.get('colaboracion_propuesta')
@@ -237,18 +260,18 @@ def _load_fallback_catalog_data():
 def api_get_project_catalog(request):
     # if not request.user.is_authenticated or not request.user.is_staff:
     #     return JsonResponse({'error': 'No autorizado'}, status=401)
-    try:
-        catalogo = ProyectoCatalog.objects.latest('version')
-        datos_catalogo = _ensure_dict_from_json(
-            catalogo.datos_catalogo,
-            context=f'catalogo proyectos v{catalogo.version}',
-        )
-    except ProyectoCatalog.DoesNotExist:
+    catalogo = _fetch_latest_catalog()
+    if not catalogo:
         fallback_catalog = _load_fallback_catalog_data()
         if fallback_catalog is not None:
             return JsonResponse(fallback_catalog, json_dumps_params={'ensure_ascii': False})
 
         return JsonResponse({'error': 'Catalogo de proyectos no encontrado'}, status=404)
+
+    datos_catalogo = _ensure_dict_from_json(
+        catalogo.datos_catalogo,
+        context=f'catalogo proyectos v{catalogo.version}',
+    )
 
     return JsonResponse(
         datos_catalogo,

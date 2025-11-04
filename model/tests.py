@@ -228,6 +228,17 @@ class ClientDiagnosticoApiTests(TestCase):
         matched = propuestas[0]
         self.assertEqual(matched['id'], 7)
 
+    @patch('model.views._fetch_latest_catalog', return_value=None)
+    def test_diagnostico_handles_catalog_operational_error(self, mock_fetch):
+        url = reverse('model:api_get_client_diagnostico', args=[self.cliente.id])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        propuestas = data.get('colaboracion_propuesta')
+        self.assertEqual(len(propuestas), 2)
+        # Without catalog the entries should be treated as custom
+        self.assertTrue(all(item['source'] == 'custom' for item in propuestas))
+
 
 class ProjectCatalogApiTests(TestCase):
     def test_fallback_catalog_is_served_when_database_is_empty(self):
@@ -252,6 +263,15 @@ class ProjectCatalogApiTests(TestCase):
         data = response.json()
         self.assertIsInstance(data, dict)
         self.assertIn('categories', data)
+
+    @patch('model.views._load_fallback_catalog_data', return_value={'categories': [], 'version': 'fallback'})
+    @patch('model.views._fetch_latest_catalog', return_value=None)
+    def test_catalog_endpoint_uses_fallback_on_operational_error(self, mock_fetch, mock_fallback):
+        response = self.client.get(reverse('model:api_get_project_catalog'))
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data['version'], 'fallback')
+        mock_fallback.assert_called_once()
 
     def test_staticfiles_finder_can_locate_catalog(self):
         catalog_path = finders.find('proyectos.json')
