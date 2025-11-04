@@ -37,6 +37,12 @@ echo "📁 Recopilando archivos estáticos..."
 rm -rf /app/staticfiles/*
 python manage.py collectstatic --noinput
 
+if [ -f /app/staticfiles/model/icons ]; then
+  echo "⚠️  Corrigiendo conflicto: /app/staticfiles/model/icons era un fichero"
+  rm -f /app/staticfiles/model/icons
+  mkdir -p /app/staticfiles/model/icons
+fi
+
 echo "🔥 Iniciando Gunicorn..."
 exec gunicorn IAFASTTRACKMODEL.wsgi:application \
   --bind 0.0.0.0:8000 \
