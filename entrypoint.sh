@@ -1,49 +1,53 @@
-#!/bin/bash
-set -e
+#!/usr/bin/env bash
+set -euo pipefail
 
-echo "=============================================="
-echo "🚀 Iniciando contenedor de Django (IAFASTTRACK)"
-echo "=============================================="
+log() {
+  printf '[entrypoint] %s\n' "$*"
+}
 
-if [ "$PRODUCTION" = "true" ]; then
-  echo "Modo: Producción"
+log "Starting Django container (IAFASTTRACK)"
+
+if [ "${PRODUCTION:-false}" = "true" ]; then
+  log "Mode: production"
 else
-  echo "Modo: Desarrollo"
+  log "Mode: development"
 fi
 
-# Esperar a la base de datos MySQL usando /dev/tcp (sin nc)
-if [ -n "$DB_HOST" ]; then
-  echo "⏳ Esperando a la base de datos ($DB_HOST:${DB_PORT:-3306})..."
+# Wait for the MySQL database using /dev/tcp (no nc dependency)
+if [ -n "${DB_HOST:-}" ]; then
+  db_port="${DB_PORT:-3306}"
+  log "Waiting for database at ${DB_HOST}:${db_port}..."
   retries=0
-  until bash -c "exec 3<>/dev/tcp/$DB_HOST/${DB_PORT:-3306}" >/dev/null 2>&1; do
-    retries=$((retries+1))
-    echo "   ➜ Intento $retries..."
+  until bash -c "exec 3<>/dev/tcp/${DB_HOST}/${db_port}" >/dev/null 2>&1; do
+    retries=$((retries + 1))
     if [ $retries -gt 60 ]; then
-      echo "❌ La base de datos no respondió a tiempo" >&2
+      log "Database did not respond in time"
       exit 1
     fi
+    log "Database not ready yet (attempt ${retries})"
     sleep 2
   done
-  # Cerramos el descriptor si abrió
+  # Close the descriptor if it was opened
   exec 3>&-
-  echo "✅ Base de datos disponible."
+  log "Database connection available"
 fi
 
-echo "📦 Aplicando migraciones..."
+log "Running migrations"
 python manage.py makemigrations --noinput || true
 python manage.py migrate --noinput
 
-echo "📁 Recopilando archivos estáticos..."
+log "Collecting static files"
+mkdir -p /app/staticfiles
 rm -rf /app/staticfiles/*
 python manage.py collectstatic --noinput
 
 if [ -f /app/staticfiles/model/icons ]; then
-  echo "⚠️  Corrigiendo conflicto: /app/staticfiles/model/icons era un fichero"
+  log "Adjusting static files directory conflict at /app/staticfiles/model/icons"
   rm -f /app/staticfiles/model/icons
   mkdir -p /app/staticfiles/model/icons
 fi
 
-echo "🔥 Iniciando Gunicorn..."
+log "Starting Gunicorn"
 exec gunicorn IAFASTTRACKMODEL.wsgi:application \
   --bind 0.0.0.0:8000 \
   --workers "${GUNICORN_WORKERS:-1}" \
