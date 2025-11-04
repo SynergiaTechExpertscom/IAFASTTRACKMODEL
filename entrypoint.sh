@@ -34,6 +34,7 @@ python manage.py makemigrations --noinput || true
 python manage.py migrate --noinput
 
 echo "📁 Recopilando archivos estáticos..."
+rm -rf /app/staticfiles/*
 python manage.py collectstatic --noinput
 
 echo "🔥 Iniciando Gunicorn..."
