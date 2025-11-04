@@ -55,6 +55,7 @@ kubectl -n iafasttrack rollout status deployment/iafasttrack-web
 Notes and production considerations
 - Replace placeholder secrets with Kubernetes Secrets or an external secret manager.
 - Ensure STATIC_ROOT is correctly set and that a web server (nginx) serves `/staticfiles` directly for performance.
+- Convert SVG icons to PNGs in `model/static/model/icons/` before shipping; see `static/model/README-icons.txt`.
 - Use a production-ready WSGI (gunicorn is included) with proper process management and logging.
 - When deploying with MySQL, create `/root/IAFASTTRACKMODEL/mysql-conf/my.cnf` on the target host to tune buffer sizes:
 
