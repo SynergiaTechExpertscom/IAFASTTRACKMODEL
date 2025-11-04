@@ -122,7 +122,7 @@ if os.environ.get('PRODUCTION', '').lower() == 'true' or not DEBUG:
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
         },
-    }
+    } 
 }
     db_info = DATABASES['default']
     conn_str = f"ENGINE={db_info['ENGINE']}; NAME={db_info['NAME']}; USER={db_info['USER']}; HOST={db_info['HOST']}"
