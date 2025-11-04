@@ -291,9 +291,10 @@ def api_ai_search_projects(request):
         
         # Si el item es un diccionario, usamos directamente todos sus campos
         if isinstance(item, dict):
-            results.append({
+            project_name = item.get('projectName') or item.get('name', '')
+            candidate = {
                 'id': item.get('id', f'suggested_{idx}'),
-                'projectName': item.get('projectName') or item.get('name', ''),
+                'projectName': project_name,
                 'description': item.get('description', ''),
                 'technology': item.get('technology', ''),
                 'kpis': item.get('kpis', []),
@@ -302,7 +303,30 @@ def api_ai_search_projects(request):
                 'monthlyROI': item.get('monthlyROI', []),
                 'categoryName': item.get('categoryName', 'Otros'),
                 'subcategoryName': item.get('subcategoryName', 'Otro')
-            })
+            }
+
+            if project_name and (
+                not candidate['description']
+                or not candidate['technology']
+                or not candidate['kpis']
+                or not candidate['valueProposition']
+                or not candidate['salesPitch']
+                or not candidate['monthlyROI']
+            ):
+                match = find_project_in_catalog_by_name(catalog, project_name)
+                if match:
+                    project = match['project']
+                    candidate['id'] = candidate['id'] or project.get('id')
+                    candidate['description'] = candidate['description'] or project.get('description', '')
+                    candidate['technology'] = candidate['technology'] or project.get('technology', '')
+                    candidate['kpis'] = candidate['kpis'] or project.get('kpis', [])
+                    candidate['valueProposition'] = candidate['valueProposition'] or project.get('valueProposition', '')
+                    candidate['salesPitch'] = candidate['salesPitch'] or project.get('salesPitch', '')
+                    candidate['monthlyROI'] = candidate['monthlyROI'] or project.get('monthlyROI', [])
+                    candidate['categoryName'] = candidate['categoryName'] or match.get('categoryName', 'Otros')
+                    candidate['subcategoryName'] = candidate['subcategoryName'] or match.get('subcategoryName', 'Otro')
+
+            results.append(candidate)
             continue
             
         # Si no es un diccionario, procesamos como antes

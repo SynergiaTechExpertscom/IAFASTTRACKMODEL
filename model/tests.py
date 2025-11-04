@@ -1,6 +1,8 @@
 # encoding: iso-8859-1
 import io
 import json
+import subprocess
+import textwrap
 from unittest.mock import MagicMock, patch
 
 from django.test import TestCase
@@ -188,3 +190,55 @@ class ClientDiagnosticoApiTests(TestCase):
         self.assertEqual(custom['kpis'][0]['name'], 'KPI custom')
         self.assertEqual(custom['monthlyROI'][0]['value'], '50')
 
+
+class SuggestedSelectionJsTests(TestCase):
+    def test_suggested_projects_assign_ids_for_selection(self):
+        script = textwrap.dedent(
+            """
+            const fs = require('fs');
+            const fileContent = fs.readFileSync('model/static/model/app.js', 'utf8');
+            const match = fileContent.match(/clientData\\.colaboracion_propuesta\\.forEach\\(\\(proj, idx\\) => \\{[\\s\\S]*?\\}\\);/);
+            if (!match) {
+                throw new Error('No se encontró el bloque de sugeridos en app.js');
+            }
+
+            const clientData = {
+                colaboracion_propuesta: [
+                    { projectName: 'Proyecto sin ID', categoryName: 'Categoría Demo', subcategoryName: 'Sub Demo' }
+                ]
+            };
+            const grouped = {};
+
+            function generateSafeId(str) {
+                if (typeof str !== 'string') {
+                    return 'invalid_id_' + Math.random().toString(36).substring(2, 9);
+                }
+                return str.toLowerCase().replace(/[^a-z0-9_]/g, '_');
+            }
+
+            const runner = new Function('clientData', 'grouped', 'generateSafeId', match[0]);
+            runner(clientData, grouped, generateSafeId);
+
+            const updated = clientData.colaboracion_propuesta[0];
+            if (!updated || !updated.id) {
+                throw new Error('La sugerencia no recibió un ID persistente.');
+            }
+            const assignedId = updated.id;
+            const groupedEntry = grouped['Categoría Demo'] && grouped['Categoría Demo']['Sub Demo'];
+            if (!groupedEntry || groupedEntry[0].id !== assignedId) {
+                throw new Error('El ID asignado no se propagó al catálogo agrupado.');
+            }
+
+            console.log(JSON.stringify({ assignedId }));
+            """
+        )
+
+        result = subprocess.run(
+            ['node', '-e', script],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+
+        payload = json.loads(result.stdout.strip())
+        self.assertTrue(payload['assignedId'])
