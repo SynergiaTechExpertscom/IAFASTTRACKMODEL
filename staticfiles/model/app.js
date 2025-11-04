@@ -1147,13 +1147,31 @@ function normalizeString(text) {
                 if (clientData.colaboracion_propuesta && clientData.colaboracion_propuesta.length > 0) {
                     const grouped = {};
                     clientData.colaboracion_propuesta.forEach((proj, idx) => {
-                        const categoryName = proj.categoryName || 'Otros';
-                        const subcategoryName = proj.subcategoryName || 'Otro';
-                        const project = { ...proj };
-                        const projectUniqueId = `${generateSafeId(categoryName)}_${generateSafeId(subcategoryName)}_${generateSafeId(project.projectName)}_${idx}`;
-                        project.originalCategoryName = categoryName;
-                        project.originalSubcategoryName = subcategoryName;
-                        project.id = project.id || projectUniqueId;
+                        const categoryName = (proj && proj.categoryName) || 'Otros';
+                        const subcategoryName = (proj && proj.subcategoryName) || 'Otro';
+                        const baseProject = (proj && typeof proj === 'object')
+                            ? { ...proj }
+                            : { projectName: proj };
+                        const projectUniqueId = `${generateSafeId(categoryName)}_${generateSafeId(subcategoryName)}_${generateSafeId(baseProject.projectName)}_${idx}`;
+                        const assignedId = baseProject.id || projectUniqueId;
+                        const project = {
+                            ...baseProject,
+                            id: assignedId,
+                            originalCategoryName: categoryName,
+                            originalSubcategoryName: subcategoryName
+                        };
+                        if (proj && typeof proj === 'object') {
+                            clientData.colaboracion_propuesta[idx].id = assignedId;
+                        } else {
+                            clientData.colaboracion_propuesta[idx] = {
+                                id: assignedId,
+                                projectName: project.projectName,
+                                description: project.description || '',
+                                technology: project.technology || '',
+                                categoryName,
+                                subcategoryName
+                            };
+                        }
                         if (!grouped[categoryName]) grouped[categoryName] = {};
                         if (!grouped[categoryName][subcategoryName]) grouped[categoryName][subcategoryName] = [];
                         grouped[categoryName][subcategoryName].push(project);
